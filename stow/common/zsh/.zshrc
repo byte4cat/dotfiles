@@ -109,6 +109,9 @@ alias tc='$HOME/.config/scripts/tmux-choose-session.sh'
 alias vpn='$HOME/.config/scripts/vpn.sh'
 alias zz='yazi'
 alias ok='$HOME/.config/scripts/kitty_socket.sh'
+# kitty wallpaper
+alias bgs='$HOME/.config/scripts/kitty_set_bg.sh'
+alias bgg='$HOME/.config/scripts/kitty_remove_bg.sh'
 
 # --- 跨平台開發工具 ---
 # conda (miniforge)
