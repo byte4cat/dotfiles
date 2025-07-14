@@ -1,0 +1,34 @@
+# ==============================================================================
+# ZSH macOS 專用設定 (.zshrc-macos)
+# 這個檔案只包含 macOS 特有的環境變數和路徑設定。
+# ==============================================================================
+
+# --- 時間格式 ---
+# macOS 預設的 LC_TIME 可能不是英文，設定為英文以確保腳本相容性
+export LC_TIME=en_US.UTF-8
+
+# --- Homebrew & macOS 系統路徑 ---
+# zplug 安裝位置 (透過 Homebrew)
+export ZPLUG_HOME=/opt/homebrew/opt/zplug
+
+# tlmgr (MacTeX)
+export PATH="/Library/TeX/texbin:$PATH"
+
+# PostgreSQL libpq
+export PATH="/opt/homebrew/opt/libpq/bin:$PATH"
+
+# Java (Azul JDK on macOS)
+export JAVA_HOME=$HOME/Library/Java/JavaVirtualMachines/azul-19/Contents/Home
+# export PATH=$JAVA_HOME/bin:$PATH # 如果需要，可以取消註解
+
+# Maven (手動安裝)
+export MAVEN_HOME=$HOME/apache-maven-3.8.2
+export PATH=$PATH:$MAVEN_HOME/bin
+
+# --- 編譯修正 (針對 Homebrew 的函式庫) ---
+# Fix npm canvas install on Apple Silicon
+export LDFLAGS="-L/opt/homebrew/opt/jpeg/lib"
+export CPPFLAGS="-I/opt/homebrew/opt/jpeg/include"
+export PKG_CONFIG_PATH="/opt/homebrew/opt/jpeg/lib/pkgconfig"
+
+# echo "macOS specific settings loaded."

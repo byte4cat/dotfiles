@@ -1,0 +1,24 @@
+# ==============================================================================
+# This file is sourced by .zshrc to set and export environment variables.
+# It's the perfect place for personal settings, API keys, and paths.
+# ==============================================================================
+
+# Define the directories in a human-readable Zsh array.
+local -a wallpaper_dirs
+wallpaper_dirs=(
+    "$HOME/Documents/wallpapers/default"
+)
+
+# Convert the array into a single, colon-delimited string.
+# This is the standard Unix way to make array-like data available
+# to other processes (which can only read strings).
+local wallpaper_dir_string
+wallpaper_dir_string=$(IFS=':'; echo "${wallpaper_dirs[*]}")
+
+export WALLPAPER_DIRS="$wallpaper_dir_string"
+
+# echo "WALLPAPER_DIRS: $WALLPAPER_DIRS"
+
+unset wallpaper_dirs wallpaper_dir_string
+
+# alias ...
