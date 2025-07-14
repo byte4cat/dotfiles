@@ -27,7 +27,6 @@ if [ -n "$TMUX" ]; then
 else
     # 在非 tmux 中使用 kitty icat
     preview_cmd='kitty +kitten icat --clear --transfer-mode=memory --place 80x40@140x5 --stdin < {} > /dev/tty'
-
 fi
 
 selected_image=$(
