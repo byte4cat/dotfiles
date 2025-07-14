@@ -2,8 +2,8 @@
 
 set -euo pipefail
 
-wallpaper_dirs=(
-    "$HOME/.config/wallpapers"
+wallpaper_directories=(
+    "$HOME/.config/wallpapers/default"
 )
 
 selected_dir=$(
@@ -24,7 +24,7 @@ else
 fi
 
 selected_image=$(
-    find "$selected_dir" -mindepth 1 -maxdepth 1 -type f \
+    find "$wallpaper_directories" -mindepth 1 -maxdepth 1 -type f \
         \( -iname "*.jpg" -o -iname "*.jpeg" -o -iname "*.png" -o -iname "*.gif" -o -iname "*.bmp" \) \
         -not -name '.DS_Store' |
         fzf --preview "$preview_cmd" \
