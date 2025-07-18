@@ -51,6 +51,7 @@ zplug "zsh-users/zsh-history-substring-search", defer:2
 zplug "plugins/git", from:oh-my-zsh, defer:3
 zplug "modules/prompt", from:prezto, defer:3
 zplug "zsh-users/zsh-syntax-highlighting", defer:2
+zplug "paulirish/git-open", as:plugin
 
 # macOS 特有插件 (zplug 的 if 判斷可以讓它留在通用設定中)
 zplug "lib/clipboard", from:oh-my-zsh, defer:2, if:"[[ $OSTYPE == *darwin* ]]"
