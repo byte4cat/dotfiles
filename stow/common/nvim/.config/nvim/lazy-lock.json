@@ -44,6 +44,7 @@
   "oil.nvim": { "branch": "master", "commit": "685cdb4ffa74473d75a1b97451f8654ceeab0f4a" },
   "plenary.nvim": { "branch": "master", "commit": "857c5ac632080dba10aae49dba902ce3abf91b35" },
   "render-markdown.nvim": { "branch": "main", "commit": "b977c94b32afdcadb8e53ba33d5934d1937d4eab" },
+  "smear-cursor.nvim": { "branch": "main", "commit": "69b2d4aa715dc2ead1aa772e19bc241b561a68fa" },
   "snacks.nvim": { "branch": "main", "commit": "bc0630e43be5699bb94dadc302c0d21615421d93" },
   "tailwind-sorter.nvim": { "branch": "main", "commit": "717e5c9761ed8334dadbb9357df7d826aae97b92" },
   "tailwindcss-colorizer-cmp.nvim": { "branch": "main", "commit": "3d3cd95e4a4135c250faf83dd5ed61b8e5502b86" },
