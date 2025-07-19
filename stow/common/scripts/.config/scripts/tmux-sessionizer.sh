@@ -2,7 +2,6 @@
 
 # === Config ===
 SEARCH_DIRS=(
-    "${HOME}/Development"
     "${HOME}/Development/personal"
     "${HOME}/Development/working/backend"
     "${HOME}/Development/working/app"
