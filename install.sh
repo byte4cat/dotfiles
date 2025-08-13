@@ -2,7 +2,7 @@
 # ==============================================================================
 # Dotfiles Installation and Setup Script (Stow Version)
 #
-# Author: yimincai
+# Author: byte4cat
 # Date: 2025-07-13 15:58:48 UTC
 #
 # This script will:
@@ -44,7 +44,7 @@ error() {
 # Set the destination for the dotfiles repository.
 # It respects a user-defined $DOTFILES_DIR, otherwise defaults to $HOME/.dotfiles.
 # The `export` command makes this variable available to subsequent processes.
-export DOTFILES_DIR="${DOTFILES_DIR:-$HOME/.dotfiles}"
+export DOTFILES_DIR="$HOME/dotfiles"
 
 # 1. Bootstrap function to clone the repository
 bootstrap() {
@@ -59,7 +59,7 @@ bootstrap() {
         success "Dotfiles directory already exists at $DOTFILES_DIR."
     else
         info "Cloning dotfiles repository to $DOTFILES_DIR..."
-        git clone -q --depth=1 "https://github.com/yimincai/dotfiles.git" "$DOTFILES_DIR"
+        git clone -q --depth=1 "https://github.com/byte4cat/dotfiles.git" "$DOTFILES_DIR"
         success "Repository cloned successfully."
     fi
 
@@ -89,41 +89,38 @@ check_dependencies() {
 
 # Create Symbolic Links with Stow
 stow_dotfiles() {
-    info "Stowing dotfiles..."
-
+    info "Stowing all dotfiles packages..."
     if [ ! -d "stow" ]; then
         error "'stow' directory not found. Make sure you are in the dotfiles root."
     fi
-    cd stow # Enter stow/
 
-    # 1. Stow common packages
-    if [ -d "common" ]; then
-        info "Stowing packages from 'common' directory..."
-        cd common
-        stow -v --target="$HOME" --restow */
-        cd .. # Return to stow/
-    else
-        warn "'common' directory not found, skipping."
+    local macos_only=(yabai skhd sketchybar borders)
+    local linux_only=(fcitx5 waybar wofi hyprland tofi dunst)
+
+    local os="$(uname)"
+    for pkg in stow/*; do
+        [ -d "$pkg" ] || continue
+        pkg_name=$(basename "$pkg")
+
+        if [[ "$os" != "Darwin" ]] && [[ " ${macos_only[*]} " == *" $pkg_name "* ]]; then
+            warn "Skipping $pkg_name (macOS only)"
+            continue
+        fi
+        if [[ "$os" != "Linux" ]] && [[ " ${linux_only[*]} " == *" $pkg_name "* ]]; then
+            warn "Skipping $pkg_name (Linux only)"
+            continue
+        fi
+
+        info "Stowing package: $pkg_name"
+        stow -d stow -t "$HOME" --restow "$pkg_name"
+    done
+
+    if [ -d "private" ]; then
+        mkdir -p "$HOME/.config/private"
+        info "Stowing private configs..."
+        stow -v -d . -t "$HOME/.config/private" --restow private
     fi
 
-    # 2. Stow OS-specific packages
-    local os_dir=""
-    if [[ "$(uname)" == "Darwin" ]]; then
-        os_dir="macos"
-    elif [[ "$(uname)" == "Linux" ]]; then
-        os_dir="linux"
-    fi
-
-    if [ -n "$os_dir" ] && [ -d "$os_dir" ]; then
-        info "Detected $(uname), stowing packages from '$os_dir' directory..."
-        cd "$os_dir"
-        stow -v --target="$HOME" --restow */
-        cd .. # Return to stow/
-    else
-        info "No OS-specific package directory found for $(uname), skipping."
-    fi
-
-    cd .. # Return to project root
     success "Symbolic links created successfully."
 }
 
@@ -144,6 +141,15 @@ install_tmux_plugins() {
 # macOS Installation Flow
 install_macos() {
     info "Starting macOS installation process..."
+
+    # Ask the user if they want to proceed with the installation
+    read -rp "This script will install packages on your macOS system. Do you want
+    to continue? (y/n): " confirm
+
+    if [[ ! "$confirm" =~ ^[Yy]$ ]]; then
+        warn "Installation aborted by user."
+        exit 0
+    fi
 
     # Install Homebrew
     if ! command -v brew &>/dev/null; then
@@ -202,6 +208,15 @@ install_macos() {
 # Linux Installation Flow (Arch Linux)
 install_linux_arch() {
     info "Starting Arch Linux installation process..."
+
+    # Ask the user if they want to proceed with the installation
+    read -rp "This script will install packages on your Arch Linux system. Do you want
+    to continue? (y/n): " confirm
+
+    if [[ ! "$confirm" =~ ^[Yy]$ ]]; then
+        warn "Installation aborted by user."
+        exit 0
+    fi
 
     # --- Package Lists ---
     # Add your desired packages here
@@ -282,70 +297,6 @@ install_linux_arch() {
     warn "Please restart Fcitx5 to see input method changes."
 
     success "Arch Linux installation process completed!"
-}
-
-# Linux Installation Flow (Fedora)
-# NOTE: Not tested yet, but should work.
-install_linux_fedora() {
-    info "Starting Fedora Linux installation process..."
-
-    # --- Package Lists ---
-    # Add your desired packages here
-    local dnf_packages=(
-        "zsh" "tmux" "neovim" "git-core" "wget"
-        "fcitx5" "fcitx5-chewing" # Input Method
-        "bat" "ripgrep" "fd-find" "fzf" "jq" "htop" "btop" "tree" "nmap"
-        "golang" "unzip" "ffmpeg" "fastfetch"
-    )
-
-    # --- System Update and Repository Setup ---
-    info "Updating system packages with DNF..."
-    sudo dnf update -y
-
-    info "Enabling RPM Fusion repositories (for packages like ffmpeg)..."
-    sudo dnf install -y \
-        "https://download1.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm" \
-        "https://download1.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm"
-    success "RPM Fusion repositories enabled."
-
-    info "Setting up Docker repository..."
-    sudo dnf -y install dnf-plugins-core
-    sudo dnf config-manager --add-repo https://download.docker.com/linux/fedora/docker-ce.repo
-    success "Docker repository enabled."
-
-    # --- DNF Package Installation ---
-    info "Installing DNF packages..."
-    # Add docker-ce packages to the main list
-    dnf_packages+=("docker-ce" "docker-ce-cli" "containerd.io" "docker-buildx-plugin" "docker-compose-plugin")
-
-    for package in "${dnf_packages[@]}"; do
-        if ! dnf list --installed "$package" &>/dev/null; then
-            info "Installing (DNF): $package..."
-            sudo dnf install -y "$package"
-        else
-            warn "(DNF) $package is already installed, skipping."
-        fi
-    done
-
-    warn "Note: 'yazi' and 'hyprshot' are not in standard Fedora/RPM Fusion repos and require manual installation (e.g., via COPR or from source)."
-
-    # --- Post-installation Steps ---
-    info "Performing post-installation steps..."
-
-    # Screenshot directory
-    mkdir -p "$HOME/Screenshots"
-    success "Created screenshot directory at ~/Screenshots."
-
-    # Docker service
-    info "Enabling and starting Docker service..."
-    sudo systemctl enable --now docker.service
-    sudo usermod -aG docker "$USER"
-    warn "You need to log out and log back in for Docker permissions to take effect."
-
-    # Fcitx5 input method configuration
-    warn "Please restart Fcitx5 to see input method changes if you installed it."
-
-    success "Fedora Linux installation process completed!"
 }
 
 # --- Main Program ---
