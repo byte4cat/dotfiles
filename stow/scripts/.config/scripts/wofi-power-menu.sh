@@ -25,7 +25,6 @@ case "$selection" in
     systemctl suspend
     ;;
 "Lock")
-    # Replace with your lock program, e.g. swaylock or hyprlock
     hyprlock
     ;;
 *)
