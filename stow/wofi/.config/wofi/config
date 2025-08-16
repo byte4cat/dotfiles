@@ -1,4 +1,4 @@
 [drun]
 allow_images=true
-image_size=24
+image_size=32
 width=30%

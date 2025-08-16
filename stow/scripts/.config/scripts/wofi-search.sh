@@ -1,38 +1,5 @@
 #!/bin/bash
 
-# QUERY=$(wofi --dmenu --width 600 -L 1 -p "Search the web:")
-# if [ -n "$QUERY" ]; then
-#     xdg-open "https://www.google.com/search?q=$QUERY"
-# fi
-
-# HISTFILE="$HOME/.config/wofi/web_search_history"
-# touch "$HISTFILE"
-# QUERY=$(cat "$HISTFILE" | sort | uniq | tail -n 20 | wofi --dmenu -width 600 -lines 10 -p "Search the web:")
-# if [ -n "$QUERY" ]; then
-#     echo "$QUERY" >>"$HISTFILE"
-#     xdg-open "https://www.google.com/search?q=$QUERY"
-# fi
-
-# # 取得使用者輸入
-# QUERY=$(wofi --dmenu -p "Google Search:" -width 600 -lines 10)
-# if [[ -z "$QUERY" ]]; then
-#     exit 0
-# fi
-#
-# # 呼叫 Google Suggest API
-# SUGGESTIONS=$(curl -s "https://suggestqueries.google.com/complete/search?client=firefox&q=${QUERY}" | jq -r '.[1][]')
-#
-# # 如果有建議，顯示建議再選一次
-# if [[ -n "$SUGGESTIONS" ]]; then
-#     CHOICE=$(echo "$SUGGESTIONS" | wofi --dmenu -p "Choose suggestion:" -width 600 -lines 10)
-# else
-#     CHOICE="$QUERY"
-# fi
-#
-# if [[ -n "$CHOICE" ]]; then
-#     xdg-open "https://www.google.com/search?q=$CHOICE"
-# fi
-
 # 取得 wofi 輸入
 INPUT=$(wofi --dmenu -p "Search the web:" --width 600 --lines 10 --columns 1)
 [[ -z "$INPUT" ]] && exit 0
@@ -65,5 +32,15 @@ if [[ "$INPUT" =~ ^s\  ]]; then
     exit 0
 fi
 
+if [[ "$INPUT" =~ ^ej[[:space:]]*(.*) ]]; then
+    KEY="${BASH_REMATCH[1]}"
+    SCRIPT_PATH="$HOME/.config/scripts/wofi-emoji.sh"
+    if [[ -x "$SCRIPT_PATH" ]]; then
+        "$SCRIPT_PATH" "$KEY"
+    else
+        echo "Emoji script not found or not executable: $SCRIPT_PATH"
+    fi
+    exit 0
+fi
 # 其他情況：直接 google 搜尋
 xdg-open "https://www.google.com/search?q=${INPUT}"

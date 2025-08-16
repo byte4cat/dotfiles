@@ -12,8 +12,8 @@
     "network",
     "cpu",
     "memory",
-    "tray"
-    // "custom/lock"
+    "tray",
+    "custom/lock"
   ],
   "hyprland/workspaces": {
     "format": "{name}: {icon}",
@@ -23,7 +23,7 @@
     }
   },
   "tray": {
-    "icon-size": 21,
+    "icon-size": 20,
     "spacing": 10
   },
   "clock": {
@@ -60,13 +60,13 @@
   //   "on-click": "sh -c '(sleep 0.5s; hyprlock)' & disown",
   //   "format": ""
   // },
-    "custom/stream_status": {
-        "format": "{text}",
-        "exec": "~/.local/scripts/stream_status",
-        "interval": 5,
-        "return-type": "json",
-        "tooltip": true
-    },
+    // "custom/stream_status": {
+    //     "format": "{text}",
+    //     "exec": "~/.local/scripts/stream_status",
+    //     "interval": 5,
+    //     "return-type": "json",
+    //     "tooltip": true
+    // },
     "later": {
         "format": "<span class='icon'>{icon}</span> <span class='text'>{text}</span>"
     }
