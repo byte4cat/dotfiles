@@ -4,7 +4,7 @@
 options="🟢 Logout
 ⏻ Shutdown
 🔄 Reboot
-💤 Suspend
+💤 Sleep
 🔒 Lock
 ❌ Cancel"
 
@@ -21,7 +21,7 @@ case "$selection" in
 "Reboot")
     systemctl reboot
     ;;
-"Suspend")
+"Sleep")
     systemctl suspend
     ;;
 "Lock")

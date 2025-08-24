@@ -1,27 +1,45 @@
 window {
-  font-size: 32;
-  font-family: "Roboto Mono Medium";
-  background-color: rgba(50, 50, 50, 0.9);
-  color: white;
-  border-bottom: 3px solid white;
+  /* background-color: #171717; */
+  background: #0a0a0a;
 }
 
-#entry:selected {
-  background-color: #bbccdd;
-  background: linear-gradient(90deg, #bbccdd, #cca5dd);
+* {
+  font-family: "Jetbrains Mono";
+  color: #fff;
 }
 
-#text:selected {
-  color: #333333;
+#scroll {
+  padding: 0.5rem;
 }
 
 #input {
-  background-color: rgba(50, 50, 50, 0.5);
-  color: white;
-  padding: 0.25em;
+  /* background-color: #262626; */
+  background-color: #171717;
+  outline: none;
+  box-shadow: none;
+  border: 0;
+  border-radius: 0;
+  font-size: 1rem;
+  padding-left: 1rem;
+  padding-right: 1rem;
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
 }
 
-image {
-  margin-left: 0.25em;
-  margin-right: 0.25em;
+#inner-box {
+  margin: 0.5rem;
+  font-size: 1rem;
+}
+
+#img {
+  margin: 10px 10px;
+}
+
+#entry {
+  border-radius: 0.5rem;
+}
+
+#entry:selected {
+  background-color: #262626;
+  outline: none;
 }

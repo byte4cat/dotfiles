@@ -3,15 +3,17 @@
 # === Config ===
 SEARCH_DIRS=(
     "${HOME}/Development/personal"
+    "${HOME}/Development/side_projects"
+    "${HOME}/Development/learning"
+    "${HOME}/Development/devops"
+    "${HOME}/Development/mc"
+    "${HOME}/Development/open_source"
+    "${HOME}/Development/note"
+
     "${HOME}/Development/working/backend"
+    "${HOME}/Development/working/web"
     "${HOME}/Development/working/app"
     "${HOME}/Development/working/cli"
-    "${HOME}/Development/working/web"
-    "${HOME}/Development/working/others"
-    "${HOME}/Development/devops/itracxing"
-    "${HOME}/Development/devops/tools"
-    "${HOME}/Development/side_projects"
-    "${HOME}/Development/learning/rust"
 )
 
 SESSIONIZER_LOG="${HOME}/scripts/tmux-sessionizer.log"
