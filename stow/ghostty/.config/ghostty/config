@@ -2,7 +2,7 @@
 
 font-family = "Jetbrains Mono Nerd Font"
 
-theme = "CyberpunkScarletProtocol"
+theme = "CutiePro"
 background = 000000
 background-opacity = 0.85
 background-blur = false
