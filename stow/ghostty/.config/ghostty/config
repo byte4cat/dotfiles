@@ -24,4 +24,9 @@ keybind = "ctrl+a>ctrl+shift+s=text:ts\x0d"
 keybind = "ctrl+a>ctrl+s=text:ts\x0d"
 keybind = "ctrl+a>ctrl+f=text:tc\x0d"
 
+# remove toggle fullscreen
+keybind = "ctrl+enter=unbind"
+keybind = "shift+enter=unbind"
+
+
 
