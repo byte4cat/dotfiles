@@ -9,7 +9,7 @@ for cmd in wpctl wofi; do
     }
 done
 
-MODE=$(printf "Output\nInput" | wofi --dmenu --lines=2 --prompt="Select device type")
+MODE=$(printf "Output\nInput\nQuickFix" | wofi --dmenu --lines=4 --prompt="Select device type")
 [ -z "$MODE" ] && exit 0
 
 if [[ "$MODE" == "Output" ]]; then
@@ -18,6 +18,10 @@ if [[ "$MODE" == "Output" ]]; then
 elif [[ "$MODE" == "Input" ]]; then
     SECTION="Sources"
     PROMPT="Select Input Device"
+elif [[ "$MODE" == "QuickFix" ]]; then
+    ~/.config/scripts/restart_pipewire.sh
+    notify-send "Restarted PipeWire"
+    exit 0
 else
     exit 0
 fi

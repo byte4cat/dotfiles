@@ -8,6 +8,26 @@ if [ -f "$HOME/.config/private/zsh/.zshrc_local" ]; then
     source "$HOME/.config/private/zsh/.zshrc_local"
 fi
 
+
+# Zsh history settings
+# history file location
+HISTFILE=~/.zsh_history
+# set history size
+HISTSIZE=10000
+SAVEHIST=10000
+# ignore duplicate commands
+setopt hist_ignore_dups
+# ignore commands that start with space
+setopt hist_ignore_space
+# store multi-line commands as single history entry
+setopt extended_history
+# append to the history file, don't overwrite it
+setopt append_history
+# immediately append history changes to the history file
+setopt inc_append_history
+# share history across all sessions
+setopt share_history
+
 # --- Zsh 模式與按鍵綁定 ---
 bindkey -v # 啟用 vi 模式
 
