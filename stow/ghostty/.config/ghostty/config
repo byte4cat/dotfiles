@@ -27,6 +27,3 @@ keybind = "ctrl+a>ctrl+f=text:tc\x0d"
 # remove toggle fullscreen
 keybind = "ctrl+enter=unbind"
 keybind = "shift+enter=unbind"
-
-
-

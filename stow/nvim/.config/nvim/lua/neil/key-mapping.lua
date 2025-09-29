@@ -48,9 +48,6 @@ vim.keymap.set("n", "<leader>R", function()
 	})
 end)
 
--- Copilot
-vim.g.copilot_assume_mapped = true
-
 -- Celluar Automaton
 -- vim.keymap.set("n", "<leader>wtf", ":CellularAutomaton make_it_rain<CR>")
 -- vim.keymap.set("n", "<leader>wtff", ":CellularAutomaton game_of_life<CR>")
@@ -98,7 +95,7 @@ vim.api.nvim_set_keymap("n", "<leader>fm", ":Telescope man_pages<CR>", default_s
 -- vim.api.nvim_set_keymap("n", "<leader>aa", "<cmd>:LazyGit<cr>", default_silent_opts)
 
 -- Neogit
-vim.api.nvim_set_keymap("n", "<leader>aa", ":Neogit kind=floating<CR>", default_silent_opts)
+vim.api.nvim_set_keymap("n", "<leader>aa", ":Neogit kind=split_below<CR>", default_silent_opts)
 
 -- Gitsigns
 vim.api.nvim_set_keymap("n", "<leader>hh", ":Gitsigns preview_hunk<CR>", default_silent_opts)
