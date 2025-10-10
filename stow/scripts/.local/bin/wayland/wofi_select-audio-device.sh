@@ -19,7 +19,7 @@ elif [[ "$MODE" == "Input" ]]; then
     SECTION="Sources"
     PROMPT="Select Input Device"
 elif [[ "$MODE" == "QuickFix" ]]; then
-    ~/.config/scripts/restart_pipewire.sh
+    ~/.config/scripts/wayland/restart_pipewire.sh
     notify-send "Restarted PipeWire"
     exit 0
 else

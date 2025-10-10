@@ -2,9 +2,9 @@
 
 font-family = "Jetbrains Mono Nerd Font"
 
-theme = "CutiePro"
+theme = "Catppuccin Mocha"
 background = 000000
-background-opacity = 0.85
+background-opacity = 0.70
 background-blur = false
 font-size = 18
 

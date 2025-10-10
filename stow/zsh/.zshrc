@@ -8,6 +8,46 @@ if [ -f "$HOME/.config/private/zsh/.zshrc_local" ]; then
     source "$HOME/.config/private/zsh/.zshrc_local"
 fi
 
+# Check if the session is running under Wayland
+if [ -n "$WAYLAND_DISPLAY" ]; then
+    # --- Standard Wayland Integration ---
+    # Ensure standard libraries (GTK, Qt, Firefox) use the native Wayland backend
+    export GDK_BACKEND="wayland"
+    export QT_QPA_PLATFORM="wayland"
+    export MOZ_ENABLE_WAYLAND="1"
+
+    # --- Electron/Chromium Fixes (Vesktop) ---
+    # Tell Electron apps to use the native Wayland backend
+    export ELECTRON_OZONE_PLATFORM_HINT="wayland"
+
+    # FIX: Use this if you experience screen tearing or graphical corruption
+    # This disables GPU acceleration and forces software rendering, often necessary for Electron on Hyprland.
+    # export ELECTRON_DISABLE_GPU="false"
+
+    # FIX: Use this if you are running a Flatpak application and experience issues
+    # export FLATPAK_ENABLE_GPU_SANDBOX="0"
+
+    # --- Other Wayland Compositors (optional) ---
+    # Use this if you need to detect Hyprland specifically
+    # if [ "$XDG_CURRENT_DESKTOP" = "Hyprland" ]; then
+    #     export _JAVA_AWT_WM_NONREPARENTING="1" # Java applications fix
+    # fi
+
+fi
+
+if [ "$XDG_SESSION_TYPE" = "x11" ]; then
+    # --- X11 專用環境變量範例 ---
+
+    # 解決某些舊版 GTK 應用程式在 X11 縮放上的問題 (如果縮放係數是 2)
+    # export GDK_SCALE=2
+
+    # 針對 X11 上的 Electron 應用程式 (如果 Wayland 模式不適用，確保它使用 X11)
+    # export ELECTRON_FORCE_WAYLAND=0
+
+    # 針對某些 Java 應用程式的修復 (較舊的 X11 設置可能需要)
+    # export _JAVA_AWT_WM_NONREPARENTING=1
+
+fi
 
 # Zsh history settings
 # history file location
@@ -48,10 +88,6 @@ bindkey -M viins 'j' vi-jk-escape
 export TERM="xterm-256color"
 export EDITOR="nvim"
 export KITTY_SOCK_DIR=/tmp/kitty
-export QT_QPA_PLATFORM=wayland
-export GDK_BACKEND=wayland
-export MOZ_ENABLE_WAYLAND=1
-export ELECTRON_OZONE_PLATFORM_HINT=wayland
 
 # --- zplug 插件管理器 ---
 # 載入 zplug (路徑應在 OS 特定檔案中設定)
@@ -133,14 +169,9 @@ alias vim="nvim"
 alias fp="lsof -i"
 alias yd="youtubedr"
 alias t="tmux"
-alias ts='$HOME/.config/scripts/tmux-sessionizer.sh'
-alias tc='$HOME/.config/scripts/tmux-choose-session.sh'
-alias vpn='$HOME/.config/scripts/vpn.sh'
+alias ts='$HOME/.local/bin/tmux-sessionizer.sh'
+alias tc='$HOME/.local/bin/tmux-choose-session.sh'
 alias zz='yazi'
-alias ok='$HOME/.config/scripts/kitty_socket.sh'
-# kitty wallpaper
-alias skbg='$HOME/.config/scripts/kitty_set_bg.sh'
-alias kbgg='$HOME/.config/scripts/kitty_remove_bg.sh'
 
 # --- 跨平台開發工具 ---
 # conda (miniforge)
@@ -199,3 +230,7 @@ if ! (( $+functions[compinit] )); then
     autoload -Uz compinit
 fi
 
+
+# AsyncAPI CLI Autocomplete
+
+ASYNCAPI_AC_ZSH_SETUP_PATH=/home/neil/.cache/@asyncapi/cli/autocomplete/zsh_setup && test -f $ASYNCAPI_AC_ZSH_SETUP_PATH && source $ASYNCAPI_AC_ZSH_SETUP_PATH; # asyncapi autocomplete setup
