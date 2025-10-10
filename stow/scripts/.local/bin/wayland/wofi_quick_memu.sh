@@ -2,17 +2,19 @@
 
 set -e
 
-LOG_PATH="$HOME/.config/scripts/logs/quick_memu.log"
+SCRIPTS_DIR="$HOME/.local/bin"
+LOG_PATH="$SCRIPTS_DIR/logs/wofi_quick_memu.log"
 
 OPTIONS=(
-    "Output"
-    "Input"
+    "Audio Output"
+    "Audio Input"
     "Restart PipeWire"
     "Restart NetworkManager"
     "Restart Wifi wlan0"
 )
 
 logger() {
+    mkdir -p "$(dirname "$LOG_PATH")"
     echo "$(date): $*" >>"$LOG_PATH"
 }
 
@@ -28,16 +30,16 @@ done
 select_audio_device() {
     logger "Selected mode: $1"
     local section prompt devices selected_line selected
-    if [[ "$1" == "Output" ]]; then
+    if [[ "$1" == "Audio Output" ]]; then
         logger "Setting section to Sinks"
         section="Sinks"
-        prompt="Select Output Device"
-    elif [[ "$1" == "Input" ]]; then
+        prompt="Select Audio Output Device"
+    elif [[ "$1" == "Audio Input" ]]; then
         logger "Setting section to Sources"
         section="Sources"
-        prompt="Select Input Device"
+        prompt="Select Audio Input Device"
     else
-        notify-send "Unknown type"
+        notify-send "Unknown audio type: $1"
         exit 1
     fi
 
@@ -86,30 +88,33 @@ main() {
     logger "User selected: $selection"
 
     case "$selection" in
-    "Output" | "Input")
+    "Audio Output" | "Audio Input")
         logger "Proceeding to select $selection device"
-        select_audio_device $selection
+        select_audio_device "$selection"
+        exit 0
         ;;
     "Restart PipeWire")
         logger "Restarting PipeWire"
         notify-send "Restarting PipeWire"
-        ~/.config/scripts/restart_pipewire.sh
+        "$SCRIPTS_DIR/restart_pipewire.sh"
         exit 0
         ;;
     "Restart NetworkManager")
         logger "Restarting NetworkManager"
         notify-send "Restarting NetworkManager"
-        ~/.config/scripts/restart_nw.sh
+        "$SCRIPTS_DIR/restart_nw.sh"
         exit 0
         ;;
     "Restart Wifi wlan0")
         logger "Restarting Wifi wlan0"
         notify-send "Restarting Wifi wlan0"
-        ~/.config/scripts/restart_wifi_wlan0.sh
+        "$SCRIPTS_DIR/restart_wifi_wlan0.sh"
+        exit 0
         ;;
     *)
+        logger "Unknown option selected: $selection"
+        notify-send "Unknown Selection" "The selected option '$selection' is not yet implemented."
         exit 0
-        notify-send "Selected $1"
         ;;
     esac
 }

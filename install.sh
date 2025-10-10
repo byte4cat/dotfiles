@@ -13,7 +13,7 @@
 # Usage: Run ./install.sh from the dotfiles root directory.
 # ==============================================================================
 
-# Exit immediately if a command exits with a non-zero status.
+# Exit immediately if a command exists with a non-zero status.
 set -euo pipefail
 
 # --- Color Definitions ---
@@ -116,9 +116,9 @@ stow_dotfiles() {
     done
 
     if [ -d "private" ]; then
-        mkdir -p "$HOME/.config/private"
-        info "Stowing private configs..."
-        stow -v -d . -t "$HOME/.config/private" --restow private
+        mkdir -p "$HOME/.local/private"
+        info "Stowing private..."
+        stow -v -d . -t "$HOME/.local/private" --restow private
     fi
 
     success "Symbolic links created successfully."

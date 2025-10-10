@@ -2,7 +2,7 @@
 
 USER_NAME="neil"
 USER_HOME="/home/$USER_NAME"
-LOG_PATH="$USER_HOME/.config/scripts/logs/restart_pipewire.log"
+LOG_PATH="$HOME/.local/share/bin/logs/restart_pipewire.log"
 
 echo "Restarting PipeWire... $(date)" >>"$LOG_PATH"
 USER_ID=$(id -u "$USER_NAME")

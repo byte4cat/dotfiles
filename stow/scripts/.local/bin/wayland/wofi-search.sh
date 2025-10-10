@@ -34,7 +34,7 @@ fi
 
 if [[ "$INPUT" =~ ^ej[[:space:]]*(.*) ]]; then
     KEY="${BASH_REMATCH[1]}"
-    SCRIPT_PATH="$HOME/.config/scripts/wofi-emoji.sh"
+    SCRIPT_PATH="$HOME/.config/scripts/wayland/wofi-emoji.sh"
     if [[ -x "$SCRIPT_PATH" ]]; then
         "$SCRIPT_PATH" "$KEY"
     else

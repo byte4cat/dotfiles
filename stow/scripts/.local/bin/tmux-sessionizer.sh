@@ -16,7 +16,7 @@ SEARCH_DIRS=(
     "${HOME}/Development/working/cli"
 )
 
-SESSIONIZER_LOG="${HOME}/scripts/tmux-sessionizer.log"
+SESSIONIZER_LOG="$HOME/.local/share/bin/logs/tmux-sessionizer.log"
 
 # remove old log file
 if [[ -f "$SESSIONIZER_LOG" ]]; then

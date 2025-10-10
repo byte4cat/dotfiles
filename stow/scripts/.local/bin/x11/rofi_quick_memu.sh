@@ -1,0 +1,129 @@
+#!/usr/bin/env bash
+
+set -e
+
+SCRIPTS_DIR="$HOME/.local/bin"
+LOG_PATH="$SCRIPTS_DIR/logs/rofi_quick_memu.log"
+
+OPTIONS=(
+    "Audio Output"
+    "Audio Input"
+    "Restart PipeWire"
+    "Restart NetworkManager"
+    "Restart Wifi wlan0"
+    "System suspend"
+)
+# ----------------
+
+logger() {
+    mkdir -p "$(dirname "$LOG_PATH")"
+    echo "$(date '+%Y-%m-%d %H:%M:%S'): $*" >>"$LOG_PATH"
+}
+
+for cmd in wpctl rofi; do
+    command -v "$cmd" >/dev/null 2>&1 || {
+        echo "Missing dependency: $cmd"
+        logger "Missing dependency: $cmd"
+        notify-send "Missing dependency: $cmd"
+        exit 1
+    }
+done
+
+select_audio_device() {
+    logger "Selected mode: $1"
+    local section prompt devices selected_line selected
+    if [[ "$1" == "Audio Output" ]]; then
+        logger "Setting section to Sinks"
+        section="Sinks"
+        prompt="Select Audio Output Device (Sink)"
+    elif [[ "$1" == "Audio Input" ]]; then
+        logger "Setting section to Sources"
+        section="Sources"
+        prompt="Select Audio Input Device (Source)"
+    else
+        notify-send "Unknown audio type: $1"
+        exit 1
+    fi
+
+    devices=$(awk -v section="$section" '
+        $0 ~ "^[[:space:]]*├─ "section":" { in_section=1; next }
+        in_section && $0 ~ "^[[:space:]]*│" && $0 ~ /\[vol:/ {
+            line=$0; sub(/^[ \t]*│[ \t]*/,"",line)
+            is_default = match(line, /^\* +([0-9]+)\.\s+(.+)$/, parts)
+            if (is_default) {
+                id = parts[1]
+                name = parts[2]
+                printf "★ %s | %s\n", id, name
+            } else if (match(line, /^([0-9]+)\.\s+(.+)$/, parts)) {
+                id = parts[1]
+                name = parts[2]
+                printf "  %s | %s\n", id, name
+            }
+            next
+        }
+        in_section && $0 !~ "^[[:space:]]*│" { in_section=0 }
+    ' < <(wpctl status))
+
+    [ -z "$devices" ] && {
+        notify-send "No devices found!" "wpctl status returned no $section devices."
+        exit 1
+    }
+
+    selected_line=$(printf "%s\n" "$devices" | rofi -dmenu -p "$prompt" -i)
+    [ -z "$selected_line" ] && exit 0
+
+    selected=$(echo "$selected_line" | sed 's/^[★ ]*//' | cut -d'|' -f1 | awk '{print $1}')
+
+    logger "User selected device ID: $selected"
+
+    wpctl set-default "$selected"
+    notify-send "Audio device switched" "$1 set to: $(echo "$selected_line" | cut -d'|' -f2- | xargs)"
+}
+
+main() {
+    logger "Script started (Rofi/i3 version)"
+
+    selection=$(printf "%s\n" "${OPTIONS[@]}" | rofi -dmenu -lines "$((${#OPTIONS[@]} + 1))" -p "Quick Menu")
+    [ -z "$selection" ] && exit 0
+
+    logger "User selected: $selection"
+
+    case "$selection" in
+    "Audio Output" | "Audio Input")
+        logger "Proceeding to select $selection device"
+        select_audio_device "$selection"
+        exit 0
+        ;;
+    "Restart PipeWire")
+        logger "Restarting PipeWire"
+        notify-send "Restarting PipeWire"
+        ~/.config/scripts/restart_pipewire.sh
+        exit 0
+        ;;
+    "Restart NetworkManager")
+        logger "Restarting NetworkManager"
+        notify-send "Restarting NetworkManager"
+        ~/.config/scripts/restart_nw.sh
+        exit 0
+        ;;
+    "Restart Wifi wlan0")
+        logger "Restarting Wifi wlan0"
+        notify-send "Restarting Wifi wlan0"
+        ~/.config/scripts/restart_wifi_wlan0.sh
+        exit 0
+        ;;
+    "System suspend")
+        logger "Suspending system using systemctl"
+        notify-send "Suspending System" "System will enter sleep mode now."
+        systemctl suspend
+        exit 0
+        ;;
+    *)
+        logger "Unknown option selected: $selection"
+        notify-send "Unknown Selection" "The selected option '$selection' is not yet implemented."
+        exit 0
+        ;;
+    esac
+}
+
+main

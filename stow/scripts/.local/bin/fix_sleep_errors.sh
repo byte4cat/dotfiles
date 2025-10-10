@@ -2,7 +2,7 @@
 
 USER_NAME="neil"
 USER_HOME="/home/$USER_NAME"
-LOG_PATH="$USER_HOME/.config/scripts/logs/fix_sleep_errors.log"
+LOG_PATH="$HOME/.local/share/bin/logs/fix_sleep_errors.log"
 
 echo "Restarting NetworkManager and PipeWire after suspend... $(date)" >>"$LOG_PATH"
 systemctl restart NetworkManager
