@@ -2,7 +2,7 @@
 
 # --- 配置 ---
 SAVE_DIR="$SCREENSHOT_DIR"
-LOG_FILE="$HOME/.local/share/scripts/logs/screenshot.log"
+LOG_FILE="$HOME/.local/bin/logs/screenshot.log"
 TIMESTAMP=$(date +%Y%m%d-%H%M%S)
 # ---
 

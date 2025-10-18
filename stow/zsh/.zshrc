@@ -8,6 +8,10 @@ if [ -f "$HOME/.config/private/zsh/.zshrc_local" ]; then
     source "$HOME/.config/private/zsh/.zshrc_local"
 fi
 
+
+export ZPLUG_HOME=$HOME/.zplug
+
+
 # Check if the session is running under Wayland
 if [ -n "$WAYLAND_DISPLAY" ]; then
     # --- Standard Wayland Integration ---
