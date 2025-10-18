@@ -18,9 +18,11 @@ return {
 					"--glob",
 					"!package-lock.json", -- Ignore package-lock.json
 					"--glob",
-					"!yarn-lock", -- Ignore package-lock.json
+					"!yarn.lock", -- Ignore package-lock.json
 					"--glob",
 					"!go.sum", -- Ignore package-lock.json
+					"--glob",
+					"!**/*.pb.go", -- Ignore generated protobuf go files
 					"--glob",
 					"!**/dist/*", -- Ignore dist directory
 					"--glob",
@@ -46,13 +48,15 @@ return {
 					"dist/.*",
 					"%.git/.*",
 					"%.vim/.*",
-					"node_modules/.*",
-					"%.idea/.*",
 					"%.vscode/.*",
+					"%.idea/.*",
+					"node_modules/.*",
 					"%.history/.*",
 					"package-lock.json",
 					"yarn.lock",
-					".nuxt/.*",
+					".nuxt/.*", -- nuxt
+					".output/.*", -- nuxt3
+					"%.pb%.go", -- pb go
 				},
 				mappings = {
 					i = {
@@ -71,7 +75,8 @@ return {
 			},
 			pickers = {
 				find_files = {
-					find_command = { "rg", "--files", "--hidden", "--glob", "!.git" },
+					-- find_command = { "rg", "--files", "--hidden", "--glob", "!.git" },
+					find_command = { "rg", "--files", "--hidden", "--glob", "!**/.git/*" },
 				},
 			},
 		}),
