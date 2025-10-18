@@ -95,7 +95,7 @@ vim.api.nvim_set_keymap("n", "<leader>fm", ":Telescope man_pages<CR>", default_s
 -- vim.api.nvim_set_keymap("n", "<leader>aa", "<cmd>:LazyGit<cr>", default_silent_opts)
 
 -- Neogit
-vim.api.nvim_set_keymap("n", "<leader>aa", ":Neogit kind=split_below<CR>", default_silent_opts)
+vim.api.nvim_set_keymap("n", "<leader>aa", ":Neogit kind=tab<CR>", default_silent_opts)
 
 -- Gitsigns
 vim.api.nvim_set_keymap("n", "<leader>hh", ":Gitsigns preview_hunk<CR>", default_silent_opts)

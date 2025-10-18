@@ -11,8 +11,8 @@ return {
 					-- Conform will run multiple formatters sequentially
 					go = { "goimports", "gofmt" },
 					-- Use a sub-list to run only the first available formatter
-					javascript = { "prettierd", "prettier" },
-					typescript = { "prettierd", "prettier" },
+					-- javascript = { "prettierd", "prettier" },
+					-- typescript = { "prettierd", "prettier" },
 					proto = { "buf" },
 					-- You can use a function here to determine the formatters dynamically
 					python = { "autoflake" },
