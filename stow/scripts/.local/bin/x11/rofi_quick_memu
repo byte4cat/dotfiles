@@ -97,19 +97,19 @@ main() {
     "Restart PipeWire")
         logger "Restarting PipeWire"
         notify-send "Restarting PipeWire"
-        ~/.config/scripts/restart_pipewire.sh
+        ~/.config/scripts/restart_pipewire
         exit 0
         ;;
     "Restart NetworkManager")
         logger "Restarting NetworkManager"
         notify-send "Restarting NetworkManager"
-        ~/.config/scripts/restart_nw.sh
+        ~/.config/scripts/restart_nw
         exit 0
         ;;
     "Restart Wifi wlan0")
         logger "Restarting Wifi wlan0"
         notify-send "Restarting Wifi wlan0"
-        ~/.config/scripts/restart_wifi_wlan0.sh
+        ~/.config/scripts/restart_wifi_wlan0
         exit 0
         ;;
     "System suspend")

@@ -173,8 +173,8 @@ alias vim="nvim"
 alias fp="lsof -i"
 alias yd="youtubedr"
 alias t="tmux"
-alias ts='$HOME/.local/bin/tmux-sessionizer.sh'
-alias tc='$HOME/.local/bin/tmux-choose-session.sh'
+alias ts='$HOME/.local/bin/tmux-sessionizer'
+alias tc='$HOME/.local/bin/tmux-choose-session'
 alias zz='yazi'
 
 # --- 跨平台開發工具 ---

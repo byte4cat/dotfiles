@@ -1,9 +1,9 @@
-#!/usr/bin/env bash
+#!/bin/bash
 
 set -e
 
 SCRIPTS_DIR="$HOME/.local/bin"
-LOG_PATH="$SCRIPTS_DIR/logs/wofi_quick_memu.log"
+LOG_PATH="$SCRIPTS_DIR/logs/walker_quick_memu.log"
 
 OPTIONS=(
     "Audio Output"
@@ -18,7 +18,7 @@ logger() {
     echo "$(date): $*" >>"$LOG_PATH"
 }
 
-for cmd in wpctl wofi; do
+for cmd in wpctl walker; do
     command -v $cmd >/dev/null 2>&1 || {
         echo "Missing $cmd"
         logger "Missing dependency: $cmd"
@@ -68,7 +68,8 @@ select_audio_device() {
         exit 1
     }
 
-    selected_line=$(printf "%s\n" "$devices" | wofi --dmenu --prompt="$prompt")
+    selected_line=$(printf "%s\n" "$devices" | walker --dmenu --width 644 --minheight 300 --maxheight 300 -p "Select item…")
+
     [ -z "$selected_line" ] && exit 0
 
     selected=$(echo "$selected_line" | sed 's/^[★ ]*//' | cut -d'|' -f1 | awk '{print $1}')
@@ -82,7 +83,7 @@ select_audio_device() {
 main() {
     logger "Script started"
 
-    selection=$(printf "%s\n" "${OPTIONS[@]}" | wofi --dmenu --lines=$((${#OPTIONS[@]} + 1)) --prompt="Select device type")
+    selection=$(printf "%s\n" "${OPTIONS[@]}" | walker --dmenu --width 295 --minheight 1 --maxheight 600 -p "Select item…")
     [ -z "$selection" ] && exit 0
 
     logger "User selected: $selection"
@@ -96,19 +97,19 @@ main() {
     "Restart PipeWire")
         logger "Restarting PipeWire"
         notify-send "Restarting PipeWire"
-        "$SCRIPTS_DIR/restart_pipewire.sh"
+        "$SCRIPTS_DIR/restart_pipewire"
         exit 0
         ;;
     "Restart NetworkManager")
         logger "Restarting NetworkManager"
         notify-send "Restarting NetworkManager"
-        "$SCRIPTS_DIR/restart_nw.sh"
+        "$SCRIPTS_DIR/restart_nw"
         exit 0
         ;;
     "Restart Wifi wlan0")
         logger "Restarting Wifi wlan0"
         notify-send "Restarting Wifi wlan0"
-        "$SCRIPTS_DIR/restart_wifi_wlan0.sh"
+        "$SCRIPTS_DIR/restart_wifi_wlan0"
         exit 0
         ;;
     *)

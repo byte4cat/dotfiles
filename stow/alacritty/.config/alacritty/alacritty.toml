@@ -18,7 +18,7 @@ multiplier = 20
 [window]
 decorations = "buttonless"
 dynamic_padding = false
-opacity = 0.9
+opacity = 0.8
 startup_mode = "Maximized"
 
 [window.padding]
@@ -30,6 +30,4 @@ live_config_reload = true
 
 [keyboard]
 bindings = [
-  # `Ctrl+F` to open tmux sessionizer, not working
-  { key = "F", mods = "Control|Shift", command = { program = "alacritty", args = [ "-e", "zsh", "-ic", "~/scripts/tmux-sessionizer.sh" ] } },
 ]

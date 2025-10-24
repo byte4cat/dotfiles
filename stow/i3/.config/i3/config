@@ -104,8 +104,8 @@ bindsym $mod+Shift+f floating toggle
 bindsym $mod+c exec $browser
 bindsym $altMod+space exec $menu
 
-bindsym $mod+v exec ~/.local/bin/x11/rofi_quick_memu.sh
-bindsym $mod+Shift+e exec ~/.local/bin/x11/rofi-emoji.sh
+bindsym $mod+v exec ~/.local/bin/x11/rofi_quick_memu
+bindsym $mod+Shift+e exec ~/.local/bin/x11/rofi-emoji
 
 # 浮動視窗
 # Use Mouse+$mod to drag floating windows to their wanted position
@@ -171,22 +171,22 @@ workspace 10 output DisplayPort-1
 # 截圖 (替換 hyprshot，使用 X11 截圖工具 scrot)
 # scrot -s 選擇區域, -u 選擇視窗, -d 1 延遲 1 秒, -c 複製到剪貼簿 (需要 xclip)
 # Region screenshot
-bindsym $mod+Control+3 exec ~/.local/bin/x11/screenshot.sh region
+bindsym $mod+Control+3 exec ~/.local/bin/x11/screenshot region
 
 # Window screenshot
-bindsym $mod+Control+2 exec ~/.local/bin/x11/screenshot.sh window
+bindsym $mod+Control+2 exec ~/.local/bin/x11/screenshot window
 
 # Fullscreen screenshot
-bindsym $mod+Control+1 exec ~/.local/bin/x11/screenshot.sh window
+bindsym $mod+Control+1 exec ~/.local/bin/x11/screenshot window
 
 # Selection + Save
-bindsym $mod+Control+Shift+3 exec ~/.local/bin/x11/screenshot.sh save-region
+bindsym $mod+Control+Shift+3 exec ~/.local/bin/x11/screenshot save-region
 
 # Window + Save
-bindsym $mod+Control+Shift+2 exec ~/.local/bin/x11/screenshot.sh save-window
+bindsym $mod+Control+Shift+2 exec ~/.local/bin/x11/screenshot save-window
 
 # Fullscreen + Save
-bindsym $mod+Control+Shift+1 exec ~/.local/bin/x11/screenshot.sh save-full
+bindsym $mod+Control+Shift+1 exec ~/.local/bin/x11/screenshot save-full
 
 # 剪貼簿歷史 (替換 wl-copy/cliphist，使用 X11 剪貼簿工具)
 # 需要安裝 clipmenu
