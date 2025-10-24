@@ -26,14 +26,14 @@ return {
 			dap.configurations.go = {
 				{
 					type = "go",
-					name = "Debug project",
+					name = "Launch Server Debug",
 					request = "launch",
-					-- program to your project main file
+					-- program to your server main file
 					program = "${workspaceFolder}/cmd/main.go",
 				},
 				{
 					type = "go",
-					name = "Debug file",
+					name = "Debug",
 					request = "launch",
 					program = "${file}",
 				},
@@ -53,38 +53,25 @@ return {
 					program = "./${relativeFileDirname}",
 				},
 			}
+			dapui.setup()
 
-			dapui.setup({
-				expand_lines = true,
-				controls = { enabled = true }, -- no extra play/step buttons
-				floating = { border = "rounded" },
-				-- Set dapui window
-				render = {
-					max_type_length = 60,
-					max_value_lines = 200,
-				},
-				-- Only one layout: just the "scopes" (variables) list at the bottom
-				layouts = {
-					{
-						elements = {
-							{ id = "scopes", size = 1.0 }, -- 100% of this panel is scopes
-						},
-						size = 15, -- height in lines (adjust to taste)
-						position = "bottom", -- "left", "right", "top", "bottom"
-					},
-				},
-			})
-
-			-- open the ui as soon as we are debugging
-			dap.listeners.after.event_initialized["dapui_config"] = function()
+			dap.listeners.before.attach.dapui_config = function()
 				dapui.open()
 			end
-			dap.listeners.before.event_terminated["dapui_config"] = function()
+
+			dap.listeners.before.launch.dapui_config = function()
+				dapui.open()
+			end
+
+			dap.listeners.before.event_terminated.dapui_config = function()
 				dapui.close()
 			end
-			dap.listeners.before.event_exited["dapui_config"] = function()
+
+			dap.listeners.before.event_exited.dapui_config = function()
 				dapui.close()
 			end
+
+			vim.fn.sign_define("DapBreakpoint", { text = "🛑", texthl = "LspDiagnosticsSignError" })
 		end,
 	},
 }

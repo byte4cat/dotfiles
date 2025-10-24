@@ -129,11 +129,36 @@ vim.keymap.set("n", "<leader>u", vim.cmd.UndotreeToggle)
 
 -- DAP
 -- Debugger keymaps
-vim.api.nvim_set_keymap("n", "<leader>dt", ":lua require('dapui').open()<CR>", { noremap = true })
-vim.api.nvim_set_keymap("n", "<leader>ds", ":lua require('dapui').close()<CR>", { noremap = true })
-vim.api.nvim_set_keymap("n", "<leader>db", ":DapToggleBreakpoint<CR>", { noremap = true })
-vim.api.nvim_set_keymap("n", "<leader>dc", ":DapContinue<CR>", { noremap = true })
-vim.api.nvim_set_keymap("n", "<leader>dr", ":lua require('dapui').open({reset=true})<CR>", { noremap = true })
+-- vim.api.nvim_set_keymap("n", "<leader>dt", ":lua require('dapui').open()<CR>", { noremap = true })
+-- vim.api.nvim_set_keymap("n", "<leader>ds", ":lua require('dapui').close()<CR>", { noremap = true })
+-- vim.api.nvim_set_keymap("n", "<leader>db", ":DapToggleBreakpoint<CR>", { noremap = true })
+-- vim.api.nvim_set_keymap("n", "<leader>dc", ":DapContinue<CR>", { noremap = true })
+-- vim.api.nvim_set_keymap("n", "<leader>dr", ":lua require('dapui').open({reset=true})<CR>", { noremap = true })
+
+vim.keymap.set("n", "<leader>du", function()
+	require("dapui").toggle()
+end, { noremap = true, silent = true, desc = "Toggle DAP UI" })
+
+vim.keymap.set(
+	"n",
+	"<leader>db",
+	":DapToggleBreakpoint<CR>",
+	{ noremap = true, silent = true, desc = "Set DAP breakpoint" }
+)
+
+vim.keymap.set("n", "<leader>dc", ":DapContinue<CR>", { noremap = true, silent = true, desc = "Set DAP breakpoint" })
+
+vim.keymap.set({ "n", "v" }, "<leader>dw", function()
+	require("dapui").eval(nil, { enter = true })
+end, { noremap = true, silent = true, desc = "Add word under cursor to Watches" })
+
+vim.keymap.set({ "n", "v" }, "Q", function()
+	require("dapui").eval()
+end, {
+	noremap = true,
+	silent = true,
+	desc = "Hover/eval a single value (opens a tiny window instead of expanding the full object) ",
+})
 
 -- Harpoon
 local harpoon = require("harpoon")
