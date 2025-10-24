@@ -171,6 +171,28 @@ return {
 			vim.fn.sign_define("DiagnosticSignInfo", { text = "", texthl = "DiagnosticSignInfo" })
 			vim.fn.sign_define("DiagnosticSignHint", { text = "", texthl = "DiagnosticSignHint" })
 
+			-- dap
+			-- https://emojipedia.org/en/stickers/search?q=circle
+			vim.fn.sign_define("DapBreakpoint", {
+				text = "🛑",
+				texthl = "DapBreakpointSymbol",
+				linehl = "DapBreakpoint",
+				numhl = "DapBreakpoint",
+			})
+
+			vim.fn.sign_define("DapStopped", {
+				text = "🔴",
+				texthl = "yellow",
+				linehl = "DapBreakpoint",
+				numhl = "DapBreakpoint",
+			})
+			vim.fn.sign_define("DapBreakpointRejected", {
+				text = "⭕",
+				texthl = "DapStoppedSymbol",
+				linehl = "DapBreakpoint",
+				numhl = "DapBreakpoint",
+			})
+
 			-- setup LSP diagnostics border
 			-- see: https://neovim.io/doc/user/lsp.html#lsp-handlers
 			vim.lsp.handlers["textDocument/hover"] = vim.lsp.with(vim.lsp.handlers.hover, {

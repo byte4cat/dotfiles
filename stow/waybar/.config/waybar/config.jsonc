@@ -25,7 +25,18 @@
 
     "hyprland/workspaces": {
         "persistent-workspaces": {
+            // 涵蓋 Hyprland 配置中的所有 1-10 號常規工作區
+            // "*": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
             "*": [1, 2, 3]
+
+
+            // 啟用特殊工作區的顯示。命名必須與 Hyprland 中定義的名稱完全匹配
+            // "special:terminal": {},
+            // "special:spotify": {},
+            // "special:workmsg": {},
+            // "special:baby": {},
+            // "special:scratchpad": {}, // 預設的 scratchpad
+            // "special:unknown": {}
         }
     },
 
