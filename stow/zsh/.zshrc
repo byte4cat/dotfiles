@@ -42,13 +42,13 @@ if [ -n "$WAYLAND_DISPLAY" ]; then
 
     # My scripts locations
     export PATH="$HOME/.local/bin/wayland:$PATH"
-    export PATH="$HOME/.local/private/scripts:$PATH"
+    export PATH="$HOME/.local/private/bin:$PATH"
 fi
 
 if [ "$XDG_SESSION_TYPE" = "x11" ]; then
     # My scripts locations
     export PATH="$HOME/.local/bin/x11:$PATH"
-    export PATH="$HOME/.local/private/scripts:$PATH"
+    export PATH="$HOME/.local/private/bin:$PATH"
 
 fi
 

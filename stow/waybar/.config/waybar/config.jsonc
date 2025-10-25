@@ -117,7 +117,7 @@
         "return-type": "json",
         "max-length": 40,
         "escape": true,
-        "interval": 1,
+        "interval": 5,
         "exec": "~/.config/waybar/scripts/spotify.py",
         "exec-if": "playerctl --player spotify status",
         "tooltip": true,
