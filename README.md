@@ -3,32 +3,43 @@
 ![https://img.shields.io/static/v1?label=made%20with&message=love&color=red](https://img.shields.io/static/v1?label=made%20with&message=love&color=red)
 ![https://img.shields.io/static/v1?label=license&message=MIT&color=blue](https://img.shields.io/static/v1?label=license&message=MIT&color=blue)
 
-This repository contains my personal configuration files (dotfiles) and a powerful installation script to automate the setup of a new development machine from scratch. The script is designed to be idempotent, meaning it can be run multiple times without causing issues.
+This repository contains my personal configuration files (dotfiles) and a powerful, modular set of installation and synchronization scripts to automate the setup of a new development machine from scratch. The primary script is designed to be idempotent, meaning it can be run multiple times without causing issues.
 
 ---
 
 ## Features
 
-- **Automated Installation**: A single command sets up a complete environment.
-- **Cross-Platform Support**: Tailored setup for **macOS**, and **Arch Linux**.
-- **Clean Symlinking**: Uses `stow` to manage symbolic links cleanly, keeping the home directory tidy.
-- **Package Management**: Installs essential CLI tools, GUI applications, and Nerd Fonts via Homebrew, Pacman/yay, and DNF.
-- **Self-Contained**: The installation script automatically clones this repository to the correct location.
+- **Modular Automation**: Tasks are separated into specialized scripts (install_arch_pkgs, sync_dotfiles, sync_pkgs) and orchestrated by a single master script (install_all).
+- **Clean Symlinking**: Uses stow to manage symbolic links cleanly from the stow/ directory, keeping the home directory tidy.
+- **Declarative Package Management**: Package lists (pacman_list.txt, aur_list.txt) are managed externally in the requirements/ directory.
+- **Package Syncing**: A dedicated script (sync_pkgs) allows you to automatically update your requirements lists from the current installed system.
+- **Arch Linux Focus**: Optimized for Arch Linux and the yay AUR helper.
+- **Self-Contained**: The repository structure follows a standard bin/, lib/, requirements/ layout for high maintainability.
 
 ---
 
 ## Installation
 
-The installation is handled by a single script. You can run it directly from the terminal using `curl`.
+The complete environment setup is handled by the master script, `path_to_repo/install`.
 
-### Quick Install (Recommended)
-
-This is the simplest way to get started. It will clone the repository to the default location (`~/.dotfiles`) and begin the setup process.
-
-Just copy and paste this command into your terminal:
+### Step 1: Clone the Repository
 
 ```bash
-bash -c "$(curl -fsSL https://raw.githubusercontent.com/byte4cat/dotfiles/main/install.sh)"
+git clone https://github.com/byte4cat/dotfiles.git ~/.dotfiles
+cd ~/.dotfiles
+```
+
+
+### Step 2: Run the Master Setup Script
+
+The `install` script will guide you through the process, prompting you to install packages and deploy configurations.
+
+```bash
+# Ensure the script has execution permission (it should, but good practice)
+chmod +x ./install
+
+# Run the full setup
+./install
 ```
 
 ---
@@ -45,10 +56,18 @@ After the script finishes, a few manual steps might be required:
 
 ## Customization
 
-You can easily customize what gets installed by editing the `install.sh` script:
+### Package Lists
 
--   Open `install.sh` in your favorite editor.
--   Add or remove packages from the corresponding package list arrays (e.g., `brew_packages`, `pacman_packages`, `aur_packages`).
+The lists of packages to install are managed in separate files for simplicity:
+
+- `requirements/pacman_list.txt`: Core packages installed via `pacman`.
+- `requirements/aur_list.txt`: AUR packages installed via `yay`.
+
+To add or remove packages, simply edit these two text files.
+
+### Deployments
+
+Configuration files for deployment are located in the `stow` directory. Each subdirectory here is treated as a separate package by the deployment script.
 
 ---
 
