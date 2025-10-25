@@ -8,9 +8,12 @@ if [ -f "$HOME/.config/private/zsh/.zshrc_local" ]; then
     source "$HOME/.config/private/zsh/.zshrc_local"
 fi
 
-
+# --- 基本環境變數 ---
 export ZPLUG_HOME=$HOME/.zplug
-
+export TERM="xterm-256color"
+export EDITOR="nvim"
+export KITTY_SOCK_DIR=/tmp/kitty
+export PATH="$HOME/.local/bin:$PATH"
 
 # Check if the session is running under Wayland
 if [ -n "$WAYLAND_DISPLAY" ]; then
@@ -37,19 +40,15 @@ if [ -n "$WAYLAND_DISPLAY" ]; then
     #     export _JAVA_AWT_WM_NONREPARENTING="1" # Java applications fix
     # fi
 
+    # My scripts locations
+    export PATH="$HOME/.local/bin/wayland:$PATH"
+    export PATH="$HOME/.local/private/scripts:$PATH"
 fi
 
 if [ "$XDG_SESSION_TYPE" = "x11" ]; then
-    # --- X11 專用環境變量範例 ---
-
-    # 解決某些舊版 GTK 應用程式在 X11 縮放上的問題 (如果縮放係數是 2)
-    # export GDK_SCALE=2
-
-    # 針對 X11 上的 Electron 應用程式 (如果 Wayland 模式不適用，確保它使用 X11)
-    # export ELECTRON_FORCE_WAYLAND=0
-
-    # 針對某些 Java 應用程式的修復 (較舊的 X11 設置可能需要)
-    # export _JAVA_AWT_WM_NONREPARENTING=1
+    # My scripts locations
+    export PATH="$HOME/.local/bin/x11:$PATH"
+    export PATH="$HOME/.local/private/scripts:$PATH"
 
 fi
 
@@ -88,10 +87,6 @@ function vi-jk-escape() {
 zle -N vi-jk-escape
 bindkey -M viins 'j' vi-jk-escape
 
-# --- 基本環境變數 ---
-export TERM="xterm-256color"
-export EDITOR="nvim"
-export KITTY_SOCK_DIR=/tmp/kitty
 
 # --- zplug 插件管理器 ---
 # 載入 zplug (路徑應在 OS 特定檔案中設定)
@@ -172,7 +167,6 @@ alias k="kubectl"
 alias vim="nvim"
 alias fp="lsof -i"
 alias yd="youtubedr"
-alias t="tmux"
 alias ts='$HOME/.local/bin/tmux-sessionizer'
 alias tc='$HOME/.local/bin/tmux-choose-session'
 alias zz='yazi'
