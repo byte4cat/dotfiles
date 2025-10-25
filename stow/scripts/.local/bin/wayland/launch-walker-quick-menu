@@ -68,7 +68,7 @@ select_audio_device() {
         exit 1
     }
 
-    selected_line=$(printf "%s\n" "$devices" | walker --dmenu --width 644 --minheight 300 --maxheight 300 -p "Select item…")
+    selected_line=$(printf "%s\n" "$devices" | walker --dmenu --width 644 --minheight 1 --maxheight 300 -p "Select item…")
 
     [ -z "$selected_line" ] && exit 0
 
@@ -83,7 +83,7 @@ select_audio_device() {
 main() {
     logger "Script started"
 
-    selection=$(printf "%s\n" "${OPTIONS[@]}" | walker --dmenu --width 295 --minheight 1 --maxheight 600 -p "Select item…")
+    selection=$(printf "%s\n" "${OPTIONS[@]}" | walker --dmenu --width 644 --minheight 1 --maxheight 300 -p "Select item…")
     [ -z "$selection" ] && exit 0
 
     logger "User selected: $selection"

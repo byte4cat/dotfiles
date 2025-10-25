@@ -1,0 +1,40 @@
+#!/usr/bin/env bash
+
+OPTIONS=(
+    "🟢 Logout"
+    "⏻ Shutdown"
+    "🔄 Reboot"
+    "💤 Sleep"
+    "🔒 Lock"
+    "❌ Cancel"
+)
+
+selection=$(printf "%s\n" "${OPTIONS[@]}" | walker --dmenu --width 644 --minheight 1 --maxheight 300 -p "Select option…")
+
+if [[ -z "$selection" ]]; then
+    exit 0
+fi
+
+case "$selection" in
+"🟢 Logout")
+    hyprctl dispatch exit
+    ;;
+"⏻ Shutdown")
+    systemctl poweroff --no-wall
+    ;;
+"🔄 Reboot")
+    systemctl reboot --no-wall
+    ;;
+"💤 Sleep")
+    systemctl suspend
+    ;;
+"🔒 Lock")
+    hyprlock
+    ;;
+"❌ Cancel")
+    exit 0
+    ;;
+*)
+    exit 0
+    ;;
+esac
