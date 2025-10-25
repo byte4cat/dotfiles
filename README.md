@@ -9,12 +9,12 @@ This repository contains my personal configuration files (dotfiles) and a powerf
 
 ## Features
 
-- **Modular Automation**: Tasks are separated into specialized scripts (install_arch_pkgs, sync_dotfiles, sync_pkgs) and orchestrated by a single master script (install_all).
-- **Clean Symlinking**: Uses stow to manage symbolic links cleanly from the stow/ directory, keeping the home directory tidy.
-- **Declarative Package Management**: Package lists (pacman_list.txt, aur_list.txt) are managed externally in the requirements/ directory.
-- **Package Syncing**: A dedicated script (sync_pkgs) allows you to automatically update your requirements lists from the current installed system.
-- **Arch Linux Focus**: Optimized for Arch Linux and the yay AUR helper.
-- **Self-Contained**: The repository structure follows a standard bin/, lib/, requirements/ layout for high maintainability.
+- **Modular Automation**: Tasks are separated into specialized scripts (`install_arch_pkgs`, `sync_dotfiles`, `sync_pkgs`) and orchestrated by a single master script (`install`).
+- **Clean Symlinking**: Uses `stow` to manage symbolic links cleanly from the `stow/` directory, keeping the home directory tidy.
+- **Declarative Package Management**: Package lists (`pacman_list.txt`, `aur_list.txt`) are managed externally in the `requirements/` directory.
+- **Package Syncing**: A dedicated script (`sync_pkgs`) allows you to automatically update your requirements lists from the current installed system.
+- **Arch Linux Focus**: Optimized for Arch Linux and the `yay` AUR helper.
+- **Self-Contained**: The repository structure follows a standard `bin/`, `lib/`, `requirements/` layout for high maintainability.
 
 ---
 
@@ -67,7 +67,7 @@ To add or remove packages, simply edit these two text files.
 
 ### Deployments
 
-Configuration files for deployment are located in the `stow` directory. Each subdirectory here is treated as a separate package by the deployment script.
+Configuration files for deployment are located in the `stow/` directory. Each subdirectory here is treated as a separate package by the deployment script.
 
 ---
 
