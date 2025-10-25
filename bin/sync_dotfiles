@@ -1,0 +1,44 @@
+#!/bin/bash
+
+# ==============================================================================
+# Stow Dotfiles Deployment Script
+# ==============================================================================
+set -euo pipefail
+
+# use BASH_SOURCE to get the script actual path
+# SCRIPT_DIR will be: ~/dotfiles/bin
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+# root path (e.g., ~/dotfiles)
+DOTFILES_DIR="$(dirname "$SCRIPT_DIR")"
+
+source "$DOTFILES_DIR/lib/common"
+
+cd_or_error "$DOTFILES_DIR"
+
+stow_dotfiles() {
+    info "Stowing dotfiles from: $DOTFILES_DIR"
+    [ -d "stow" ] || error "'stow' directory not found."
+
+    for pkg in stow/*; do
+        [ -d "$pkg" ] || continue
+        pkg_name=$(basename "$pkg")
+        info "Stowing package: $pkg_name"
+        stow -d stow -t "$HOME" --restow "$pkg_name"
+    done
+
+    if [ -d "private" ]; then
+        mkdir -p "$HOME/.local/private"
+        info "Stowing private package..."
+        stow -v -d . -t "$HOME/.local/private" --restow private
+    fi
+    success "✅ All dotfiles stowed successfully."
+}
+
+main() {
+    check_command git stow
+    stow_dotfiles
+    success "🎉 Dotfiles deployment completed!"
+}
+
+main "$@"
