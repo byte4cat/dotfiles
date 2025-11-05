@@ -6,11 +6,11 @@
         "hyprland/workspaces"
     ],
     "modules-center": [
-        "hyprland/window"
+        // "hyprland/window",
+        "custom/spotify"
     ],
     "modules-right": [
         "tray",
-        "custom/spotify",
         "cpu",
         "memory",
         "network",
@@ -115,7 +115,7 @@
     "custom/spotify": {
         "format": "{}",
         "return-type": "json",
-        "max-length": 40,
+        "min-length": 40,
         "escape": true,
         "interval": 5,
         "exec": "~/.config/waybar/scripts/spotify.py",
