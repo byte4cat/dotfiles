@@ -76,8 +76,24 @@ select_audio_device() {
 
     logger "User selected device ID: $selected"
 
+    local assets="$HOME/.local/share/byte4work/assets/"
+    local icon
+    local mic="$assets/mic.png"
+    local speaker="$assets/speaker.png"
+    local headsets="$assets/headsets.png"
+
+    if [[ "$section" == "Sinks" ]]; then
+        icon="$speaker"
+    else
+        icon="$mic"
+    fi
+
+    if [[ "$section" == "Sinks" ]] && ([[ "$selected_line" == *"headset"* ]] || [[ "$selected_line" == *"Headset"* ]]); then
+        icon="$headsets"
+    fi
+
     wpctl set-default "$selected"
-    notify-send "Audio device switched" "$1 set to: $(echo "$selected_line" | cut -d'|' -f2- | xargs)"
+    notify-send -i "$icon" "Audio device switched" "$1 set to: $(echo "$selected_line" | cut -d'|' -f2- | xargs)"
 }
 
 main() {

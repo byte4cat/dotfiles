@@ -1,8 +1,13 @@
 #!/usr/bin/env bash
 
-session=$(tmux list-sessions -F "#{session_name}" | fzf)
+session_list=$(tmux list-sessions -F "#{session_name}" 2>/dev/null)
 
-selected=$session
+if [[ -z "$session_list" ]]; then
+    echo "No existing tmux sessions found. Exiting."
+    exit 0
+fi
+
+selected=$(echo "$session_list" | fzf)
 
 if [[ -z $selected ]]; then
     exit 0
