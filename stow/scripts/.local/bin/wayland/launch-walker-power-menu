@@ -2,9 +2,10 @@
 
 OPTIONS=(
     "🟢 Logout"
-    "⏻ Shutdown"
+    "☯ Shutdown"
     "🔄 Reboot"
-    "💤 Sleep"
+    # "💤 Sleep"
+    # "🛌🏻 Hibernate"
     "🔒 Lock"
     "❌ Cancel"
 )
@@ -25,9 +26,12 @@ case "$selection" in
 "🔄 Reboot")
     systemctl reboot --no-wall
     ;;
-"💤 Sleep")
-    systemctl suspend
-    ;;
+# "🛌🏻 Hibernate")
+#     systemctl hibernate
+#     ;;
+# "💤 Sleep")
+#     systemctl suspend
+#     ;;
 "🔒 Lock")
     hyprlock
     ;;
