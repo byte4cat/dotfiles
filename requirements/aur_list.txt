@@ -17,7 +17,6 @@ elephant-desktopapplications-bin
 elephant-files-bin
 elephant-menus-bin
 elephant-providerlist-bin
-elephant-runner-bin
 elephant-symbols-bin
 elephant-todo-bin
 elephant-unicode-bin
@@ -40,6 +39,8 @@ phonon-qt6-mpv-debug
 postman-bin
 python-gbinder
 python-gbinder-debug
+python-imageio-ffmpeg
+python-screeninfo
 qimgv-git
 qimgv-git-debug
 redisinsight-bin
@@ -53,6 +54,7 @@ vesktop-bin
 walker-bin
 walker-bin-debug
 waydroid
+waypaper
 winboat-bin
 wlogout
 wlogout-debug

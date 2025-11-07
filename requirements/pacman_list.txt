@@ -49,7 +49,6 @@ elephant-calc-bin
 elephant-clipboard-bin
 elephant-desktopapplications-bin
 elephant-menus-bin
-elephant-runner-bin
 elephant-symbols-bin
 elephant-todo-bin
 elephant-unicode-bin
@@ -227,6 +226,7 @@ sushi
 swaync
 swayosd-git
 swell-foop
+swww
 sysprof
 task
 tcpdump
@@ -261,6 +261,7 @@ vulkan-tools
 walker-bin
 waybar
 waydroid
+waypaper
 wget
 winboat-bin
 wireplumber
