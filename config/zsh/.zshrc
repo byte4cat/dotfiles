@@ -171,8 +171,8 @@ alias k="kubectl"
 alias vim="nvim"
 alias fp="lsof -i"
 alias yd="youtubedr"
-alias ts='byte4cat-tmux-sessionizer'
-alias tc='byte4cat-tmux-choose-session'
+alias ts='byte4work-tmux-sessionizer'
+alias tc='byte4work-tmux-choose-session'
 alias zz='yazi'
 
 # --- Cross-Platform Development Tools ---

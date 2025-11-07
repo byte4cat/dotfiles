@@ -113,19 +113,19 @@ main() {
     "Restart PipeWire")
         logger "Restarting PipeWire"
         notify-send "Restarting PipeWire"
-        "$SCRIPTS_DIR/restart_pipewire"
+        "$SCRIPTS_DIR/byte4work-restart-pipewire"
         exit 0
         ;;
     "Restart NetworkManager")
         logger "Restarting NetworkManager"
         notify-send "Restarting NetworkManager"
-        "$SCRIPTS_DIR/restart_nw"
+        "$SCRIPTS_DIR/byte4work-restart-network-manager"
         exit 0
         ;;
     "Restart Wifi wlan0")
         logger "Restarting Wifi wlan0"
         notify-send "Restarting Wifi wlan0"
-        "$SCRIPTS_DIR/restart_wifi_wlan0"
+        "$SCRIPTS_DIR/byte4work-restart-wifi-wlan0"
         exit 0
         ;;
     *)
