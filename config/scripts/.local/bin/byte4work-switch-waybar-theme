@@ -1,34 +1,21 @@
 #!/bin/bash
 
-# PRESET=$1 # theme name
-#
-# # delete old symbol link
-# rm -f ~/.config/waybar/config.jsonc
-# rm -f ~/.config/waybar/style.css
-#
-# # create new symbol link
-# ln -s ~/.config/waybar/modules/config-$PRESET.jsonc ~/.config/waybar/config.jsonc
-# ln -s ~/.config/waybar/styles/style-$PRESET.css ~/.config/waybar/style.css
-#
-# # restart Waybar
-# killall waybar
-# waybar &
-
-#!/bin/bash
-
 # --- 1. Define Paths ---
 WAYBAR_CONFIG_DIR="$HOME/.config/waybar"
 CONFIG_DIR="$WAYBAR_CONFIG_DIR/modules"
 STYLE_DIR="$WAYBAR_CONFIG_DIR/styles"
 
 # --- 2. Discover Available Preset Names ---
-# Finds all config-*.jsonc files and extracts the PRESET name.
-AVAILABLE_PRESETS=$(find "$CONFIG_DIR" -maxdepth 1 -name "config-*.jsonc" -exec basename {} \; |
-    sed -e 's/config-//' -e 's/.jsonc//' | sort)
+# Finds all *.jsonc files and extracts the PRESET name.
+AVAILABLE_PRESETS=$(
+    find "$CONFIG_DIR" -maxdepth 1 -name "*.jsonc" -exec basename {} \; |
+        sed -E -e 's/^config-//' -e 's/\.jsonc$//' |
+        sort
+)
 
 # Error handling: Check if any presets were found
 if [ -z "$AVAILABLE_PRESETS" ]; then
-    echo "Error: No Waybar presets (config-*.jsonc) found in $CONFIG_DIR." >&2
+    echo "Error: No Waybar presets (*.jsonc) found in $CONFIG_DIR." >&2
     exit 1
 fi
 
@@ -41,10 +28,6 @@ PRESET=$(printf "%s\n" "$AVAILABLE_PRESETS" |
 # Check if the user made a selection (exit if canceled or empty)
 [ -z "$PRESET" ] && exit 0
 
-# Since AVAILABLE_PRESETS already contains only the clean names (e.g., 'laptop', 'external'),
-# we don't need complex sed/awk processing like in your example.
-# The variable $PRESET now holds the selected preset name (e.g., 'laptop').
-
 # --- 4. Symlink Switching Logic ---
 
 # Delete old symlinks
@@ -52,8 +35,8 @@ rm -f "$WAYBAR_CONFIG_DIR/config.jsonc"
 rm -f "$WAYBAR_CONFIG_DIR/style.css"
 
 # Create new symlinks
-ln -s "$CONFIG_DIR/config-$PRESET.jsonc" "$WAYBAR_CONFIG_DIR/config.jsonc"
-ln -s "$STYLE_DIR/style-$PRESET.css" "$WAYBAR_CONFIG_DIR/style.css"
+ln -s "$CONFIG_DIR/$PRESET.jsonc" "$WAYBAR_CONFIG_DIR/config.jsonc"
+ln -s "$STYLE_DIR/$PRESET.css" "$WAYBAR_CONFIG_DIR/style.css"
 
 # --- 5. Restart Waybar ---
 echo "Switching to preset: $PRESET"
