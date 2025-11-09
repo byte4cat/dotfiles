@@ -1,0 +1,48 @@
+#!/usr/bin/env bash
+
+# 腳本名稱: ~/.config/rofi/wifi/wifinew.sh (掃描/連線新網路)
+
+# 設定 Walker/dmenu 模式的外觀參數
+WALKER_OPTIONS="--dmenu -p"
+
+# 1. 獲取並整理 Wi-Fi 網路列表 (SSID, 頻道, 訊號)
+WIFI_ICON=$HOME/.local/share/byte4work/assets/wifi.png
+WIFI_RAW=$(nmcli -t -f SSID,CHAN,SIGNAL device wifi list | sed '1d')
+
+# 檢查列表是否為空
+[ -z "$WIFI_RAW" ] && notify-send -i "$WIFI_ICON" "🚫 No WiFi Networks Found" && exit 1
+
+# 2. 格式化列表並標示頻率 (SSID [頻率] (訊號))
+WIFI_FORMATTED=$(echo -e "$WIFI_RAW" | while IFS=: read -r SSID CHAN SIGNAL; do
+    if [ -z "$SSID" ]; then
+        continue # 略過隱藏網路
+    fi
+
+    if [ "$CHAN" -gt 14 ]; then
+        FREQ_TAG="[5G]"
+    else
+        FREQ_TAG="[2.4G]"
+    fi
+
+    printf "%-30s %s (%s)\n" "$SSID" "$FREQ_TAG" "$SIGNAL"
+done | sort -r)
+
+# 3. 使用 Walker 顯示選單
+chosen_line=$(echo -e "$WIFI_FORMATTED" | walker $WALKER_OPTIONS "Scan & Connect")
+
+# 4. 提取選中的 SSID
+[ -z "$chosen_line" ] && exit 0
+SSID=$(echo "$chosen_line" | sed -E 's/(\[|\().*//' | xargs)
+
+# --- 5. 連線（依賴 PolicyKit 代理進行身份驗證） ---
+
+notify-send -i "$WIFI_ICON" "📶 Connecting to $SSID..."
+
+# 如果需要密碼，PolicyKit 代理會彈出密碼提示框。
+nmcli device wifi connect "$SSID"
+
+if [ $? -eq 0 ]; then
+    notify-send -i "$WIFI_ICON" "✅ Connection Successful" "Connected to $SSID."
+else
+    notify-send -i "$WIFI_ICON" "❌ Connection Failed" "Could not connect to $SSID. (PolicyKit Agent required for new networks)"
+fi

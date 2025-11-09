@@ -8,6 +8,7 @@ LOG_PATH="$SCRIPTS_DIR/logs/walker_quick_memu.log"
 OPTIONS=(
     "Audio Output"
     "Audio Input"
+    "Toggle VPN"
     "Restart PipeWire"
     "Restart NetworkManager"
     "Restart Wifi wlan0"
@@ -27,7 +28,73 @@ for cmd in wpctl walker; do
     }
 done
 
+# --- 函數一：自動獲取所有 VPN 連線名稱 ---
+get_vpn_connections() {
+    # 獲取所有已配置的 VPN 名稱
+    nmcli -t -f NAME,TYPE con show 2>/dev/null |
+        grep -E ':(vpn|openvpn|wireguard|pptp|l2tp|vpnc|fortisslvpn|ipsec)$' |
+        cut -d: -f1
+}
+
+# --- 函數二 (新增)：格式化 VPN 選項並加入狀態標記 ---
+format_vpn_options() {
+    # 獲取所有活躍的連線名稱，方便後續檢查
+    local active_connections=$(nmcli -t -f NAME con show --active 2>/dev/null)
+
+    # 獲取所有 VPN 連線名稱
+    mapfile -t vpn_list < <(get_vpn_connections)
+
+    local output=""
+    local status_icon=""
+
+    for vpn_name in "${vpn_list[@]}"; do
+        # 檢查當前 VPN 名稱是否在活躍連線列表中
+        if echo "$active_connections" | grep -q "^$vpn_name$"; then
+            # 活躍，使用綠色圓點
+            status_icon="🟢"
+        else
+            # 非活躍，使用紅色圓點
+            status_icon="🔴"
+        fi
+
+        # 建立格式化的字串，中間使用 Tab 讓狀態和名稱對齊
+        output+="$status_icon\t$vpn_name\n"
+    done
+
+    # 輸出所有格式化後的選項
+    echo -e "$output"
+}
+
+# --- 通用 VPN 切換函數 ---
+toggle_vpn() {
+    local vpn_name="$1"
+    logger "Toggling VPN: $vpn_name"
+
+    # 檢查 VPN 連線是否處於活躍狀態 (Active)
+    if nmcli con show --active | grep -q "^$vpn_name[[:space:]]"; then
+        # 狀態為活躍 (Active)，執行斷開連線
+        logger "VPN $vpn_name is active. Deactivating..."
+        notify-send "VPN: Disconnecting" "Deactivating $vpn_name..."
+        if nmcli con down "$vpn_name"; then
+            notify-send "VPN: Disconnected 📴" "$vpn_name is now disconnected."
+        else
+            notify-send "VPN Error" "Failed to disconnect $vpn_name."
+        fi
+    else
+        # 狀態為非活躍 (Inactive)，執行連接
+        logger "VPN $vpn_name is inactive. Activating..."
+        notify-send "VPN: Connecting..." "Activating $vpn_name..."
+        if nmcli con up "$vpn_name" | grep -q "successfully activated"; then
+            notify-send "VPN: Connected 🔒" "$vpn_name successfully connected."
+        else
+            notify-send "VPN Error ❌" "Failed to connect to $vpn_name. Check configuration/logs."
+        fi
+    fi
+}
+# --------------------
+
 select_audio_device() {
+    # ... (此函數內容保持不變，略過以簡化呈現)
     logger "Selected mode: $1"
     local section prompt devices selected_line selected
     if [[ "$1" == "Audio Output" ]]; then
@@ -112,22 +179,53 @@ main() {
         ;;
     "Restart PipeWire")
         logger "Restarting PipeWire"
-        notify-send "Restarting PipeWire"
         "$SCRIPTS_DIR/byte4work-restart-pipewire"
+        notify-send "PipeWire Restarted"
         exit 0
         ;;
     "Restart NetworkManager")
         logger "Restarting NetworkManager"
         notify-send "Restarting NetworkManager"
         "$SCRIPTS_DIR/byte4work-restart-network-manager"
+        notify-send "NetworkManager Restarted"
         exit 0
         ;;
     "Restart Wifi wlan0")
         logger "Restarting Wifi wlan0"
-        notify-send "Restarting Wifi wlan0"
         "$SCRIPTS_DIR/byte4work-restart-wifi-wlan0"
+        notify-send "Wifi wlan0 Restarted"
         exit 0
         ;;
+
+    # --- 處理 VPN 子選單 (自動獲取選項並帶有狀態) ---
+    "Toggle VPN")
+        logger "User chose Toggle VPN. Getting list of VPN connections with status."
+
+        # 呼叫新的格式化函數來獲取帶有狀態標記的選項
+        local vpn_options_formatted=$(format_vpn_options)
+
+        if [ -z "$vpn_options_formatted" ]; then
+            logger "No VPN connections found."
+            notify-send "VPN Error" "No configured VPN connections found."
+            exit 0
+        fi
+
+        # 顯示子選單並獲取選定的 **完整行**
+        local selected_line=$(echo -e "$vpn_options_formatted" | walker --dmenu --width 644 --minheight 1 --maxheight 300 -p "Select VPN to toggle…")
+
+        [ -z "$selected_line" ] && {
+            logger "VPN submenu cancelled."
+            exit 0
+        }
+
+        # 從選定的行中，移除開頭的圓點和 Tab，只提取 VPN 名稱
+        local selected_vpn=$(echo "$selected_line" | awk -F'\t' '{print $2}')
+
+        # 呼叫通用的切換函數
+        toggle_vpn "$selected_vpn"
+        exit 0
+        ;;
+    # ----------------------------------------
     *)
         logger "Unknown option selected: $selection"
         notify-send "Unknown Selection" "The selected option '$selection' is not yet implemented."

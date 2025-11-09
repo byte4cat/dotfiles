@@ -1,0 +1,29 @@
+#!/usr/bin/env bash
+
+# 1. 獲取已儲存的 Wi-Fi 連線名稱 (SSID)
+# 修正：使用 'name' 欄位，並篩選出 TYPE 為 'wifi' 的連線。
+WIFI_ICON=$HOME/.local/share/byte4work/assets/wifi.png
+WIFI_PROFILES=$(nmcli -t -f NAME,TYPE connection show | grep 'wireless' | cut -d: -f1)
+
+# 檢查是否有儲存的連線
+[ -z "$WIFI_PROFILES" ] && notify-send -i "$WIFI_ICON" "ℹ️ No Saved Wi-Fi Connections" && exit 0
+
+# 2. 使用 Walker 顯示選單
+WALKER_OPTIONS="--dmenu -p"
+
+chosen_profile=$(echo -e "$WIFI_PROFILES" | walker $WALKER_OPTIONS "Choose Saved Connection")
+
+# 3. 檢查使用者是否取消
+[ -z "$chosen_profile" ] && exit 0
+
+# 4. 嘗試連線
+notify-send -i "$WIFI_ICON" "🔄 Activating $chosen_profile..."
+
+# 使用 nmcli up 啟用連線
+nmcli connection up "$chosen_profile"
+
+if [ $? -eq 0 ]; then
+    notify-send -i "$WIFI_ICON" "✅ Connection Activated" "Successfully connected using $chosen_profile."
+else
+    notify-send -i "$WIFI_ICON" "❌ Activation Failed" "Could not activate $chosen_profile."
+fi
