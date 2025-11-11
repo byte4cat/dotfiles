@@ -20,7 +20,7 @@ case "$selection" in
 "🟢 Logout")
     hyprctl dispatch exit
     ;;
-"⏻ Shutdown")
+"☯ Shutdown")
     systemctl poweroff --no-wall
     ;;
 "🔄 Reboot")

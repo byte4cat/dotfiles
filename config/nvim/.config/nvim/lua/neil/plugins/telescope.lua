@@ -7,26 +7,13 @@ return {
 			defaults = {
 				vimgrep_arguments = {
 					"rg",
-					"--color=never",
+					-- "--color=never",
 					"--no-heading",
 					"--with-filename",
 					"--line-number",
 					"--column",
 					"--smart-case",
-					"--glob",
-					"!**/node_modules/*", -- Ignore node_modules
-					"--glob",
-					"!package-lock.json", -- Ignore package-lock.json
-					"--glob",
-					"!yarn.lock", -- Ignore package-lock.json
-					"--glob",
-					"!go.sum", -- Ignore package-lock.json
-					"--glob",
-					"!**/*.pb.go", -- Ignore generated protobuf go files
-					"--glob",
-					"!**/dist/*", -- Ignore dist directory
-					"--glob",
-					"!.DS_Store", -- Ignore DS_Store files
+					"--hidden",
 				},
 
 				prompt_prefix = "🔭 ",
@@ -42,6 +29,7 @@ return {
 						mirror = false,
 					},
 				},
+				-- Telescope (find_files)
 				file_ignore_patterns = {
 					".DS_Store",
 					"mocks/.*",
@@ -75,8 +63,7 @@ return {
 			},
 			pickers = {
 				find_files = {
-					-- find_command = { "rg", "--files", "--hidden", "--glob", "!.git" },
-					find_command = { "rg", "--files", "--hidden", "--glob", "!**/.git/*" },
+					find_command = { "rg", "--files", "--no-ignore", "--hidden", "--glob", "!**/.git/*" },
 				},
 			},
 		}),
