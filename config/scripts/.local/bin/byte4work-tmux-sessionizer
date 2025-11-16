@@ -6,9 +6,7 @@ SEARCH_DIRS=(
     "${HOME}/Development/side_projects"
     "${HOME}/Development/learning"
     "${HOME}/Development/devops"
-    "${HOME}/Development/mc"
     "${HOME}/Development/open_source"
-    "${HOME}/Development/note"
 
     "${HOME}/Development/working/backend"
     "${HOME}/Development/working/web"
@@ -32,6 +30,7 @@ pick_project() {
     local selected
     local extra_repos=(
         "${HOME}/dotfiles"
+        "${HOME}/Development/note"
         # Add more fixed paths if you want
     )
 
