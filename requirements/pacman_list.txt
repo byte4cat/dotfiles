@@ -5,6 +5,7 @@ alacritty
 amd-ucode
 android-tools
 another-redis-desktop-manager-bin
+anydesk-bin
 baobab
 bat
 bc
@@ -25,6 +26,7 @@ chromium
 cliphist
 clipmenu
 cloc-git
+cmatrix
 code
 cpupower
 dbeaver
@@ -34,6 +36,7 @@ decibels
 devhelp
 dkms
 dmidecode
+dnsmasq
 docker
 docker-compose
 dolphin
@@ -64,6 +67,7 @@ fcitx5-gtk
 fcitx5-mcbopomofo-git
 fcitx5-qt
 fd
+fdupes
 feh
 ffmpegthumbnailer
 firefox
@@ -164,6 +168,7 @@ linux-lts
 linux-lts-headers
 live-media
 loupe
+lshw
 lxqt-policykit
 ly
 malcontent
@@ -171,12 +176,15 @@ mesa-utils
 ncdu
 networkmanager
 network-manager-applet
+networkmanager-fortisslvpn
+networkmanager-openvpn
 nmap
 noto-fonts
 noto-fonts-cjk
 noto-fonts-emoji
 noto-fonts-extra
 nvtop
+obsidian
 openbsd-netcat
 opencode-bin
 openfortivpn
@@ -192,6 +200,7 @@ pipewire
 pipewire-alsa
 pipewire-jack
 pipewire-pulse
+planify
 plocate
 polkit-gnome
 polkit-kde-agent
@@ -260,7 +269,6 @@ vulkan-radeon
 vulkan-tools
 walker-bin
 waybar
-waydroid
 waypaper
 wget
 winboat-bin
@@ -281,6 +289,7 @@ xorg-xinit
 yay
 yazi
 yelp
+zen-browser-bin
 zoom
 zoxide
 zram-generator
