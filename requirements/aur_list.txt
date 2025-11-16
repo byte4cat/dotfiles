@@ -1,4 +1,5 @@
 another-redis-desktop-manager-bin
+anydesk-bin
 binder_linux-dkms-git
 brave-bin
 cloc-git
@@ -8,6 +9,8 @@ electron12-bin
 electron12-bin-debug
 electron37-bin
 electron37-bin-debug
+electron39-bin
+electron39-bin-debug
 elephant-bin
 elephant-bin-debug
 elephant-bluetooth-bin
@@ -26,18 +29,20 @@ fcitx5-mcbopomofo-git-debug
 forticlient-vpn-debug
 freelens-bin
 google-chrome
-lib32-amdvlk
-libgbinder
+gxml
+gxml-debug
 libgbinder-debug
-libglibutil
 libglibutil-debug
+networkmanager-fortisslvpn
+networkmanager-fortisslvpn-debug
 opencode-bin
 pgadmin4-desktop-debug
 pgadmin4-server-debug
 phonon-qt6-mpv
 phonon-qt6-mpv-debug
+planify
+planify-debug
 postman-bin
-python-gbinder
 python-gbinder-debug
 python-imageio-ffmpeg
 python-screeninfo
@@ -53,7 +58,6 @@ tofi-debug
 vesktop-bin
 walker-bin
 walker-bin-debug
-waydroid
 waypaper
 winboat-bin
 wlogout
@@ -64,4 +68,7 @@ xf86-video-vmware
 xf86-video-vmware-debug
 yay
 yay-debug
+yp-tools
+yp-tools-debug
+zen-browser-bin
 zoom
