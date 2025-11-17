@@ -164,7 +164,6 @@ yy() {
 }
 
 # --- General Aliases ---
-alias c="clear"
 alias ll="ls -lA"
 alias la="ls -a"
 alias k="kubectl"
