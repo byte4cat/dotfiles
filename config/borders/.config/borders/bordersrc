@@ -1,3 +1,0 @@
-source "$HOME/.config/scripts/colors.sh"
-
-borders active_color=$COLOR_GREEN inactive_color=$COLOR_BACKGROUND width=10.0
