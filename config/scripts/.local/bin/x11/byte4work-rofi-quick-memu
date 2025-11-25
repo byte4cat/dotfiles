@@ -12,6 +12,7 @@ OPTIONS=(
     "Restart NetworkManager"
     "Restart Wifi wlan0"
     "System suspend"
+    "Logout"
 )
 # ----------------
 
@@ -116,6 +117,10 @@ main() {
         logger "Suspending system using systemctl"
         notify-send "Suspending System" "System will enter sleep mode now."
         systemctl suspend
+        exit 0
+        ;;
+    "Logout")
+        i3-msg exit
         exit 0
         ;;
     *)
