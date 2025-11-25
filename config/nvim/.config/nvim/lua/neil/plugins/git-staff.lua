@@ -1,15 +1,15 @@
 return {
-	-- {
-	-- 	"tpope/vim-fugitive",
-	-- 	config = function()
-	-- vim.api.nvim_create_autocmd("FileType", {
-	-- 	pattern = "fugitive",
-	-- callback = function()
-	-- 	vim.api.nvim_buf_set_keymap(0, "n", "<leader>p", ":Git push<CR>", { noremap = true, silent = true })
-	-- end,
-	-- 	})
-	-- 	end,
-	-- },
+	{
+		"tpope/vim-fugitive",
+		config = function()
+			vim.api.nvim_create_autocmd("FileType", {
+				pattern = "fugitive",
+				callback = function()
+					vim.api.nvim_buf_set_keymap(0, "n", "<leader>p", ":Git push<CR>", { noremap = true, silent = true })
+				end,
+			})
+		end,
+	},
 	{
 
 		"NeogitOrg/neogit",
