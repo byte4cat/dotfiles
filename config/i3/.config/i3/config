@@ -3,7 +3,7 @@
 ####################
 ### 1. 變數設定 ###
 ####################
-font pango:monospace 8
+font pango:monospace 12
 
 # 設置 Mod 鍵為 Super (Windows 鍵)
 set $mod Mod4
@@ -11,10 +11,10 @@ set $altMod Mod1
 
 # 設置你的程式
 set $terminal ghostty
-set $fileManager nautilus
+set $fileManager thunar
 # i3 通常使用 dmenu 或 rofi。wofi 是 Wayland 原生。
 set $menu rofi -show drun
-set $browser chromium --enable-features=Vulkan --enable-webgl --ignore-gpu-blacklist
+set $browser firefox
 set $workmsg flatpak run dev.vencord.Vesktop
 
 #######################
@@ -25,7 +25,7 @@ set $workmsg flatpak run dev.vencord.Vesktop
 exec --no-startup-id gsettings set org.gnome.desktop.interface color-scheme "prefer-dark"
 exec --no-startup-id gsettings set org.gnome.desktop.interface gtk-theme "adw-gtk3"
 # i3/X11 的環境變數設定
-exec --no-startup-id xrandr --output DisplayPort-1 --mode 1920x1200 --pos 0x0 --rotate left --output HDMI-A-1 --mode 3840x2160 --pos 1200x0 --primary
+exec --no-startup-id xrandr --output DisplayPort-1 --mode 1920x1200 --pos 0x0 --rotate left --output HDMI-A-1 --mode 1920x1080 --pos 1200x0 --primary
 
 # 開機啟動
 # set $ws1 "1:Term"
@@ -47,7 +47,7 @@ set $gaps_out 10
 
 # i3 使用 exec --no-startup-id 確保程式背景運行
 # 替換 hyprpaper
-exec_always --no-startup-id feh --bg-fill ~/.config/wallpapers/Anime/168847-man_de_nu_hai-ka_tong-ren_men_zai_zi_ran_jie-kuai_le_de-yang_guang-3840x2160.jpg
+exec_always --no-startup-id feh --bg-fill ~/.local/share/wallpapers/171652.jpg
 # 替換 waybar，你需要安裝和設定 polybar
 exec --no-startup-id polybar
 # exec --no-startup-id i3bar # 如果你使用內建的 i3status
@@ -104,7 +104,7 @@ bindsym $mod+Shift+f floating toggle
 bindsym $mod+c exec $browser
 bindsym $altMod+space exec $menu
 
-bindsym $mod+v exec ~/.local/bin/x11/byte4work-rofi_quick_memu
+bindsym $mod+v exec ~/.local/bin/x11/byte4work-rofi-quick-memu
 bindsym $mod+Shift+e exec ~/.local/bin/x11/byte4work-rofi-emoji
 
 # 浮動視窗
