@@ -69,6 +69,7 @@ flatpak
 freelens-bin
 fzf
 ghex
+ghostscript
 ghostty
 gimp
 git
