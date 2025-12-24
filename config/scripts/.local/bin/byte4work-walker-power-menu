@@ -4,7 +4,7 @@ OPTIONS=(
     "🟢 Logout"
     "☯ Shutdown"
     "🔄 Reboot"
-    # "💤 Sleep"
+    "💤 Sleep"
     # "🛌🏻 Hibernate"
     "🔒 Lock"
     "❌ Cancel"
@@ -19,6 +19,7 @@ fi
 case "$selection" in
 "🟢 Logout")
     hyprctl dispatch exit
+    # loginctl terminate-session "$XDG_SESSION_ID"
     ;;
 "☯ Shutdown")
     systemctl poweroff --no-wall
@@ -29,9 +30,9 @@ case "$selection" in
 # "🛌🏻 Hibernate")
 #     systemctl hibernate
 #     ;;
-# "💤 Sleep")
-#     systemctl suspend
-#     ;;
+"💤 Sleep")
+    systemctl suspend
+    ;;
 "🔒 Lock")
     hyprlock
     ;;
