@@ -110,12 +110,12 @@ vim.api.nvim_set_keymap(
 	"<cmd>lua require'telescope.builtin'.find_files()<cr>",
 	{ noremap = true, silent = true, desc = "Find Files" }
 )
-vim.api.nvim_set_keymap(
-	"n",
-	"<leader>as",
-	"<cmd>lua require'telescope.builtin'.buffers({ show_all_buffers = true })<cr>",
-	{ noremap = true, silent = true, desc = "Search Buffers (All)" }
-)
+-- vim.api.nvim_set_keymap(
+-- 	"n",
+-- 	"<leader>fd",
+-- 	"<cmd>lua require'telescope.builtin'.buffers({ show_all_buffers = true })<cr>",
+-- 	{ noremap = true, silent = true, desc = "Search Buffers (All)" }
+-- )
 vim.api.nvim_set_keymap(
 	"n",
 	"<leader>fg",

@@ -24,6 +24,7 @@ fcitx5-mcbopomofo-git
 freelens-bin
 google-chrome
 gxml
+localsend-bin
 networkmanager-fortisslvpn
 opencode-bin
 phonon-qt6-mpv
@@ -32,6 +33,9 @@ postman-bin
 python-imageio-ffmpeg
 python-screeninfo
 qimgv-git
+qt5-remoteobjects
+qt5-webchannel
+qt5-webengine
 spotify
 swayosd-git
 vesktop-bin

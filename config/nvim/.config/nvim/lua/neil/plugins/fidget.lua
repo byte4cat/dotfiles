@@ -8,6 +8,7 @@ return {
 			require("fidget").setup({
 				notification = {
 					window = {
+						avoid = { "NvimTree" },
 						normal_hl = "FidgetTransparent",
 						winblend = 0,
 						border = "none",
@@ -17,11 +18,6 @@ return {
 					display = {
 						progress_icon = { "meter" }, -- 進度條的圖示
 						icon_style = "Special", -- 或 "Question"、"WarningMsg" 看你喜歡什麼顏色
-					},
-				},
-				integration = {
-					["nvim-tree"] = {
-						enable = true, -- Integrate with nvim-tree/nvim-tree.lua (if installed)
 					},
 				},
 			})

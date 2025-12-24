@@ -1,9 +1,14 @@
 return {
 	"nvim-telescope/telescope.nvim",
 	tag = "0.1.8",
-	dependencies = { "nvim-lua/plenary.nvim" },
-	config = {
-		require("telescope").setup({
+	dependencies = {
+		"nvim-lua/plenary.nvim",
+		"nvim-telescope/telescope-fzf-native.nvim",
+		build = "make",
+	},
+	config = function()
+		local telescope = require("telescope")
+		telescope.setup({
 			defaults = {
 				vimgrep_arguments = {
 					"rg",
@@ -14,8 +19,13 @@ return {
 					"--column",
 					"--smart-case",
 					"--hidden",
+					"--trim",
 				},
-
+				preview = {
+					msg_bg_fillchar = " ",
+					timeout = 200, -- 超過 200ms 就跳過該預覽
+					filesize_limit = 0.5, -- 超過 0.5MB 的檔案不預覽，避免卡住
+				},
 				prompt_prefix = "🔭 ",
 				selection_caret = " ",
 				sorting_strategy = "descending",
@@ -32,19 +42,20 @@ return {
 				-- Telescope (find_files)
 				file_ignore_patterns = {
 					".DS_Store",
-					"mocks/.*",
-					"dist/.*",
-					"%.git/.*",
-					"%.vim/.*",
-					"%.vscode/.*",
-					"%.idea/.*",
-					"node_modules/.*",
-					"%.history/.*",
+					"mocks/",
+					"dist/",
+					"%.git/",
+					"%.vim/",
+					"%.vscode/",
+					"%.idea/",
+					"node_modules/",
+					"%.history/",
 					"package-lock.json",
 					"yarn.lock",
-					".nuxt/.*", -- nuxt
-					".output/.*", -- nuxt3
+					".nuxt/", -- nuxt
+					".output/", -- nuxt3
 					"%.pb%.go", -- pb go
+					"target/", -- rust output folder
 				},
 				mappings = {
 					i = {
@@ -63,9 +74,18 @@ return {
 			},
 			pickers = {
 				find_files = {
-					find_command = { "rg", "--files", "--no-ignore", "--hidden", "--glob", "!**/.git/*" },
+					find_command = { "rg", "--files", "--hidden", "--glob", "!**/.git/*" },
 				},
 			},
-		}),
-	},
+			exextensions = {
+				fzf = {
+					fuzzy = true,
+					override_generic_sorter = true,
+					override_file_sorter = true,
+					case_mode = "smart_case",
+				},
+			},
+		})
+		telescope.load_extension("fzf")
+	end,
 }
