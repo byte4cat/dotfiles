@@ -14,7 +14,7 @@ source "$DOTFILES_DIR/lib/common"
 
 main() {
     info "Starting full Dotfiles environment setup..."
-
+    
     [[ -f /etc/arch-release ]] || error "This script is only for Arch Linux."
 
     # --- Install pkgs from requirements/*.txt ---
