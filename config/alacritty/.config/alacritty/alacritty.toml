@@ -18,7 +18,7 @@ multiplier = 20
 [window]
 decorations = "buttonless"
 dynamic_padding = false
-opacity = 0.8
+opacity = 1.0
 startup_mode = "Maximized"
 
 [window.padding]
