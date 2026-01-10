@@ -3,12 +3,8 @@ anydesk-bin
 binder_linux-dkms-git
 bottles
 brave-bin
-cloc-git
 debtap
 downgrade
-electron12-bin
-electron37-bin
-electron39-bin
 elephant-bin
 elephant-bluetooth-bin
 elephant-calc-bin

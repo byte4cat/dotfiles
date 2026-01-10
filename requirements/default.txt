@@ -1,0 +1,39 @@
+# chinese support
+sudo pacman -S noto-fonts-cjk noto-fonts-emoji noto-fonts-extra
+
+# fonts
+sudo pacman -S ttf-jetbrains-mono-nerd
+
+# install zsh
+sudo pacman -S zsh
+chsh -s /bin/zsh
+
+# oh-my-zsh
+sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+
+# zplug
+curl -sL --proto-redir -all,https https://raw.githubusercontent.com/zplug/installer/master/installer.zsh | zsh
+
+# nvm
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh | bash
+nvm install --lts
+
+# z
+sudo pacman -S zoxide
+
+# rust
+sudo pacman -S rustup
+rustup default stable
+
+# yay -S awww-git
+
+# gtk-theme
+sudo pacman -S gtk-engine-murrine
+
+# tmux
+sudo pacman -S tmux
+# and install tpm
+
+# vlc
+sudo pacman -S vlc
+sudo pacman -S --needed libva-utils vlc-codecs-extra libvdpau

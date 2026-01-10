@@ -1,0 +1,53 @@
+#!/bin/bash
+# ==============================================================================
+# Common Utilities for Dotfiles and Installer Scripts
+# ==============================================================================
+set -euo pipefail
+
+# -----------------------------
+# Colors
+# -----------------------------
+Green='\033[0;32m'
+Red='\033[0;31m'
+Blue='\033[1;34m'
+Yellow='\033[0;33m'
+Reset='\033[0m'
+
+# -----------------------------
+# Logging
+# -----------------------------
+info()    { echo -e "${Blue}[INFO] ${1}${Reset}"; }
+warn()    { echo -e "${Yellow}[WARN] ${1}${Reset}"; }
+success() { echo -e "${Green}[SUCCESS] ${1}${Reset}"; }
+error()   { echo -e "${Red}[ERROR] ${1}${Reset}" >&2; exit 1; }
+
+# -----------------------------
+# Dependency Checks
+# -----------------------------
+check_command() {
+    for cmd in "$@"; do
+        command -v "$cmd" >/dev/null 2>&1 || error "Required command not found: $cmd"
+    done
+}
+
+# -----------------------------
+# Safe Directory Navigation
+# -----------------------------
+cd_or_error() {
+    local dir="$1"
+    [ -d "$dir" ] || error "Directory not found: $dir"
+    cd "$dir" || error "Failed to enter directory: $dir"
+}
+
+# -----------------------------
+# User Confirmation
+# -----------------------------
+confirm() {
+    local prompt="${1:-Are you sure?}"
+    read -rp "$prompt [y/N]: " resp
+    case "$resp" in
+        [yY][eE][sS]|[yY]) return 0 ;;
+        *) return 1 ;;
+    esac
+}
+

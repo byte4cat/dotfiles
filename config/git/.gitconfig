@@ -1,6 +1,7 @@
 [user]
 	name = yimintsai
     email = byte4cat@gmail.com
+	signingkey = DE2110637E8BCF37
 
 [alias]
     co = checkout
@@ -41,3 +42,5 @@
 	smudge = git-lfs smudge -- %f
 	process = git-lfs filter-process
 	required = true
+[commit]
+	gpgsign = true
