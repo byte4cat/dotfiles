@@ -1,28 +1,25 @@
 #!/bin/bash
 
-# Get the script's actual directory
+# use BASH_SOURCE to get the script actual path
 # SCRIPT_DIR will be: ~/dotfiles/bin
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-# Set the requirements directory path (one level up from bin)
+# ~/dotfiles/requirements
 REQUIREMENTS_DIR="$(dirname "$SCRIPT_DIR")/requirements"
 
-# Ensure the requirements directory exists
-mkdir -p "$REQUIREMENTS_DIR"
+echo "Generating pacman_list.txt..."
 
-echo "Step 1: Exporting official packages (pacman_list.txt)..."
-# -Qentq: Query, Explicitly installed, Native (official repos), Unrequired (not deps), Quiet (name only)
-pacman -Qentq | sort >"$REQUIREMENTS_DIR/pacman_list.txt"
+# Exports all explicitly installed packages (not dependencies) using pacman -Qe.
+# Excludes common base system packages (adjust this exclusion list as needed).
+pacman -Qeq | grep -v 'archlinux-keyring\|base\|bash\|btrfs-progs\|coreutils\|device-mapper\|diffutils\|e2fsprogs\|file\|filesystem\|findutils\|gawk\|gcc-libs\|glibc\|grep\|gzip\|iproute2\|iputils\|less\|libcap\|logrotate\|lvm2\|man-db\|man-pages\|mdadm\|nano\|netctl\|pacman\|pacman-mirrorlist\|pciutils\|procps-ng\|psmisc\|sed\|shadow\|systemd\|systemd-sysv\|tar\|texinfo\|util-linux\|vi\|which' | sort >"$REQUIREMENTS_DIR/pacman_list.txt"
 
-echo "Step 2: Exporting AUR packages (aur_list.txt)..."
-# -Qmq: Query, Foreign (AUR/manual), Quiet (name only)
-# This works even if yay is broken.
-pacman -Qmq | sort >"$REQUIREMENTS_DIR/aur_list.txt"
+echo "pacman_list.txt updated."
 
-echo "--------------------------------------------------"
-echo "Package sync completed successfully!"
-echo "Official packages found: $(wc -l <"$REQUIREMENTS_DIR/pacman_list.txt")"
-echo "AUR packages found:      $(wc -l <"$REQUIREMENTS_DIR/aur_list.txt")"
-echo "Location: $REQUIREMENTS_DIR"
-echo "Ensure this directory is included in your rsync backup."
-echo "--------------------------------------------------"
+echo "Generating aur_list.txt..."
+
+# Exports all packages installed from the AUR.
+yay -Qmq >"$REQUIREMENTS_DIR/aur_list.txt"
+
+echo "aur_list.txt updated."
+
+echo "Please review the generated files and manually remove any unwanted packages."

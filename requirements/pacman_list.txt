@@ -61,7 +61,6 @@ kitty
 kubectl
 lazygit
 lf
-lib32-sdl2-compat
 libguestfs
 libreoffice-still
 libva-utils
@@ -101,7 +100,6 @@ sassc
 scrcpy
 scrot
 sddm
-steam
 stow
 swaync
 sysprof

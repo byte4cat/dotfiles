@@ -207,9 +207,6 @@ export PATH="$PATH:$HOME/.pub-cache/bin"
 export BUN_INSTALL="$HOME/.bun"
 export PATH="$BUN_INSTALL/bin:$PATH"
 
-# Rust
-. "$HOME/.cargo/env"
-
 # Google Cloud SDK
 if [ -f "$HOME/google-cloud-sdk/path.zsh.inc" ]; then
     . "$HOME/google-cloud-sdk/path.zsh.inc"
@@ -240,3 +237,6 @@ if [ -f '/home/neil/google-cloud-sdk/path.zsh.inc' ]; then . '/home/neil/google-
 
 # The next line enables shell command completion for gcloud.
 if [ -f '/home/neil/google-cloud-sdk/completion.zsh.inc' ]; then . '/home/neil/google-cloud-sdk/completion.zsh.inc'; fi
+
+# To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
+[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
