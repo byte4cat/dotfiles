@@ -198,6 +198,9 @@ export GOPATH="$HOME/go"
 export GOBIN="$GOPATH/bin"
 export PATH="$PATH:$GOBIN"
 
+# Rust
+export PATH="$HOME/.cargo/bin:$PATH"
+
 # Flutter & Flutterfire CLI
 export PATH="$PATH:$HOME/flutter/bin"
 export PATH="$PATH:$HOME/.pub-cache/bin"
@@ -227,7 +230,6 @@ fi
 if ! (( $+functions[compinit] )); then
     autoload -Uz compinit
 fi
-
 
 # AsyncAPI CLI Autocomplete
 ASYNCAPI_AC_ZSH_SETUP_PATH=/home/neil/.cache/@asyncapi/cli/autocomplete/zsh_setup && test -f $ASYNCAPI_AC_ZSH_SETUP_PATH && source $ASYNCAPI_AC_ZSH_SETUP_PATH; # asyncapi autocomplete setup
