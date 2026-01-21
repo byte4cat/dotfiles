@@ -1,0 +1,7 @@
+Name=pgAdmin 4 (Venv)
+Comment=PostgreSQL Administration Tool
+Exec=byte4work-run-pgadmin4-venv
+Icon=pgadmin4
+Terminal=false
+Type=Application
+Categories=Development;Database;

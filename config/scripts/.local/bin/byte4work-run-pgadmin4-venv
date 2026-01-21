@@ -2,5 +2,19 @@
 # This script sets up a virtual environment for pgAdmin 4 and starts it.
 # You should install a pgadmin4 via wheel file or pip first.
 
-source ~/.local/share/pgadmin4-venv/bin/activate
-pgadmin4
+if [ ! -d "/var/lib/pgadmin" ] || [ ! -d "/var/log/pgadmin" ]; then
+    echo "[INFO] Setting up system directories..."
+    sudo mkdir -p /var/lib/pgadmin /var/log/pgadmin
+    sudo chown -R $USER:$USER /var/lib/pgadmin /var/log/pgadmin
+fi
+
+VENV_PATH="$HOME/.local/share/pgadmin4-venv/bin/activate"
+
+if [ -f "$VENV_PATH" ]; then
+    source "$VENV_PATH"
+    echo "🚀 Launching pgAdmin 4..."
+    pgadmin4
+else
+    echo "❌ Error: Virtual environment no found at $VENV_PATH"
+    exit 1
+fi

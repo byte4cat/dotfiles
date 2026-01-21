@@ -1,0 +1,21 @@
+#!/bin/bash
+
+#!/bin/bash
+VENV_DIR="$HOME/.local/share/pgadmin4-venv"
+
+echo "[INFO] Checking virtual environment..."
+if [ ! -f "$VENV_DIR/bin/activate" ]; then
+    echo "[INFO] Environment not found. Creating it now..."
+    python -m venv "$VENV_DIR"
+fi
+
+source "$VENV_DIR/bin/activate"
+
+echo "[INFO] Upgrade pip ..."
+pip install --upgrade pip
+
+echo "[INFO] Upgrade pgAdmin4 ..."
+pip install --upgrade pgadmin4
+
+echo "[INFO] Upgraded pgAdmin4 version:"
+pip show pgadmin4 | grep Version

@@ -1,0 +1,14 @@
+title = "🎯 OBJECTIVES"
+tasks = [
+    "Check out the live refresh!",
+    "Change the font size in this file",
+    "Change the font size in this file",
+    "Change the font size in this file",
+    "Change the font size in this file"
+]
+anchor_bottom = true
+anchor_right = true
+margin_bottom = 150
+margin_right = 50
+background_color = "rgba(20, 20, 30, 0.9)"
+text_color = "#f5f5f5"
