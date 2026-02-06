@@ -1,3 +1,6 @@
+# To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
+[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
+
 if [[ "$(uname)" == "Darwin" ]]; then
     [ -f "$HOME/.zshrc_macos" ] && source "$HOME/.zshrc_macos"
 elif [[ "$(uname)" == "Linux" ]]; then
@@ -164,8 +167,11 @@ yy() {
 }
 
 # --- General Aliases ---
-alias ll="ls -lA"
-alias la="ls -a"
+# alias ll="ls -la"
+# alias la="ls -a"
+alias ls='eza --icons --group-directories-first'
+alias ll='eza -lh --icons --git --group-directories-first'
+alias lt='eza --tree --level=2 --icons'
 alias k="kubectl"
 alias vim="nvim"
 alias fp="lsof -i"
@@ -240,5 +246,18 @@ if [ -f '/home/neil/google-cloud-sdk/path.zsh.inc' ]; then . '/home/neil/google-
 # The next line enables shell command completion for gcloud.
 if [ -f '/home/neil/google-cloud-sdk/completion.zsh.inc' ]; then . '/home/neil/google-cloud-sdk/completion.zsh.inc'; fi
 
-# To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
-[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
+# # Re-bind for Vi-Insert Mode
+# # Use the correct ZLE widget names for Vi mode
+# bindkey -M viins '^A' vi-beginning-of-line
+# bindkey -M viins '^E' vi-end-of-line
+# bindkey -M viins '^K' vi-kill-line
+# bindkey -M viins '^U' backward-kill-line
+# bindkey -M viins '^W' backward-kill-word
+# bindkey -M viins '^F' vi-forward-char
+# bindkey -M viins '^B' vi-backward-char
+# bindkey -M viins '^L' clear-screen
+# bindkey -M viins '^R' history-incremental-search-backward
+#
+# # Also allow movement in Command mode (optional)
+# bindkey -M vicmd '^A' vi-beginning-of-line
+# bindkey -M vicmd '^E' vi-end-of-line

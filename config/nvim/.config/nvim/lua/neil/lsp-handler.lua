@@ -2,17 +2,31 @@
 local cmp_lsp = require("cmp_nvim_lsp")
 
 local capabilities =
-	vim.tbl_deep_extend("force", {}, vim.lsp.protocol.make_client_capabilities(), cmp_lsp.default_capabilities())
+    vim.tbl_deep_extend("force", {}, vim.lsp.protocol.make_client_capabilities(), cmp_lsp.default_capabilities())
 
 -- Setup LSP handlers
 vim.filetype.add({ extension = { templ = "templ" } })
 
 vim.lsp.config("rust_analyzer", {
-	-- Server-specific settings. See `:help lsp-quickstart`
-	capabilities = capabilities,
-	settings = {
-		-- ["rust-analyzer"] = {},
-	},
+    -- Server-specific settings. See `:help lsp-quickstart`
+    capabilities = capabilities,
+    settings = {
+        -- ['rust-analyzer'] = {
+        --     completion = {
+        --         autoimport = { enable = true },
+        --         postfix = { enable = true },
+        --     },
+        --     checkOnSave = {
+        --         command = "clippy",
+        --     },
+        --     imports = {
+        --         granularity = {
+        --             group = "module",
+        --         },
+        --         prefix = "self",
+        --     },
+        -- },
+    }
 })
 
 -- lsp.gopls.setup({
