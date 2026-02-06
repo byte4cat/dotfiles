@@ -1,1 +1,3 @@
 # echo "Linux specific settings loaded."
+
+export PATH="$PATH:/usr/bin/vendor_perl"
