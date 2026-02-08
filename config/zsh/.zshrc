@@ -13,7 +13,6 @@ fi
 
 # --- Basic Environment Variables ---
 export ZPLUG_HOME=$HOME/.zplug
-export TERM="xterm-256color"
 export EDITOR="nvim"
 export KITTY_SOCK_DIR=/tmp/kitty
 export PATH="$HOME/.local/bin:$PATH"
@@ -261,3 +260,4 @@ if [ -f '/home/neil/google-cloud-sdk/completion.zsh.inc' ]; then . '/home/neil/g
 # # Also allow movement in Command mode (optional)
 # bindkey -M vicmd '^A' vi-beginning-of-line
 # bindkey -M vicmd '^E' vi-end-of-line
+# export PATH="$HOME/.local/share/nvim/mason/bin:$PATH"

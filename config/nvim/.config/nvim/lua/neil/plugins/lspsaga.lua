@@ -2,6 +2,7 @@ return {
 	{
 		"nvimdev/lspsaga.nvim",
 		dependencies = { "nvim-lspconfig" },
+		event = "LspAttach",
 		config = function()
 			require("lspsaga").setup({
 				ui = {
