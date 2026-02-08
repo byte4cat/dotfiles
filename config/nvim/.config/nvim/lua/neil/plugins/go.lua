@@ -6,9 +6,10 @@ return {
 			"neovim/nvim-lspconfig",
 			"nvim-treesitter/nvim-treesitter",
 		},
+		ft = { "go", "gomod" },
 		config = function()
 			require("go").setup({
-				remap_commands = { GoDoc = false }, -- 禁用 :GoDoc 命令
+				lsp_conf = true,
 			})
 		end,
 	},

@@ -1,152 +1,98 @@
+local theme_cache = vim.fn.stdpath("state") .. "/last_theme"
+
+local function get_last_theme()
+	local f = io.open(theme_cache, "r")
+	if f then
+		local theme = f:read("*all"):gsub("%s+", "")
+		f:close()
+		return (theme ~= "" and theme) and theme or "nightfox"
+	end
+	return "nightfox"
+end
+
+local function save_theme(theme)
+	local f = io.open(theme_cache, "w")
+	if f then
+		f:write(theme)
+		f:close()
+	end
+end
+
+local function apply_transparency()
+	local groups = { "Normal", "NormalFloat", "NormalNC", "SignColumn", "EndOfBuffer" }
+	for _, group in ipairs(groups) do
+		vim.api.nvim_set_hl(0, group, { bg = "none", ctermbg = "none" })
+	end
+end
+
+-- 主題清單
 local themes = {
-	{
-		"rebelot/kanagawa.nvim",
-		name = "kanagawa",
-		priority = 1000,
-		config = function()
-			require("kanagawa").setup({
-				transparent = true,
-				background = {
-					dark = "wave",
-					light = "lotus",
-				},
-				colors = {
-					theme = { all = { ui = { bg_gutter = "none" } } },
-				},
-			})
-			-- vim.cmd("colorscheme kanagawa")
-		end,
-	},
-
-	{
-		"olimorris/onedarkpro.nvim",
-		priority = 1000,
-		config = function()
-			require("onedarkpro").setup({
-				colors = {},
-				options = {
-					transparency = true,
-					terminal_colors = true,
-					cursorline = true,
-				},
-			})
-			-- vim.cmd("colorscheme onedark")
-		end,
-	},
-
-	{
-		"catppuccin/nvim",
-		name = "catppuccin",
-		priority = 1000,
-		config = function()
-			require("catppuccin").setup({
-				flavour = "mocha",
-				transparent_background = true,
-			})
-			-- vim.cmd("colorscheme catppuccin")
-		end,
-	},
-
+	{ "rebelot/kanagawa.nvim", name = "kanagawa", lazy = true, opts = { transparent = true } },
+	{ "catppuccin/nvim", name = "catppuccin", lazy = true, opts = { transparent_background = true } },
+	{ "folke/tokyonight.nvim", name = "tokyonight", lazy = true, opts = { transparent = true } },
+	{ "rose-pine/neovim", name = "rose-pine", lazy = true, opts = { styles = { transparency = true } } },
+	{ "olimorris/onedarkpro.nvim", name = "onedarkpro", lazy = true, opts = { options = { transparency = true } } },
 	{
 		"sainnhe/gruvbox-material",
 		name = "gruvbox-material",
-		priority = 1000,
+		lazy = true,
 		config = function()
 			vim.g.gruvbox_material_transparent_background = 1
-			-- vim.cmd("colorscheme gruvbox-material")
 		end,
 	},
-
-	{
-		"shaunsingh/nord.nvim",
-		name = "nord",
-		priority = 1000,
-		config = function()
-			vim.g.nord_disable_background = true
-			-- vim.cmd("colorscheme nord")
-		end,
-	},
-
-	{
-		"folke/tokyonight.nvim",
-		name = "tokyonight",
-		priority = 1000,
-		config = function()
-			require("tokyonight").setup({
-				transparent = true,
-				styles = {
-					sidebars = "transparent",
-					floats = "transparent",
-				},
-			})
-			-- vim.cmd("colorscheme tokyonight")
-		end,
-	},
-
 	{
 		"sainnhe/everforest",
 		name = "everforest",
-		priority = 1000,
+		lazy = true,
 		config = function()
 			vim.g.everforest_transparent_background = 1
-			-- vim.cmd("colorscheme everforest")
 		end,
 	},
-
+	{ "EdenEast/nightfox.nvim", name = "nightfox", lazy = true, opts = { options = { transparent = true } } },
 	{
-		"savq/melange-nvim",
-		name = "melange",
-		priority = 1000,
+		"shaunsingh/nord.nvim",
+		name = "nord",
+		lazy = true,
 		config = function()
-			-- vim.cmd("colorscheme melange")
+			vim.g.nord_disable_background = true
 		end,
 	},
-
-	{
-		"nyoom-engineering/oxocarbon.nvim",
-		name = "oxocarbon",
-		priority = 1000,
-		config = function()
-			vim.opt.background = "dark"
-			-- vim.cmd("colorscheme oxocarbon")
-		end,
-	},
-
-	{
-		"EdenEast/nightfox.nvim",
-		name = "nightfox",
-		priority = 1000,
-		config = function()
-			require("nightfox").setup({
-				options = {
-					transparent = true,
-					styles = {
-						comments = "italic",
-						keywords = "bold",
-						types = "italic,bold",
-					},
-				},
-			})
-			vim.cmd("colorscheme nightfox")
-		end,
-	},
-
-	{
-		"rose-pine/neovim",
-		name = "rose-pine",
-		priority = 1000,
-		config = function()
-			require("rose-pine").setup({
-				variant = "moon", -- "main", "moon", "dawn"
-				styles = {
-					transparency = true,
-				},
-			})
-			-- vim.cmd("colorscheme rose-pine")
-		end,
-	},
+	{ "savq/melange-nvim", name = "melange", lazy = true },
+	{ "nyoom-engineering/oxocarbon.nvim", name = "oxocarbon", lazy = true },
 }
 
-return {
-	themes,
-}
+-- 啟動與快捷鍵邏輯
+vim.schedule(function()
+	-- 啟動時讀取
+	local last = get_last_theme()
+	pcall(function()
+		vim.cmd.colorscheme(last)
+		apply_transparency()
+	end)
+
+	-- 設定快捷鍵
+	vim.keymap.set("n", "<leader>th", function()
+		local actions = require("telescope.actions")
+		local action_state = require("telescope.actions.state")
+
+		require("telescope.builtin").colorscheme({
+			enable_preview = true,
+			attach_mappings = function(prompt_bufnr, map)
+				-- 監聽按下 Enter 的動作
+				actions.select_default:replace(function()
+					local selection = action_state.get_selected_entry()
+					actions.close(prompt_bufnr)
+					if selection then
+						local name = selection.value
+						vim.cmd.colorscheme(name)
+						save_theme(name) -- 成功記憶的核心
+						vim.defer_fn(apply_transparency, 10)
+					end
+				end)
+				return true
+			end,
+		})
+	end, { desc = "Theme Picker (Save on Enter)" })
+end)
+
+return themes
