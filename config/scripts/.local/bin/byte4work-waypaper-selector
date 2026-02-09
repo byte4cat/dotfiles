@@ -1,6 +1,7 @@
 #!/bin/bash
 
-STATE_FILE="$HOME/.local/share/waypaper/default.json"
+STATE_FILE="$HOME/.local/state/waypaper/default.json"
+mkdir -p "$(dirname "$STATE_FILE")"
 FOLDERS=(
     ~/.local/share/wallpapers
 )
