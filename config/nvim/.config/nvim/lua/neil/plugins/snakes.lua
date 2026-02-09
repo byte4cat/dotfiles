@@ -89,12 +89,20 @@ return {
 			desc = "Grep (Snacks)",
 		},
 		{
-			"<leader>pb",
+			"<leader>fb",
 			function()
 				Snacks.picker.buffers()
 			end,
 			desc = "Buffers (Snacks)",
 		},
+		{
+			"<leader>pm",
+			function()
+				Snacks.picker.man()
+			end,
+			desc = "Search Man Page",
+		},
+
 		{
 			"<leader>ph",
 			function()
