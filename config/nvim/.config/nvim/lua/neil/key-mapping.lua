@@ -144,12 +144,12 @@ vim.api.nvim_set_keymap(
 -- 	":Telescope help_tags<CR>",
 -- 	{ noremap = true, silent = true, desc = "Search Help" }
 -- )
-vim.api.nvim_set_keymap(
-	"n",
-	"<leader>fm",
-	":Telescope man_pages<CR>",
-	{ noremap = true, silent = true, desc = "Search Man Pages" }
-)
+-- vim.api.nvim_set_keymap(
+-- 	"n",
+-- 	"<leader>fm",
+-- 	":Telescope man_pages<CR>",
+-- 	{ noremap = true, silent = true, desc = "Search Man Pages" }
+-- )
 
 -- Neogit
 vim.api.nvim_set_keymap(
@@ -276,11 +276,11 @@ vim.keymap.set("n", "<leader>fj", function()
 end, { noremap = true, silent = true, desc = "Harpoon: Quick Menu" })
 
 -- Toggle previous & next juffers stored within Harpoon list
-vim.keymap.set("n", "<leader>k", function()
+vim.keymap.set("n", "<A-k>", function()
 	harpoon:list():prev()
 end, { noremap = true, silent = true, desc = "Harpoon: Previous File" })
 
-vim.keymap.set("n", "<leader>j", function()
+vim.keymap.set("n", "<A-j>", function()
 	harpoon:list():next()
 end, { noremap = true, silent = true, desc = "Harpoon: Next File" })
 
