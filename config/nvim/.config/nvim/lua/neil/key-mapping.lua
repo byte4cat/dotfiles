@@ -1,5 +1,3 @@
-local notify = require("notify")
-
 -- show prev view
 vim.keymap.set("n", "<leader>pv", vim.cmd.Ex, { noremap = true, silent = true, desc = "Show previous view (Ex)" })
 
@@ -68,7 +66,7 @@ vim.keymap.set("n", "<Esc>", "<cmd>nohlsearch<CR>", { noremap = true, silent = t
 -- lsp restart
 vim.keymap.set("n", "<leader>R", function()
 	vim.cmd("LspRestart")
-	notify("Language server restarted", "info", {
+	vim.notify("Language server restarted", "info", {
 		title = "LSP",
 	})
 end, { noremap = true, silent = true, desc = "LSP Restart" })
@@ -91,61 +89,61 @@ vim.keymap.set("n", "<leader>zm", function()
 	if vim.wo.foldenable then
 		vim.opt.foldenable = false
 		vim.opt.foldlevel = 99
-		notify("Fold disable", "info", {
+		vim.notify("Fold disable", "info", {
 			title = "Editor",
 		})
 	else
 		vim.opt.foldenable = true
 		vim.opt.foldlevel = 0
-		notify("Fold enable", "info", {
+		vim.notify("Fold enable", "info", {
 			title = "Editor",
 		})
 	end
 end, { noremap = true, silent = true, desc = "Toggle Folding" })
 
 -- Telescope
-vim.api.nvim_set_keymap(
-	"n",
-	"<leader>ff",
-	"<cmd>lua require'telescope.builtin'.find_files()<cr>",
-	{ noremap = true, silent = true, desc = "Find Files" }
-)
+-- vim.api.nvim_set_keymap(
+-- 	"n",
+-- 	"<leader>ff",
+-- 	"<cmd>lua require'telescope.builtin'.find_files()<cr>",
+-- 	{ noremap = true, silent = true, desc = "Find Files" }
+-- )
 -- vim.api.nvim_set_keymap(
 -- 	"n",
 -- 	"<leader>fd",
 -- 	"<cmd>lua require'telescope.builtin'.buffers({ show_all_buffers = true })<cr>",
 -- 	{ noremap = true, silent = true, desc = "Search Buffers (All)" }
 -- )
+-- vim.api.nvim_set_keymap(
+-- 	"n",
+-- 	"<leader>fg",
+-- 	":Telescope git_status<CR>",
+-- 	{ noremap = true, silent = true, desc = "Git Status" }
+-- )
+-- vim.api.nvim_set_keymap(
+-- 	"n",
+-- 	"<leader>fb",
+-- 	":Telescope git_bcommits<CR>",
+-- 	{ noremap = true, silent = true, desc = "Git Buffer Commits" }
+-- )
 vim.api.nvim_set_keymap(
 	"n",
-	"<leader>fg",
-	":Telescope git_status<CR>",
-	{ noremap = true, silent = true, desc = "Git Status" }
-)
-vim.api.nvim_set_keymap(
-	"n",
-	"<leader>fb",
-	":Telescope git_bcommits<CR>",
-	{ noremap = true, silent = true, desc = "Git Buffer Commits" }
-)
-vim.api.nvim_set_keymap(
-	"n",
-	"<leader>td",
+	"<leader>pd",
 	":TodoTelescope<cr>",
 	{ noremap = true, silent = true, desc = "Todo Search" }
 )
-vim.api.nvim_set_keymap(
-	"n",
-	"<leader>ft",
-	":Telescope live_grep<CR>",
-	{ noremap = true, silent = true, desc = "Live Grep (Text Search)" }
-)
-vim.api.nvim_set_keymap(
-	"n",
-	"<leader>fh",
-	":Telescope help_tags<CR>",
-	{ noremap = true, silent = true, desc = "Search Help" }
-)
+-- vim.api.nvim_set_keymap(
+-- 	"n",
+-- 	"<leader>ft",
+-- 	":Telescope live_grep<CR>",
+-- 	{ noremap = true, silent = true, desc = "Live Grep (Text Search)" }
+-- )
+-- vim.api.nvim_set_keymap(
+-- 	"n",
+-- 	"<leader>fh",
+-- 	":Telescope help_tags<CR>",
+-- 	{ noremap = true, silent = true, desc = "Search Help" }
+-- )
 vim.api.nvim_set_keymap(
 	"n",
 	"<leader>fm",
@@ -290,11 +288,11 @@ end, { noremap = true, silent = true, desc = "Harpoon: Next File" })
 vim.keymap.set("n", "<leader>tt", function()
 	if vim.bo.filetype == "go" then
 		vim.cmd("GoTestFile")
-		notify("Running GoTestFile", "info", {
+		vim.notify("Running GoTestFile", "info", {
 			title = "Golang",
 		})
 	else
-		notify("This filetype not supported for test file", "error", {
+		vim.notify("This filetype not supported for test file", "error", {
 			title = "Golang",
 		})
 	end
@@ -303,11 +301,11 @@ end, { noremap = true, silent = true, desc = "Go: Test File" })
 vim.keymap.set("n", "<leader>tc", function()
 	if vim.bo.filetype == "go" then
 		vim.cmd("GoTestFunc")
-		notify("Running GoTestFunc", "info", {
+		vim.notify("Running GoTestFunc", "info", {
 			title = "Golang",
 		})
 	else
-		notify("This filetype not supported for test function", "error", {
+		vim.notify("This filetype not supported for test function", "error", {
 			title = "Golang",
 		})
 	end
@@ -316,11 +314,11 @@ end, { noremap = true, silent = true, desc = "Go: Test Function" })
 vim.keymap.set("n", "<leader>tp", function()
 	if vim.bo.filetype == "go" then
 		vim.cmd("GoTestPkg")
-		notify("Running GoTestPkg", "info", {
+		vim.notify("Running GoTestPkg", "info", {
 			title = "Golang",
 		})
 	else
-		notify("This filetype not supported for test pkg", "error", {
+		vim.notify("This filetype not supported for test pkg", "error", {
 			title = "Golang",
 		})
 	end
@@ -329,11 +327,11 @@ end, { noremap = true, silent = true, desc = "Go: Test Package" })
 vim.keymap.set("n", "<leader>ta", function()
 	if vim.bo.filetype == "go" then
 		vim.cmd("GoTestSum")
-		notify("Running GoTestSum", "info", {
+		vim.notify("Running GoTestSum", "info", {
 			title = "Golang",
 		})
 	else
-		notify("This filetype not supported for test sum", "error", {
+		vim.notify("This filetype not supported for test sum", "error", {
 			title = "Golang",
 		})
 	end

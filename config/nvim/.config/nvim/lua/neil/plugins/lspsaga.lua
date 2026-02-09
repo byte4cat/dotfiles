@@ -9,7 +9,7 @@ return {
 					code_action = "💡",
 				},
 				lightbulb = {
-					enabled = true,
+					enabled = false,
 					sign = false,
 					sign_priority = 40,
 					virtual_text = true,
@@ -17,6 +17,9 @@ return {
 				outline = {
 					win_width = 40,
 					auto_preview = false,
+				},
+				symbol_in_winbar = {
+					enabled = true,
 				},
 			})
 		end,
