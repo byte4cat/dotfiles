@@ -5,7 +5,6 @@ font-family = "Jetbrains Mono Nerd Font"
 theme = "Catppuccin Mocha"
 background = 000000
 background-opacity = 1
-background-blur = false
 font-size = 20
 font-feature = "calt"
 
@@ -15,15 +14,16 @@ gtk-titlebar = false
 
 confirm-close-surface = false
 
-# what is a prefix?
-keybind = ctrl+shift+f=scroll_page_fractional:0.5
-keybind = ctrl+shift+b=scroll_page_fractional:-0.5
 
 # ctrl a is a command prefix
 keybind = "ctrl+a>ctrl+shift+s=text:ts\x0d"
-
 keybind = "ctrl+a>ctrl+s=text:ts\x0d"
 keybind = "ctrl+a>ctrl+f=text:tc\x0d"
+
+
+keybind = "ctrl+shift+f=scroll_page_fractional:0.5"
+keybind = "ctrl+shift+b=scroll_page_fractional:-0.5"
+
 
 # remove toggle fullscreen
 keybind = "ctrl+enter=unbind"
