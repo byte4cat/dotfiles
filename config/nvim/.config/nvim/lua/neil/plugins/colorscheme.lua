@@ -59,6 +59,9 @@ local themes = {
 	},
 	{ "savq/melange-nvim", name = "melange", lazy = true },
 	{ "nyoom-engineering/oxocarbon.nvim", name = "oxocarbon", lazy = true },
+	{ "scottmckendry/cyberdream.nvim", name = "cyberdream", lazy = true, opts = { transparent = true } },
+	{ "AlexvZyl/nordic.nvim", name = "nordic", lazy = true, opts = { transparent_bg = true } },
+	{ "eldritch-theme/eldritch.nvim", name = "eldritch", lazy = true, opts = { transparent = true } },
 }
 
 -- 啟動與快捷鍵邏輯

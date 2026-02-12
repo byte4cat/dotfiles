@@ -4,7 +4,32 @@ return {
 	lazy = false,
 	opts = {
 		-- replace telescope
-		picker = { enabled = true },
+		picker = {
+			sources = {
+				files = {
+					-- 顯示隱藏檔案
+					hidden = true,
+					-- 包含未被 git 追蹤的檔案
+					untracked = true,
+					-- 跟隨符號連結
+					follow = true,
+					-- 排除圖片
+					exclude = {
+						"**/*.jpg",
+						"**/*.jpeg",
+						"**/*.png",
+						"**/*.webp",
+						"**/*.gif",
+					},
+				},
+			},
+			prompt = "🔭 ",
+			layout = {
+				preset = function()
+					return vim.o.columns >= 120 and "default" or "vertical"
+				end,
+			},
+		},
 
 		-- (replace nvim-notify)
 		notifier = { enabled = true, timeout = 2000 },
@@ -89,7 +114,7 @@ return {
 			desc = "Grep (Snacks)",
 		},
 		{
-			"<leader>fb",
+			"<leader>ff",
 			function()
 				Snacks.picker.buffers()
 			end,

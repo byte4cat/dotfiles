@@ -1,6 +1,33 @@
 return {
 	{
 		"mfussenegger/nvim-dap",
+		-- keys = {
+		-- 	{
+		-- 		"<leader>du",
+		-- 		function()
+		-- 			require("dapui").toggle()
+		-- 		end,
+		-- 		desc = "Toggle DAP UI",
+		-- 	},
+		-- 	{ "<leader>db", "<cmd>DapToggleBreakpoint<cr>", desc = "Set DAP breakpoint" },
+		-- 	{ "<leader>dc", "<cmd>DapContinue<cr>", desc = "DAP Continue" },
+		-- 	{
+		-- 		"<leader>dw",
+		-- 		function()
+		-- 			require("dapui").eval(nil, { enter = true })
+		-- 		end,
+		-- 		mode = { "n", "v" },
+		-- 		desc = "Add to Watches",
+		-- 	},
+		-- 	{
+		-- 		"Q",
+		-- 		function()
+		-- 			require("dapui").eval()
+		-- 		end,
+		-- 		mode = { "n", "v" },
+		-- 		desc = "Hover/eval value",
+		-- 	},
+		-- },
 		dependencies = {
 			"rcarriga/nvim-dap-ui",
 			"theHamsta/nvim-dap-virtual-text",
