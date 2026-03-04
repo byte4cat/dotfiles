@@ -14,7 +14,7 @@ return {
 					-- Go
 					go = { "goimports", "gofumpt" },
 					-- Python
-					python = { "isort", "black", "autoflake" },
+					python = { "ruff_fix", "ruff_format", "ruff_organize_imports" },
 					-- Web (TS, JS, JSX, Vue, CSS, HTML)
 					javascript = { "prettierd" },
 					typescript = { "prettierd" },

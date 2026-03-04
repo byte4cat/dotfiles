@@ -1,6 +1,6 @@
 #!/bin/bash
 
-STATE_FILE="$HOME/.local/state/waypaper/default.json"
+STATE_FILE="$HOME/.local/state/waypaper/default.toml"
 mkdir -p "$(dirname "$STATE_FILE")"
 FOLDERS=(
     ~/.local/share/wallpapers

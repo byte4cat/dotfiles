@@ -17,7 +17,7 @@ confirm-close-surface = false
 
 # ctrl a is a command prefix
 keybind = "ctrl+a>ctrl+shift+s=text:ts\x0d"
-keybind = "ctrl+a>ctrl+s=text:ts\x0d"
+keybind = "ctrl+a>ctrl+s=text:ts\x1d"
 keybind = "ctrl+a>ctrl+f=text:tc\x0d"
 
 
