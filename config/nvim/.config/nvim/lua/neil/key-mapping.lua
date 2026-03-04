@@ -128,7 +128,7 @@ end, { noremap = true, silent = true, desc = "Toggle Folding" })
 -- )
 vim.api.nvim_set_keymap(
 	"n",
-	"<leader>pd",
+	"<leader>td",
 	":TodoTelescope<cr>",
 	{ noremap = true, silent = true, desc = "Todo Search" }
 )

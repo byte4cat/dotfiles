@@ -1,3 +1,5 @@
 # echo "Linux specific settings loaded."
 
 export PATH="$PATH:/usr/bin/vendor_perl"
+
+function mann () {man $1 | bat -l man --style=-numbers}
