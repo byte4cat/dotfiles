@@ -12,7 +12,6 @@ return {
 		config = function()
 			vim.env.PATH = vim.fn.stdpath("data") .. "/mason/bin:" .. vim.env.PATH
 
-			local lspconfig = require("lspconfig")
 			local mason = require("mason")
 			local mason_lspconfig = require("mason-lspconfig")
 			local mason_tool_installer = require("mason-tool-installer")
@@ -70,40 +69,65 @@ return {
 				keymap.setup(bufnr)
 			end
 
-			vim.filetype.add({
-				extension = {
-					templ = "templ",
-					astro = "astro",
-					ignore = "ignore",
-					gotmpl = "gotmpl",
-					gowork = "gowork",
-					tsx = "typescriptreact",
-					jsx = "javascriptreact",
-				},
-				filename = {
-					["docker-compose.yaml"] = "yaml.docker-compose",
-					["docker-compose.yml"] = "yaml.docker-compose",
-					["compose.yaml"] = "yaml.docker-compose",
-					["compose.yml"] = "yaml.docker-compose",
+			local function apply_lsp_config(name, user_config)
+				local final_config = vim.tbl_deep_extend("force", {
+					capabilities = capabilities,
+					on_attach = on_attach,
+				}, user_config or {})
+
+				-- 自動過濾該 Server 不被 Neovim 識別的 filetypes
+				local ok, lsp_config = pcall(require, "lspconfig.configs." .. name)
+				if ok and lsp_config.default_config.filetypes then
+					local filtered_ft = {}
+					for _, ft in ipairs(lsp_config.default_config.filetypes) do
+						if vim.fn.getcompletion(ft, "filetype")[1] ~= "" then
+							table.insert(filtered_ft, ft)
+						end
+					end
+					-- 如果使用者沒手動指定 filetypes，才用過濾後的
+					final_config.filetypes = user_config.filetypes or filtered_ft
+				end
+
+				vim.lsp.config(name, final_config)
+				vim.lsp.enable(name)
+			end
+
+			local base_config = {
+				capabilities = capabilities,
+				on_attach = on_attach,
+			}
+
+			local skip_servers = { "rust_analyzer", "tailwindcss" }
+
+			for _, server in ipairs(servers) do
+				local skip = false
+				for _, s in ipairs(skip_servers) do
+					if s == server then
+						skip = true
+						break
+					end
+				end
+
+				if not skip then
+					apply_lsp_config(server, {})
+				end
+			end
+
+			apply_lsp_config("rust_analyzer", {
+				capabilities = capabilities,
+				on_attach = on_attach,
+				settings = {
+					["rust-analyzer"] = {
+						procMacro = { enable = true },
+						checkOnSave = true,
+						cargo = { allFeatures = true },
+					},
 				},
 			})
 
-			for _, server in ipairs(servers) do
-				vim.lsp.config(server, {
-					capabilities = capabilities,
-					on_attach = on_attach,
-				})
-			end
-
-			-- vim.lsp.config("volar", {
-			-- 	capabilities = capabilities,
-			-- 	on_attach = on_attach,
-			-- 	init_options = {
-			-- 		vue = { hybridMode = true },
-			-- 	},
-			-- })
-
-			vim.lsp.config("tailwindcss", {
+			apply_lsp_config("tailwindcss", {
+				capabilities = capabilities,
+				on_attach = on_attach,
 				filetypes = { "html", "css", "javascriptreact", "typescriptreact", "vue", "svelte" },
 			})
 
