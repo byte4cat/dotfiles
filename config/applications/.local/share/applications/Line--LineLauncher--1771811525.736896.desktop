@@ -1,0 +1,13 @@
+[Desktop Entry]
+Name=LineLauncher
+Exec=flatpak run --command=bottles-cli com.usebottles.bottles run -p "LineLauncher" -b "Line" -- %u
+Type=Application
+Terminal=false
+Categories=Application;
+Icon=/home/neil/.var/app/com.usebottles.bottles/data/bottles/bottles/Line/icons/LineLauncher.png
+Comment=Launch LineLauncher using Bottles.
+StartupWMClass=LineLauncher
+Actions=Configure;
+[Desktop Action Configure]
+Name=Configure in Bottles
+Exec=flatpak run com.usebottles.bottles -b "Line"
