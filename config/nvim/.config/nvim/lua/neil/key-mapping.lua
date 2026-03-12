@@ -267,7 +267,7 @@ end, {
 
 -- Harpoon
 local harpoon = require("harpoon")
-vim.keymap.set("n", "<leader>a", function()
+vim.keymap.set("n", "<leader>aa", function()
 	harpoon:list():add()
 end, { noremap = true, silent = true, desc = "Harpoon: Add File" })
 
@@ -285,54 +285,54 @@ vim.keymap.set("n", "<A-j>", function()
 end, { noremap = true, silent = true, desc = "Harpoon: Next File" })
 
 -- Go testing
-vim.keymap.set("n", "<leader>tt", function()
-	if vim.bo.filetype == "go" then
-		vim.cmd("GoTestFile")
-		vim.notify("Running GoTestFile", "info", {
-			title = "Golang",
-		})
-	else
-		vim.notify("This filetype not supported for test file", "error", {
-			title = "Golang",
-		})
-	end
-end, { noremap = true, silent = true, desc = "Go: Test File" })
-
-vim.keymap.set("n", "<leader>tc", function()
-	if vim.bo.filetype == "go" then
-		vim.cmd("GoTestFunc")
-		vim.notify("Running GoTestFunc", "info", {
-			title = "Golang",
-		})
-	else
-		vim.notify("This filetype not supported for test function", "error", {
-			title = "Golang",
-		})
-	end
-end, { noremap = true, silent = true, desc = "Go: Test Function" })
-
-vim.keymap.set("n", "<leader>tp", function()
-	if vim.bo.filetype == "go" then
-		vim.cmd("GoTestPkg")
-		vim.notify("Running GoTestPkg", "info", {
-			title = "Golang",
-		})
-	else
-		vim.notify("This filetype not supported for test pkg", "error", {
-			title = "Golang",
-		})
-	end
-end, { noremap = true, silent = true, desc = "Go: Test Package" })
-
-vim.keymap.set("n", "<leader>ta", function()
-	if vim.bo.filetype == "go" then
-		vim.cmd("GoTestSum")
-		vim.notify("Running GoTestSum", "info", {
-			title = "Golang",
-		})
-	else
-		vim.notify("This filetype not supported for test sum", "error", {
-			title = "Golang",
-		})
-	end
-end, { noremap = true, silent = true, desc = "Go: Test Summary" })
+-- vim.keymap.set("n", "<leader>tt", function()
+-- 	if vim.bo.filetype == "go" then
+-- 		vim.cmd("GoTestFile")
+-- 		vim.notify("Running GoTestFile", "info", {
+-- 			title = "Golang",
+-- 		})
+-- 	else
+-- 		vim.notify("This filetype not supported for test file", "error", {
+-- 			title = "Golang",
+-- 		})
+-- 	end
+-- end, { noremap = true, silent = true, desc = "Go: Test File" })
+--
+-- vim.keymap.set("n", "<leader>tc", function()
+-- 	if vim.bo.filetype == "go" then
+-- 		vim.cmd("GoTestFunc")
+-- 		vim.notify("Running GoTestFunc", "info", {
+-- 			title = "Golang",
+-- 		})
+-- 	else
+-- 		vim.notify("This filetype not supported for test function", "error", {
+-- 			title = "Golang",
+-- 		})
+-- 	end
+-- end, { noremap = true, silent = true, desc = "Go: Test Function" })
+--
+-- vim.keymap.set("n", "<leader>tp", function()
+-- 	if vim.bo.filetype == "go" then
+-- 		vim.cmd("GoTestPkg")
+-- 		vim.notify("Running GoTestPkg", "info", {
+-- 			title = "Golang",
+-- 		})
+-- 	else
+-- 		vim.notify("This filetype not supported for test pkg", "error", {
+-- 			title = "Golang",
+-- 		})
+-- 	end
+-- end, { noremap = true, silent = true, desc = "Go: Test Package" })
+--
+-- vim.keymap.set("n", "<leader>ta", function()
+-- 	if vim.bo.filetype == "go" then
+-- 		vim.cmd("GoTestSum")
+-- 		vim.notify("Running GoTestSum", "info", {
+-- 			title = "Golang",
+-- 		})
+-- 	else
+-- 		vim.notify("This filetype not supported for test sum", "error", {
+-- 			title = "Golang",
+-- 		})
+-- 	end
+-- end, { noremap = true, silent = true, desc = "Go: Test Summary" })

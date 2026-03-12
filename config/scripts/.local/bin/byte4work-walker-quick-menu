@@ -8,6 +8,7 @@ LOG_PATH="$SCRIPTS_DIR/logs/walker_quick_memu.log"
 OPTIONS=(
     "Audio Output"
     "Audio Input"
+    "Toggle Sleep"
     "Toggle VPN"
     "Restart PipeWire"
     "Restart NetworkManager"
@@ -194,6 +195,12 @@ main() {
         logger "Restarting Wifi wlan0"
         "$SCRIPTS_DIR/byte4work-restart-wifi-wlan0"
         notify-send "Wifi wlan0 Restarted"
+        exit 0
+        ;;
+
+    "Toggle Sleep")
+        logger "Toggle Sleep"
+        "$SCRIPTS_DIR/byte4work-hypridle-toggle"
         exit 0
         ;;
 
