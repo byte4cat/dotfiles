@@ -1,0 +1,12 @@
+mouse_support: true
+max_watch_history: 50
+allow_unicode: false
+images: Sixels
+refresh_after_modifying_search_filters: true
+provider: YouTube
+env:
+  browser: xdg-open
+  video-player: mpv
+  # video-player: mpv --ytdl-format="bestvideo[height<=2160]+bestaudio/best" --fs
+  youtube-downloader: yt-dlp
+  terminal-emulator: ghostty -e
