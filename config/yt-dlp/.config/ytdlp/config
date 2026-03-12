@@ -1,0 +1,16 @@
+# 強制抓 1080p，但如果沒有 1080p 就往上抓 (不設限)，確保永遠有畫面
+-f "bestvideo[height<=1080]+bestaudio/best"
+# -f "bestvideo+bestaudio/best"
+--format-sort "res:1080,vcodec:av1,vcodec:vp9"
+
+--extractor-args "youtube:player-client=ios"
+--concurrent-fragments 20
+--downloader-args "ffmpeg:-threads 16"
+
+--prefer-free-formats
+--write-subs
+--write-auto-subs
+--sub-langs "zh-Hant,zh-TW,en.*"
+
+--no-playlist
+--user-agent "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36"

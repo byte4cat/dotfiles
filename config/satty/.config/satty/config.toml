@@ -1,0 +1,11 @@
+[general]
+output-filename = "/home/neil/Pictures/Screenshots/satty-%Y%m%d-%H%M%S.png"
+initial-tool = "rectangle"
+copy-command = "wl-copy"
+
+# [color-palette]
+# custom = ["#ff0000", "#00ff00", "#0000ff", "#ffffff", "#000000"]
+
+[font]
+family = "Noto Sans CJK SC"
+style = "Bold"
