@@ -17,3 +17,9 @@ vim.filetype.add({
 		["compose.yml"] = "yaml.docker-compose",
 	},
 })
+
+vim.filetype.add({
+	extension = {
+		hurl = "hurl",
+	},
+})

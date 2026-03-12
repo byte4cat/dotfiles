@@ -261,3 +261,5 @@ if [ -f '/home/neil/google-cloud-sdk/completion.zsh.inc' ]; then . '/home/neil/g
 # bindkey -M vicmd '^A' vi-beginning-of-line
 # bindkey -M vicmd '^E' vi-end-of-line
 # export PATH="$HOME/.local/share/nvim/mason/bin:$PATH"
+
+export GPG_TTY=$(tty)

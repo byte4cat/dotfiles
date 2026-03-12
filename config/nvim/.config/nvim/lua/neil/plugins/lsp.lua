@@ -31,6 +31,7 @@ return {
 				"cmake",
 				"ts_ls",
 				"eslint",
+				"emmet_language_server",
 				"html",
 				"cssls",
 				"tailwindcss",
@@ -129,6 +130,10 @@ return {
 				capabilities = capabilities,
 				on_attach = on_attach,
 				filetypes = { "html", "css", "javascriptreact", "typescriptreact", "vue", "svelte" },
+			})
+
+			apply_lsp_config("emmet_language_server", {
+				filetypes = { "html", "typescriptreact", "javascriptreact", "css", "sass", "scss", "less", "templ" },
 			})
 
 			mason.setup()

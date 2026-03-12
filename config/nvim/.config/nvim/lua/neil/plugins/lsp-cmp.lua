@@ -9,8 +9,10 @@ return {
 		"saadparwaiz1/cmp_luasnip",
 		"onsails/lspkind.nvim", -- 圖標
 		"roobert/tailwindcss-colorizer-cmp.nvim", -- Tailwind 顏色
+		"L3MON4D3/LuaSnip",
 	},
 	config = function()
+		local ls = require("luasnip")
 		local cmp = require("cmp")
 		local tailwindcss_colorizer = require("tailwindcss-colorizer-cmp")
 		require("tailwindcss-colorizer-cmp").setup({
@@ -36,31 +38,46 @@ return {
 					require("luasnip").lsp_expand(args.body)
 				end,
 			},
+
 			mapping = cmp.mapping.preset.insert({
+				-- 上下移動選單
 				["<C-k>"] = cmp.mapping.select_prev_item(cmp_select),
 				["<C-j>"] = cmp.mapping.select_next_item(cmp_select),
 
-				-- 你原本的 S-Tab 邏輯：有選單就確認（或選下一個），沒選單就 fallback
-				["<S-Tab>"] = cmp.mapping(function(fallback)
-					if cmp.visible() then
-						local selected_entry = cmp.get_selected_entry()
-						if not selected_entry then
-							cmp.select_next_item({ behavior = cmp.SelectBehavior.Select })
-						else
-							cmp.confirm({ select = true })
+				-- 只有 Enter 負責確認補全
+				["<CR>"] = cmp.mapping.confirm({
+					behavior = cmp.ConfirmBehavior.Replace,
+					select = true,
+				}),
+
+				-- Tab 專門用於：展開 Snippet 或 跳到下一個輸入塊
+				["<Tab>"] = cmp.mapping(function(fallback)
+					if ls.expand_or_locally_jumpable() then
+						-- 如果選單開著，先把它關掉，避免干擾跳轉
+						if cmp.visible() then
+							cmp.close()
 						end
+						ls.expand_or_jump()
+					else
+						fallback() -- 正常的 Tab 功能（縮排）
+					end
+				end, { "i", "s" }),
+
+				-- Shift-Tab 專門用於：跳回上一個輸入塊
+				["<S-Tab>"] = cmp.mapping(function(fallback)
+					if ls.locally_jumpable(-1) then
+						if cmp.visible() then
+							cmp.close()
+						end
+						ls.jump(-1)
 					else
 						fallback()
 					end
 				end, { "i", "s" }),
 
-				["<Tab>"] = nil,
 				["<C-Space>"] = cmp.mapping.complete(),
-				["<CR>"] = cmp.mapping.confirm({
-					behavior = cmp.ConfirmBehavior.Replace,
-					select = true,
-				}),
 			}),
+
 			sources = cmp.config.sources({
 				{ name = "nvim_lsp" },
 				{ name = "luasnip" },
