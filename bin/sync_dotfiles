@@ -16,28 +16,55 @@ source "$DOTFILES_DIR/lib/common"
 
 cd_or_error "$DOTFILES_DIR"
 
+cleanup_orphans() {
+    info "Cleaning up broken symlinks in ~/.config and ~/.local/private..."
+    # 尋找目錄下指向 dotfiles 但原始檔案已不存在的斷頭連結並刪除
+    # -L 是找連結，! -e 是找指向目標不存在的
+    find "$HOME/.config" "$HOME/.local/private" -xtype l -delete 2>/dev/null || true
+
+    # 清理空目錄
+    find "$HOME/.config" "$HOME/.local/private" -type d -empty -delete 2>/dev/null || true
+}
+
 stow_dotfiles() {
+    cleanup_orphans
+
     info "Stowing dotfiles from: $DOTFILES_DIR"
     [ -d "config" ] || error "'stow' directory not found."
 
+    info "Stowing config packages..."
     for pkg in config/*; do
         [ -d "$pkg" ] || continue
         pkg_name=$(basename "$pkg")
-        info "Stowing package: $pkg_name"
-        stow -d config -t "$HOME" --restow "$pkg_name"
+
+        info "  > Stowing config: $pkg_name"
+        stow -d config -t "$HOME" --restow --no-folding "$pkg_name"
     done
 
     if [ -d "private" ]; then
-        mkdir -p "$HOME/.local/private"
-        info "Stowing private package..."
-        stow -v -d . -t "$HOME/.local/private" --restow private
+        info "Stowing private packages..."
+
+        for p_pkg in private/*; do
+            [ -d "$p_pkg" ] || continue
+            p_pkg_name=$(basename "$p_pkg")
+
+            info "  > Stowing private: $p_pkg_name"
+            stow -d private -t "$HOME" --restow --no-folding "$p_pkg_name"
+        done
     fi
+
     success "✅ All dotfiles stowed successfully."
 }
 
 main() {
     check_command git stow
     stow_dotfiles
+
+    if command -v systemctl >/dev/null; then
+        info "Reloading systemd user daemon..."
+        systemctl --user daemon-reload
+    fi
+
     success "🎉 Dotfiles deployment completed!"
 }
 

@@ -1,0 +1,35 @@
+# --cookies /home/neil/.local/private/yt-dlp/www.youtube.com_cookies.txt
+--cookies-from-browser firefox
+# 畫質與格式 (針對 1440p/1080p 優化)
+# -f "bestvideo[height<=1440]+bestaudio/best"
+# 優先選取 4K (2160p) 以下的最佳畫質
+-f "bestvideo[height<=2160]+bestaudio/best"
+-S "res:2160,vcodec:vp9/av1,acodec:m4a"
+--merge-output-format mkv
+# 模擬不同的客戶端類型，這能繞過部分針對 Web API 的限速
+# --extractor-args "youtube:player-client=web,tv;po_token=web.player+getpot;formats=missing_pot;fetch-pot=always;player-params=opi=112496729"
+--extractor-args "youtube:player-client=ios,tv;formats=missing_pot"
+--user-agent "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:123.0) Gecko/20100101 Firefox/123.0"
+# 嵌入字幕
+--embed-subs
+# 嵌入縮圖作為檔案圖示
+--embed-thumbnail
+  # 嵌入影片資訊（上傳者、日期等）
+--embed-metadata
+# 下載所有可用語言字幕
+--all-subs
+--sponsorblock-mark all
+# 下載加速
+--concurrent-fragments 5
+
+# --- 字幕精簡化 ---
+--write-subs
+--write-auto-subs
+--sub-format "srt/best"
+# 只抓繁中、簡中、英文
+--sub-langs "zh-Hant,zh-Hans,en.*"
+# 確保字幕合併進 mkv 而不產生一堆外掛檔案
+--embed-subs
+
+# 存檔路徑 (如果你常用 ytfzf 下載功能)
+-o "~/Videos/%(title)s.%(ext)s"
