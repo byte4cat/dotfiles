@@ -7,8 +7,8 @@
 -S "res:2160,vcodec:vp9/av1,acodec:m4a"
 --merge-output-format mkv
 # 模擬不同的客戶端類型，這能繞過部分針對 Web API 的限速
-# --extractor-args "youtube:player-client=web,tv;po_token=web.player+getpot;formats=missing_pot;fetch-pot=always;player-params=opi=112496729"
---extractor-args "youtube:player-client=ios,tv;formats=missing_pot"
+--extractor-args "youtube:player-client=web,tv;po_token=web.player+getpot;formats=missing_pot;fetch-pot=always;player-params=opi=112496729"
+# --extractor-args "youtube:player-client=ios,tv;formats=missing_pot"
 --user-agent "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:123.0) Gecko/20100101 Firefox/123.0"
 # 嵌入字幕
 --embed-subs
@@ -16,8 +16,6 @@
 --embed-thumbnail
   # 嵌入影片資訊（上傳者、日期等）
 --embed-metadata
-# 下載所有可用語言字幕
---all-subs
 --sponsorblock-mark all
 # 下載加速
 --concurrent-fragments 5
