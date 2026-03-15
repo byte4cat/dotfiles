@@ -263,3 +263,4 @@ if [ -f '/home/neil/google-cloud-sdk/completion.zsh.inc' ]; then . '/home/neil/g
 # export PATH="$HOME/.local/share/nvim/mason/bin:$PATH"
 
 export GPG_TTY=$(tty)
+source /usr/share/zsh-theme-powerlevel10k/powerlevel10k.zsh-theme
