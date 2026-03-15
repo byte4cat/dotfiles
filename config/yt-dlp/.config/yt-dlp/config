@@ -1,5 +1,5 @@
 # --cookies /home/neil/.local/private/yt-dlp/www.youtube.com_cookies.txt
---cookies-from-browser firefox
+--cookies-from-browser chromium
 # 畫質與格式 (針對 1440p/1080p 優化)
 # -f "bestvideo[height<=1440]+bestaudio/best"
 # 優先選取 4K (2160p) 以下的最佳畫質
@@ -19,7 +19,6 @@
 --sponsorblock-mark all
 # 下載加速
 --concurrent-fragments 5
-
 # --- 字幕精簡化 ---
 --write-subs
 --write-auto-subs
@@ -28,6 +27,5 @@
 --sub-langs "zh-Hant,zh-Hans,en.*"
 # 確保字幕合併進 mkv 而不產生一堆外掛檔案
 --embed-subs
-
 # 存檔路徑 (如果你常用 ytfzf 下載功能)
 -o "~/Videos/%(title)s.%(ext)s"

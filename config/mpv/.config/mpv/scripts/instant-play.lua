@@ -5,7 +5,7 @@ msg.info("--- Instant Play Mode Initialized ---")
 msg.info("--- Monitoring playlist updates ---")
 
 -- Observe changes in the playlist count
-mp.observe_property("playlist-count", "number", function(name, count)
+mp.observe_property("playlist-count", "number", function(_, count)
 	-- If count is greater than 1, a new file was recently appended
 	if count and count > 1 then
 		msg.info("New file detected in playlist. Forcing jump to latest entry.")
