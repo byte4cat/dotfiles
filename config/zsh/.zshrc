@@ -239,12 +239,6 @@ fi
 # AsyncAPI CLI Autocomplete
 ASYNCAPI_AC_ZSH_SETUP_PATH=/home/neil/.cache/@asyncapi/cli/autocomplete/zsh_setup && test -f $ASYNCAPI_AC_ZSH_SETUP_PATH && source $ASYNCAPI_AC_ZSH_SETUP_PATH; # asyncapi autocomplete setup
 
-# The next line updates PATH for the Google Cloud SDK.
-if [ -f '/home/neil/google-cloud-sdk/path.zsh.inc' ]; then . '/home/neil/google-cloud-sdk/path.zsh.inc'; fi
-
-# The next line enables shell command completion for gcloud.
-if [ -f '/home/neil/google-cloud-sdk/completion.zsh.inc' ]; then . '/home/neil/google-cloud-sdk/completion.zsh.inc'; fi
-
 # # Re-bind for Vi-Insert Mode
 # # Use the correct ZLE widget names for Vi mode
 # bindkey -M viins '^A' vi-beginning-of-line
@@ -264,3 +258,9 @@ if [ -f '/home/neil/google-cloud-sdk/completion.zsh.inc' ]; then . '/home/neil/g
 
 export GPG_TTY=$(tty)
 source /usr/share/zsh-theme-powerlevel10k/powerlevel10k.zsh-theme
+
+# The next line updates PATH for the Google Cloud SDK.
+if [ -f '/home/neil/Downloads/google-cloud-sdk/path.zsh.inc' ]; then . '/home/neil/Downloads/google-cloud-sdk/path.zsh.inc'; fi
+
+# The next line enables shell command completion for gcloud.
+if [ -f '/home/neil/Downloads/google-cloud-sdk/completion.zsh.inc' ]; then . '/home/neil/Downloads/google-cloud-sdk/completion.zsh.inc'; fi

@@ -1,0 +1,17 @@
+#!/bin/bash
+
+CONFIG_SRC="$HOME/.config/waybar/config.jsonc"
+STYLE_SRC="$HOME/.config/waybar/style.css"
+TMP_CFG="/tmp/waybar_cfg"
+
+# 檢查 PRIMARY_MONITOR 是否真的存在於目前系統
+# 如果抓不到，就 Fallback 到第一個偵測到的螢幕
+MONITOR=$(hyprctl monitors -j | jq -r ".[] | select(.name == \"$PRIMARY_MONITOR\") | .name")
+if [ -z "$MONITOR" ]; then
+    MONITOR=$(hyprctl monitors -j | jq -r '.[0].name')
+fi
+
+sed "s/__PRIMARY_MONITOR__/$MONITOR/g" "$CONFIG_SRC" > "$TMP_CFG"
+
+killall waybar 2>/dev/null
+waybar -c "$TMP_CFG" -s "$STYLE_SRC" &
