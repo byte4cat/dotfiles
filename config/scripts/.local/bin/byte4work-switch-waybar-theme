@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# NOTE: SHOULD SET PRIMARY_MONITOR as env variable to let this script work
+
 # --- 1. Define Paths ---
 WAYBAR_CONFIG_DIR="$HOME/.config/waybar"
 CONFIG_DIR="$WAYBAR_CONFIG_DIR/modules"
@@ -38,7 +40,11 @@ rm -f "$WAYBAR_CONFIG_DIR/style.css"
 ln -s "$CONFIG_DIR/$PRESET.jsonc" "$WAYBAR_CONFIG_DIR/config.jsonc"
 ln -s "$STYLE_DIR/$PRESET.css" "$WAYBAR_CONFIG_DIR/style.css"
 
+# fallback
+MONITOR=${PRIMARY_MONITOR:-$(hyprctl monitors -j | jq -r '.[0].name')}
+sed "s/__PRIMARY_MONITOR__/${PRIMARY_MONITOR}/g" "$WAYBAR_CONFIG_DIR/config.jsonc" >/tmp/waybar_cfg
+
 # --- 5. Restart Waybar ---
 echo "Switching to preset: $PRESET"
 killall waybar
-waybar &
+waybar -c /tmp/waybar_cfg -s "$WAYBAR_CONFIG_DIR/style.css" &

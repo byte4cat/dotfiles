@@ -1,3 +1,5 @@
+local opts = { noremap = true, silent = true }
+
 -- show prev view
 vim.keymap.set("n", "<leader>pv", vim.cmd.Ex, { noremap = true, silent = true, desc = "Show previous view (Ex)" })
 
@@ -29,6 +31,21 @@ vim.api.nvim_set_keymap("n", "<C-l>", "<C-w>l", { noremap = true, silent = true,
 vim.api.nvim_set_keymap("n", "<C-n>", "<C-w>w", { noremap = true, silent = true, desc = "Next Window" })
 -- previous window
 vim.api.nvim_set_keymap("n", "<C-p>", "<C-w>p", { noremap = true, silent = true, desc = "Previous Window" })
+
+-- autopair
+-- 1. 當你在括號中間按 Enter 時，自動展開並縮進 (這是你最懷念的功能)
+-- 邏輯：如果你輸入 {} 然後在中間按 Enter，它會變成
+-- {
+--   (游標在這一行)
+-- }
+-- vim.keymap.set("i", "{<CR>", "{<CR>}<Esc>O", opts)
+-- vim.keymap.set("i", "[<CR>", "[<CR>]<Esc>O", opts)
+-- vim.keymap.set("i", "(<CR>", "(<CR>)<Esc>O", opts)
+
+-- 2. 基礎自動補對 (如果你發現打 { 不會自動出 }，可以補這幾行)
+-- vim.keymap.set("i", "{<Tab>", "{}<Left>", opts)
+-- vim.keymap.set("i", "[<Tab>", "[]<Left>", opts)
+-- vim.keymap.set("i", "(<Tab>", "()<Left>", opts)
 
 -- nvim-tmux-navigator (會覆蓋 <C-h/j/k/l> 的視窗切換)
 vim.api.nvim_set_keymap(

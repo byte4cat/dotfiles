@@ -1,5 +1,6 @@
 {
   "layer": "top",
+  "output": "__PRIMARY_MONITOR__",
   "position": "top",
   "mode": "dock",
   "height": 0,

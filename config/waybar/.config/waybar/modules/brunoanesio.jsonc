@@ -1,5 +1,6 @@
 {
   "layer": "bottom",
+  "output": "__PRIMARY_MONITOR__",
   "position": "top",
   "height": 40,
   "spacing": 2,

@@ -10,6 +10,16 @@ local function get_last_theme()
 	return "nightfox"
 end
 
+local function set_theme(name)
+	if name and name ~= "" then
+		local ok, err = pcall(vim.cmd.colorscheme, name)
+		if not ok then
+			vim.notify("Theme switch error: " .. name, vim.log.levels.DEBUG)
+		end
+		-- apply_transparency 會由 ColorScheme Autocmd 自動觸發
+	end
+end
+
 local function save_theme(theme)
 	local f = io.open(theme_cache, "w")
 	if f then
@@ -19,10 +29,12 @@ local function save_theme(theme)
 end
 
 local function apply_transparency()
-	local groups = { "Normal", "NormalFloat", "NormalNC", "SignColumn", "EndOfBuffer" }
-	for _, group in ipairs(groups) do
-		vim.api.nvim_set_hl(0, group, { bg = "none", ctermbg = "none" })
-	end
+	pcall(function()
+		local groups = { "Normal", "NormalFloat", "NormalNC", "SignColumn", "EndOfBuffer" }
+		for _, group in ipairs(groups) do
+			vim.api.nvim_set_hl(0, group, { bg = "none", ctermbg = "none" })
+		end
+	end)
 end
 
 -- 主題清單
@@ -68,34 +80,72 @@ local themes = {
 vim.schedule(function()
 	-- 啟動時讀取
 	local last = get_last_theme()
-	pcall(function()
-		vim.cmd.colorscheme(last)
-		apply_transparency()
-	end)
+	set_theme(last)
+	apply_transparency()
+
+	vim.api.nvim_create_autocmd("ColorScheme", {
+		pattern = "*",
+		callback = function()
+			apply_transparency()
+		end,
+	})
+
+	local w = vim.loop.new_fs_event()
+	w:start(
+		theme_cache,
+		{},
+		vim.schedule_wrap(function(err, fname, events)
+			if err then
+				return
+			end
+			local new_theme = get_last_theme()
+			-- 只有當檔案內容真的變了，且跟目前主題不同時才切換，避免無窮迴圈
+			if new_theme ~= vim.g.colors_name then
+				set_theme(new_theme)
+			end
+		end)
+	)
 
 	-- 設定快捷鍵
 	vim.keymap.set("n", "<leader>th", function()
 		local actions = require("telescope.actions")
 		local action_state = require("telescope.actions.state")
+		local builtin = require("telescope.builtin")
 
-		require("telescope.builtin").colorscheme({
+		builtin.colorscheme({
 			enable_preview = true,
+			-- 在預覽切換時暫時關閉所有 Autocmd
 			attach_mappings = function(prompt_bufnr, map)
-				-- 監聽按下 Enter 的動作
+				-- 這裡攔截 Telescope 的預覽行為
+				-- Telescope 預覽主題時會呼叫 colorscheme，我們讓它在 eventignore 下執行
+				vim.api.nvim_create_autocmd("ColorSchemePre", {
+					buffer = prompt_bufnr,
+					callback = function()
+						vim.opt.eventignore:append("ColorScheme")
+					end,
+				})
+
+				-- 改完後恢復
+				vim.api.nvim_create_autocmd("ColorScheme", {
+					buffer = prompt_bufnr,
+					callback = function()
+						vim.opt.eventignore:remove("ColorScheme")
+					end,
+				})
+
 				actions.select_default:replace(function()
 					local selection = action_state.get_selected_entry()
 					actions.close(prompt_bufnr)
 					if selection then
 						local name = selection.value
-						vim.cmd.colorscheme(name)
-						save_theme(name) -- 成功記憶的核心
-						vim.defer_fn(apply_transparency, 10)
+						set_theme(name)
+						save_theme(name)
 					end
 				end)
 				return true
 			end,
 		})
-	end, { desc = "Theme Picker (Save on Enter)" })
+	end, { desc = "Theme Picker (Silenced Preview)" })
 end)
 
 return themes

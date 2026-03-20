@@ -3,3 +3,8 @@ show_hidden = true
 
 [preview]
 image = true
+
+[opener]
+edit = [
+    { run = 'nvim "$@"', block = true, desc = "Neovim" }
+]
