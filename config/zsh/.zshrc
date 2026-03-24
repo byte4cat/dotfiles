@@ -7,8 +7,8 @@ elif [[ "$(uname)" == "Linux" ]]; then
     [ -f "$HOME/.zshrc_linux" ] && source "$HOME/.zshrc_linux"
 fi
 
-if [ -f "$HOME/.local/private/zsh/.zshrc_local" ]; then
-    source "$HOME/.local/private/zsh/.zshrc_local"
+if [ -f "$HOME/.local/private/.zshrc_local" ]; then
+    source "$HOME/.local/private/.zshrc_local"
 fi
 
 # --- Basic Environment Variables ---
