@@ -5,7 +5,7 @@ OPTIONS=(
     "☯ Shutdown"
     "🔄 Reboot"
     "💤 Sleep"
-    # "🛌🏻 Hibernate"
+    "🛌🏻 Hibernate"
     "🔒 Lock"
     "❌ Cancel"
 )
@@ -27,9 +27,9 @@ case "$selection" in
 "🔄 Reboot")
     systemctl reboot --no-wall
     ;;
-# "🛌🏻 Hibernate")
-#     systemctl hibernate
-#     ;;
+"🛌🏻 Hibernate")
+    systemctl hibernate
+    ;;
 "💤 Sleep")
     systemctl suspend
     ;;

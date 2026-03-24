@@ -1,0 +1,22 @@
+#!/bin/bash
+
+DOMAIN=$1
+
+if [ -z "$DOMAIN" ]; then
+    echo "Usage: $0 <domain>"
+    exit 1
+fi
+
+echo "Tracking $DOMAIN ... (Ctrl+C to stop)"
+
+while true; do
+    RESULT=$(nslookup "$DOMAIN" 2>/dev/null | grep -A 1 "Name:" | grep "Address:" | awk '{print $2}')
+
+    if [ -n "$RESULT" ]; then
+        notify-send -u critical "DNS Resolved! ✅" "$DOMAIN -> $RESULT"
+        echo "Resolved: $DOMAIN is at $RESULT"
+        break
+    fi
+
+    sleep 30
+done
