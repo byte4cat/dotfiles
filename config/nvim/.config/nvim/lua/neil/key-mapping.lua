@@ -284,7 +284,7 @@ end, {
 
 -- Harpoon
 local harpoon = require("harpoon")
-vim.keymap.set("n", "<leader>aa", function()
+vim.keymap.set("n", "<leader>o", function()
 	harpoon:list():add()
 end, { noremap = true, silent = true, desc = "Harpoon: Add File" })
 

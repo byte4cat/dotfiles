@@ -1,1 +1,3 @@
+#!/bin/zsh
+
 $DOTFILES_DIR/bin/sync_dotfiles

@@ -50,8 +50,8 @@ return {
 					select = true,
 				}),
 
-				-- Tab 專門用於：展開 Snippet 或 跳到下一個輸入塊
-				["<Tab>"] = cmp.mapping(function(fallback)
+				-- Alt-Tab 專門用於：展開 Snippet 或 跳到下一個輸入塊
+				["<A-Tab>"] = cmp.mapping(function(fallback)
 					if ls.expand_or_locally_jumpable() then
 						-- 如果選單開著，先把它關掉，避免干擾跳轉
 						if cmp.visible() then
@@ -64,7 +64,7 @@ return {
 				end, { "i", "s" }),
 
 				-- Shift-Tab 專門用於：跳回上一個輸入塊
-				["<S-Tab>"] = cmp.mapping(function(fallback)
+				["<A-S-Tab>"] = cmp.mapping(function(fallback)
 					if ls.locally_jumpable(-1) then
 						if cmp.visible() then
 							cmp.close()

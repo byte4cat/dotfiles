@@ -23,7 +23,7 @@ return {
 					css = { "prettierd" },
 					html = { "prettierd" },
 					-- Others
-					rust = { "rustfmt" },
+					rust = { "trim_whitespace", "rustfmt" },
 					proto = { "buf" },
 					templ = { "templ" },
 					sh = { "shfmt" },
@@ -31,6 +31,7 @@ return {
 					-- Normal
 					["*"] = { "codespell" },
 					["_"] = { "trim_whitespace" },
+					json = { "prettierd" },
 				},
 
 				format_on_save = {

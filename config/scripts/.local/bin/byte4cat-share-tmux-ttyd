@@ -1,0 +1,47 @@
+#!/usr/bin/env bash
+
+# Strict Mode
+set -euo pipefail
+
+# 1. Select Tmux Session (using fzf)
+session=$(tmux list-sessions -F "#{session_name}" 2>/dev/null | \
+    fzf --height 40% --reverse --header="🔍 Select Session to Share (ESC to cancel):")
+
+if [[ -z "$session" ]]; then
+    echo "👋 Sharing cancelled."
+    exit 0
+fi
+
+# 2. Extract Precise IP (Excluding interface names)
+# Use awk to find 'inet ' lines and grab the IP address
+ip=$(ip -4 addr show up scope global | awk '/inet / {print $2}' | cut -d/ -f1 | head -n1)
+
+# Fallback to 0.0.0.0 if no IP is found
+[[ -z "$ip" ]] && ip="0.0.0.0"
+
+# 3. Parameters
+port=42069  # Using your preferred port
+user="neil"
+pass=$(date +%m%d)  # Dynamic password based on MMDD
+auth="$user:$pass"
+
+# 4. Display Info & Notification
+echo "------------------------------------------"
+echo "🚀 Sharing Session: [$session]"
+echo "🔗 URL: http://$ip:$port"
+echo "🔐 User: $user | 🔑 Pass: $pass"
+echo "------------------------------------------"
+
+# Send desktop notification
+if command -v notify-send &> /dev/null; then
+    notify-send -t 10000 "ttyd Started" "URL: http://$ip:$port\nPass: $pass"
+fi
+
+# 5. Launch ttyd
+# -W: Writable | -o: Close on exit | -c: Credential (user:pass)
+# Using -c is safer than passing it in the exec command
+exec ttyd -p "$port" \
+     -i "$ip" \
+     -c "$auth" \
+     -W \
+     tmux attach -t "$session"

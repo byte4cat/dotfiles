@@ -3,3 +3,32 @@
 export PATH="$PATH:/usr/bin/vendor_perl"
 
 function mann () {man $1 | bat -l man --style=-numbers}
+
+# Broadcast source to all tmux panes
+reload_all_panes() {
+    local current_pane=$(tmux display-message -p '#{pane_id}')
+    local all_panes=$(tmux list-panes -a -F '#{pane_id} #{pane_current_command}')
+
+    # 逐行讀取所有 Pane 資訊
+    echo "$all_panes" | while read -r pane_id pane_cmd; do
+        if [[ "$pane_id" == "$current_pane" ]]; then
+            source ~/.zshrc
+            continue
+        fi
+
+        # 核心檢查：如果該 Pane 正在執行 nvim, vim, 或 ssh，就跳過
+        if [[ "$pane_cmd" =~ (nvim|vim|ssh|top|btop|htop|cargo|go) ]]; then
+            echo "⏭️  Skipping $pane_id (running $pane_cmd)"
+            # 發送一個不需要 Enter 的提醒到 tmux 狀態列
+            tmux display-message -t "$pane_id" "⚠️ Dotfiles updated, reload manually later."
+        else
+            # 只有在純 Shell (zsh/bash) 的 Pane 才發送指令
+            tmux send-keys -t "$pane_id" "source ~/.zshrc" Enter
+            echo "✅ Reloaded $pane_id"
+        fi
+    done
+
+    notify-send "Dotfiles" "Reload broadcast finished!"
+}
+
+alias rall=reload_all_panes

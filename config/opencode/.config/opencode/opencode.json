@@ -1,0 +1,97 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "agent": {
+    "build": {
+      "mode": "primary",
+      "model": "github-copilot/gpt-5-mini",
+      "prompt": "{file:./prompts/build.md}",
+      "permission": {
+        "bash": {
+          "*": "allow",
+          "git *": "allow",
+          "git commit *": "ask",
+          "git push *": "deny"
+        },
+        "edit": "allow",
+        "write": "allow",
+        "patch": "allow",
+        "read": {
+          "*": "allow",
+          "*.env": "deny",
+          "*.env.*": "deny",
+          "*.env.example": "allow"
+        },
+        "grep": "allow",
+        "glob": "allow",
+        "list": "allow",
+        "ls": "allow",
+        "skill": "allow",
+        "todowrite": "allow",
+        "websearch": "allow",
+        "webfetch": "allow",
+        "question": "allow"
+      }
+    },
+    "plan": {
+      "mode": "primary",
+      "model": "github-copilot/gpt-5-mini",
+      "permission": {
+        "bash": "ask",
+        "edit": "deny",
+        "write": "ask",
+        "patch": "deny",
+        "read": {
+          "*": "allow",
+          "*.env": "deny",
+          "*.env.*": "deny",
+          "*.env.example": "allow"
+        },
+        "grep": "allow",
+        "glob": "allow",
+        "list": "allow",
+        "ls": "allow",
+        "skill": "allow",
+        "todowrite": "allow",
+        "websearch": "allow",
+        "webfetch": "allow",
+        "question": "allow"
+      }
+    },
+    "code-reviewer": {
+      "description": "Reviews code for best practices and potential issues",
+      "mode": "subagent",
+      "model": "github-copilot/gpt-5-mini",
+      "prompt": "{file:./prompts/review.md}",
+      "permission": {
+        "bash": "ask",
+        "edit": "deny",
+        "write": "ask",
+        "patch": "deny",
+        "read": {
+          "*": "allow",
+          "*.env": "deny",
+          "*.env.*": "deny",
+          "*.env.example": "allow"
+        },
+        "grep": "allow",
+        "glob": "allow",
+        "list": "allow",
+        "ls": "allow",
+        "skill": "allow",
+        "todowrite": "allow",
+        "websearch": "allow",
+        "webfetch": "allow",
+        "question": "allow"
+      }
+    }
+  },
+  "permission": {
+    "read": {
+      "*": "allow",
+      "*.env": "deny",
+      "*.env.*": "deny",
+      "*.env.example": "allow"
+    }
+  },
+  "plugin": ["@mohak34/opencode-notifier@latest"]
+}
