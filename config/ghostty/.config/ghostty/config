@@ -5,7 +5,7 @@ font-family = "Jetbrains Mono Nerd Font"
 theme = "Catppuccin Mocha"
 background = 000000
 background-opacity = 1
-font-size = 20
+font-size = 14
 font-feature = "calt"
 
 shell-integration-features = no-cursor,no-sudo,no-title

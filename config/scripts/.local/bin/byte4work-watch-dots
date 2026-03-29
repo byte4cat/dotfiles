@@ -1,0 +1,23 @@
+#! /bin/zsh
+
+# watchdog, dotfiles sync
+WATCH_DIR="$DOTFILES_DIR/config"
+
+echo "👀 Watching $WATCH_DIR for changes..."
+
+inotifywait -m -r -e close_write "$WATCH_DIR" | while read -r directory events filename; do
+    # ignore .git directories
+    if [[ "$directory" == *".git"* ]]; then continue; fi
+
+    echo "✨ Change detected in $filename, syncing..."
+
+    # sync dotfiles script
+    $DOTFILES_DIR/bin/sync_dotfiles
+
+    # if in tmux, set a buffer to notify the user to reload panes
+    if [[ -n "$TMUX" ]]; then
+        tmux set-buffer "reload_all_panes"
+        # send a desktop notification for Linux
+        notify-send "Dotfiles Changed" "Sync complete. Run 'rall' to update all panes."
+    fi
+done

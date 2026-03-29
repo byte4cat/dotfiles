@@ -32,7 +32,7 @@ return {
 		},
 
 		-- (replace nvim-notify)
-		notifier = { enabled = true, timeout = 2000 },
+		notifier = { enabled = true, timeout = 1500 },
 
 		scroll = { enabled = true },
 

@@ -5,11 +5,15 @@ set -e
 SCRIPTS_DIR="$HOME/.local/bin"
 LOG_PATH="$SCRIPTS_DIR/logs/walker_quick_memu.log"
 
+MON_NAME="HDMI-A-1"
+MON_CFG="1920x1200@60,-1200x0,1,transform,1"
+
 OPTIONS=(
     "Audio Output"
     "Audio Input"
     "Toggle Sleep"
     "Toggle VPN"
+    "Toggle Vertical Monitor"
     "Restart PipeWire"
     "Restart NetworkManager"
     "Restart Wifi wlan0"
@@ -28,6 +32,19 @@ for cmd in wpctl walker; do
         exit 1
     }
 done
+
+# Monitor Toggle Logic
+toggle_monitor() {
+    if hyprctl monitors | grep -q "$MON_NAME"; then
+        logger "Disabling $MON_NAME"
+        hyprctl keyword monitor "$MON_NAME,disable"
+        notify-send "Monitor Manager" "🖥️ $MON_NAME Disabled"
+    else
+        logger "Enabling $MON_NAME with config: $MON_CFG"
+        hyprctl keyword monitor "$MON_NAME,$MON_CFG"
+        notify-send "Monitor Manager" "🖥️ $MON_NAME Enabled"
+    fi
+}
 
 # --- 函數一：自動獲取所有 VPN 連線名稱 ---
 get_vpn_connections() {
@@ -176,6 +193,10 @@ main() {
     "Audio Output" | "Audio Input")
         logger "Proceeding to select $selection device"
         select_audio_device "$selection"
+        exit 0
+        ;;
+    "Toggle Vertical Monitor")
+        toggle_monitor
         exit 0
         ;;
     "Restart PipeWire")

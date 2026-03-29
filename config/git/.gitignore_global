@@ -126,3 +126,9 @@ dmypy.json
 
 # other plugins or settings
 scripts/vpn.sh
+
+# AI
+.opencode/
+.claude/
+AGENTS.md
+CLAUDE.md
