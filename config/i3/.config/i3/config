@@ -3,7 +3,7 @@
 ####################
 ### 1. 變數設定 ###
 ####################
-font pango:monospace 12
+font pango:monospace 14
 
 # 設置 Mod 鍵為 Super (Windows 鍵)
 set $mod Mod4
@@ -92,8 +92,6 @@ for_window [class="Rofi|Wofi"] move position center
 ###################
 ### 5. 按鍵綁定 ###
 ###################
-
-# i3 使用 bindsym 語法
 
 # 基礎操作
 bindsym $mod+Return exec $terminal
