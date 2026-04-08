@@ -16,6 +16,28 @@ source "$DOTFILES_DIR/lib/common"
 
 cd_or_error "$DOTFILES_DIR"
 
+link_librewolf_chrome() {
+    local lw_config_dir="$HOME/.config/librewolf/librewolf"
+    local dotfiles_chrome_src="$DOTFILES_DIR/config/librewolf/chrome"
+
+    if [ -d "$lw_config_dir" ] && [ -d "$dotfiles_chrome_src" ]; then
+        info "🔗 Linking LibreWolf chrome to random profile(s)..."
+
+        # 尋找所有以 .default-default 結尾的資料夾
+        for profile in "$lw_config_dir"/*.default-default; do
+            [ -d "$profile" ] || continue
+
+            info "  > Target profile: $(basename "$profile")"
+
+            # 建立符號連結，使用 -sf 確保重複執行時會覆蓋
+            ln -sf "$dotfiles_chrome_src" "$profile/chrome"
+        done
+        success "✅ LibreWolf chrome linked."
+    else
+        warn "⚠️ LibreWolf config or dotfiles source not found, skipping link."
+    fi
+}
+
 cleanup_orphans() {
     info "Cleaning up broken symlinks in ~/.config and ~/.local/private..."
     # 尋找目錄下指向 dotfiles 但原始檔案已不存在的斷頭連結並刪除
@@ -59,6 +81,8 @@ stow_dotfiles() {
 main() {
     check_command git stow
     stow_dotfiles
+
+    link_librewolf_chrome
 
     if command -v systemctl >/dev/null; then
         info "Reloading systemd user daemon..."
