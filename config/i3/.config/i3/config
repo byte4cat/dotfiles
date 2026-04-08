@@ -5,21 +5,20 @@
 ####################
 font pango:monospace 14
 
-# 設置 Mod 鍵為 Super (Windows 鍵)
+# 設置 Mod 鍵為 Super
 set $mod Mod4
 set $altMod Mod1
 
 # 設置你的程式
 set $terminal ghostty
 set $fileManager thunar
-# i3 通常使用 dmenu 或 rofi。wofi 是 Wayland 原生。
 set $menu rofi -show drun
 set $browser firefox
 set $workmsg flatpak run dev.vencord.Vesktop
 
-#######################
+############################
 ### 2. 環境變數/佈景主題 ###
-#######################
+############################
 
 # 設定 GTK/Qt 主題
 exec --no-startup-id gsettings set org.gnome.desktop.interface color-scheme "prefer-dark"
@@ -33,7 +32,7 @@ exec --no-startup-id xrandr --output HDMI-A-1 --mode 1920x1200 --pos 0x0 --rotat
 #
 # assign [class="Ghostty"] $ws1
 # assign [class="Chromium"] $ws2
-#
+
 exec --no-startup-id dunst
 # exec --no-startup-id $browser
 
@@ -45,10 +44,7 @@ set $gaps_out 10
 ### 3. AUTOSTART ###
 ###################
 
-# i3 使用 exec --no-startup-id 確保程式背景運行
-# 替換 hyprpaper
 exec_always --no-startup-id feh --bg-fill ~/.local/share/wallpapers/171652.jpg
-# 替換 waybar，你需要安裝和設定 polybar
 exec --no-startup-id polybar
 # exec --no-startup-id i3bar # 如果你使用內建的 i3status
 exec --no-startup-id fcitx5
@@ -99,7 +95,7 @@ bindsym $mod+q kill
 bindsym $mod+e exec $fileManager
 bindsym $mod+f fullscreen toggle
 bindsym $mod+Shift+f floating toggle
-bindsym $mod+c exec $browser
+bindsym $mod+b exec $browser
 bindsym $altMod+space exec $menu
 
 bindsym $mod+v exec ~/.local/bin/x11/byte4work-rofi-quick-memu
@@ -149,7 +145,6 @@ bindsym $mod+Shift+9 move container to workspace number 9
 bindsym $mod+Shift+0 move container to workspace number 10
 
 # 佈局切換 (i3 內建)
-# 替換 Hyprland 的 'dwindle' 概念
 bindsym $mod+s layout stacking
 bindsym $mod+w layout tabbed
 bindsym $mod+t layout toggle split
