@@ -26,6 +26,9 @@ exec --no-startup-id gsettings set org.gnome.desktop.interface gtk-theme "adw-gt
 # i3/X11 的環境變數設定
 exec --no-startup-id xrandr --output HDMI-A-1 --mode 1920x1200 --pos 0x0 --rotate left --output DisplayPort-1 --mode 3840x2160 --pos 1200x0 --primary
 
+# Mapping capslock to ctrl
+exec --no-startup-id setxkbmap -option ctrl:nocaps
+
 # 開機啟動
 # set $ws1 "1:Term"
 # set $ws2 "2:Web"
