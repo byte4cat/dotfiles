@@ -13,7 +13,7 @@ set $altMod Mod1
 set $terminal ghostty
 set $fileManager thunar
 set $menu rofi -show drun
-set $browser firefox
+set $browser librewolf
 set $workmsg flatpak run dev.vencord.Vesktop
 
 ############################
