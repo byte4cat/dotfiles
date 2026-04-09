@@ -1,0 +1,50 @@
+# Base
+[[entries]]
+name = "Google"
+url = "https://www.google.com/search?q=%TERM%"
+prefix = "gg"
+default = true
+
+[[entries]]
+name = "Translate"
+url = "https://translate.google.com/?sl=en&tl=zh-TW&text=%TERM%"
+prefix = "t"
+
+# Dev
+[[entries]]
+name = "GitHub"
+url = "https://github.com/search?q=%TERM%"
+prefix = "gh"
+
+[[entries]]
+name = "Rust Docs"
+url = "https://docs.rs/releases/search?query=%TERM%"
+prefix = "rs"
+
+[[entries]]
+name = "Go Packages"
+url = "https://pkg.go.dev/search?q=%TERM%"
+prefix = "go"
+
+# System
+[[entries]]
+name = "Arch Wiki"
+url = "https://wiki.archlinux.org/index.php?search=%TERM%"
+prefix = "aw"
+
+[[entries]]
+name = "AUR"
+url = "https://aur.archlinux.org/packages?K=%TERM%"
+prefix = "au"
+
+# Video
+[[entries]]
+name = "Youtube"
+url = "https://www.youtube.com/results?search_query=%TERM%"
+prefix = "y"
+
+# Others
+[[entries]]
+name = "Maps"
+url = "https://www.google.com/maps/search/%TERM%"
+prefix = "m"
