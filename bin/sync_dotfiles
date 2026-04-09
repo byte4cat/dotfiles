@@ -29,6 +29,10 @@ link_librewolf_chrome() {
 
             info "  > Target profile: $(basename "$profile")"
 
+            if [ -L "$target" ] || [ -e "$target" ]; then
+                rm -rf "$target"
+            fi
+
             # 建立符號連結，使用 -sf 確保重複執行時會覆蓋
             ln -sf "$dotfiles_chrome_src" "$profile/chrome"
         done
