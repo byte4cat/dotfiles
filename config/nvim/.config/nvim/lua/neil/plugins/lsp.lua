@@ -61,7 +61,7 @@ return {
 				"prettierd",
 				"clang-format",
 				"shfmt",
-				"codespell",
+				-- "codespell",
 				"sql-formatter",
 			}
 
