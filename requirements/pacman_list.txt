@@ -5,6 +5,7 @@ amdgpu_top
 amd-ucode
 another-redis-desktop-manager-bin
 anydesk-bin
+apache
 awww
 bat
 bc
@@ -20,6 +21,7 @@ bottom
 bpf
 brave-bin
 bridge-utils
+bruno
 btop
 cachyos-keyring
 cachyos-mirrorlist
@@ -131,6 +133,7 @@ libguestfs
 libmad
 libpulse
 libreoffice-still
+librewolf-bin
 libva-intel-driver
 libva-utils
 libvncserver
@@ -163,6 +166,7 @@ nvtop
 nwg-look
 obsidian
 obs-studio
+oha
 ollama-rocm
 openbsd-netcat
 opencode

@@ -2,7 +2,6 @@
 web_search_history
 
 # Editors
-.vscode/
 .idea/
 
 # Vagrant

@@ -1,16 +1,4 @@
-local opts = { noremap = true, silent = true }
-
--- show prev view
-vim.keymap.set("n", "<leader>pv", vim.cmd.Ex, { noremap = true, silent = true, desc = "Show previous view (Ex)" })
-
 vim.api.nvim_set_keymap("i", "jk", "<Esc>", { noremap = true, silent = true, desc = "Exit Insert Mode" })
-
--- 使用 <F1> 切換到下一個文檔 (注意：這會覆蓋下一行的 <F1> 設置)
-vim.api.nvim_set_keymap("n", "<F1>", ":bnext<CR>", { noremap = true, silent = true, desc = "Next Buffer" })
--- 使用 <F1> 切換到前一個文檔 (此行會覆蓋上一行的 <F1> 設置，但 desc 不會顯示)
-vim.api.nvim_set_keymap("n", "<F1>", ":bprev<CR>", { noremap = true, silent = true, desc = "Previous Buffer" })
--- 建議將其中一個改成 <F2>
-vim.api.nvim_set_keymap("n", "<F2>", ":bprev<CR>", { noremap = true, silent = true, desc = "Previous Buffer" })
 
 -- 使用 <F3> 交換當前視窗和下一個視窗的位置
 vim.api.nvim_set_keymap("n", "<F3>", "<C-w>x", { noremap = true, silent = true, desc = "Swap Window Position" })
@@ -31,21 +19,6 @@ vim.api.nvim_set_keymap("n", "<C-l>", "<C-w>l", { noremap = true, silent = true,
 vim.api.nvim_set_keymap("n", "<C-n>", "<C-w>w", { noremap = true, silent = true, desc = "Next Window" })
 -- previous window
 vim.api.nvim_set_keymap("n", "<C-p>", "<C-w>p", { noremap = true, silent = true, desc = "Previous Window" })
-
--- autopair
--- 1. 當你在括號中間按 Enter 時，自動展開並縮進 (這是你最懷念的功能)
--- 邏輯：如果你輸入 {} 然後在中間按 Enter，它會變成
--- {
---   (游標在這一行)
--- }
--- vim.keymap.set("i", "{<CR>", "{<CR>}<Esc>O", opts)
--- vim.keymap.set("i", "[<CR>", "[<CR>]<Esc>O", opts)
--- vim.keymap.set("i", "(<CR>", "(<CR>)<Esc>O", opts)
-
--- 2. 基礎自動補對 (如果你發現打 { 不會自動出 }，可以補這幾行)
--- vim.keymap.set("i", "{<Tab>", "{}<Left>", opts)
--- vim.keymap.set("i", "[<Tab>", "[]<Left>", opts)
--- vim.keymap.set("i", "(<Tab>", "()<Left>", opts)
 
 -- nvim-tmux-navigator (會覆蓋 <C-h/j/k/l> 的視窗切換)
 vim.api.nvim_set_keymap(
@@ -127,19 +100,19 @@ end, { noremap = true, silent = true, desc = "Toggle Folding" })
 -- )
 -- vim.api.nvim_set_keymap(
 -- 	"n",
--- 	"<leader>fd",
+-- 	"<leader>pf",
 -- 	"<cmd>lua require'telescope.builtin'.buffers({ show_all_buffers = true })<cr>",
 -- 	{ noremap = true, silent = true, desc = "Search Buffers (All)" }
 -- )
 -- vim.api.nvim_set_keymap(
 -- 	"n",
--- 	"<leader>fg",
+-- 	"<leader>pg",
 -- 	":Telescope git_status<CR>",
 -- 	{ noremap = true, silent = true, desc = "Git Status" }
 -- )
 -- vim.api.nvim_set_keymap(
 -- 	"n",
--- 	"<leader>fb",
+-- 	"<leader>ff",
 -- 	":Telescope git_bcommits<CR>",
 -- 	{ noremap = true, silent = true, desc = "Git Buffer Commits" }
 -- )
@@ -149,12 +122,12 @@ vim.api.nvim_set_keymap(
 	":TodoTelescope<cr>",
 	{ noremap = true, silent = true, desc = "Todo Search" }
 )
--- vim.api.nvim_set_keymap(
--- 	"n",
--- 	"<leader>ft",
--- 	":Telescope live_grep<CR>",
--- 	{ noremap = true, silent = true, desc = "Live Grep (Text Search)" }
--- )
+vim.api.nvim_set_keymap(
+	"n",
+	"<leader>ps",
+	":Telescope live_grep<CR>",
+	{ noremap = true, silent = true, desc = "Live Grep (Text Search)" }
+)
 -- vim.api.nvim_set_keymap(
 -- 	"n",
 -- 	"<leader>fh",
@@ -284,7 +257,7 @@ end, {
 
 -- Harpoon
 local harpoon = require("harpoon")
-vim.keymap.set("n", "<leader>o", function()
+vim.keymap.set("n", "<leader>a", function()
 	harpoon:list():add()
 end, { noremap = true, silent = true, desc = "Harpoon: Add File" })
 

@@ -4,6 +4,8 @@ bibata-cursor-theme-bin
 binder_linux-dkms-git
 bridge-utils
 bridge-utils-debug
+bruno
+bruno-debug
 crush-bin
 crush-bin-debug
 debtap
