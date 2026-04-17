@@ -29,6 +29,8 @@ link_librewolf_chrome() {
 
             info "  > Target profile: $(basename "$profile")"
 
+            local target="$profile/chrome"
+            info "  > Target profile: $(basename "$profile")"
             if [ -L "$target" ] || [ -e "$target" ]; then
                 rm -rf "$target"
             fi

@@ -39,3 +39,4 @@ application/x-rar=org.gnome.FileRoller.desktop
 x-scheme-handler/postman=Postman.desktop
 application/x-zerosize=code-oss.desktop
 x-scheme-handler/freetube=FreeTube.desktop
+x-scheme-handler/bruno=bruno.desktop

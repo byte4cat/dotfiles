@@ -106,13 +106,13 @@ return {
 			end,
 			desc = "Find Files (Snacks)",
 		},
-		{
-			"<leader>ps",
-			function()
-				Snacks.picker.grep()
-			end,
-			desc = "Grep (Snacks)",
-		},
+		-- {
+		-- 	"<leader>ps",
+		-- 	function()
+		-- 		Snacks.picker.grep()
+		-- 	end,
+		-- 	desc = "Grep (Snacks)",
+		-- },
 		{
 			"<leader>ff",
 			function()

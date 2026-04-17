@@ -2,7 +2,7 @@
 
 set -e
 
-SCRIPTS_DIR="$HOME/.local/bin"
+SCRIPTS_DIR="$HOME/.local/bin/wayland"
 LOG_PATH="$SCRIPTS_DIR/logs/walker_quick_memu.log"
 
 MON_NAME="HDMI-A-1"

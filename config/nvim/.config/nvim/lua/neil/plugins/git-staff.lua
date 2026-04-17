@@ -36,10 +36,10 @@ return {
 		-- see default keymaps in
 		-- https://github.com/akinsho/git-conflict.nvim?tab=readme-ov-file#mappings
 		-- example keymaps:
-		-- vim.keymap.set('n', 'co', '<Plug>(git-conflict-ours)')
-		-- vim.keymap.set('n', 'ct', '<Plug>(git-conflict-theirs)')
-		-- vim.keymap.set('n', 'cb', '<Plug>(git-conflict-both)')
-		-- vim.keymap.set('n', 'c0', '<Plug>(git-conflict-none)')
+		-- vim.keymap.set('n', 'gco', '<Plug>(git-conflict-ours)')
+		-- vim.keymap.set('n', 'gct', '<Plug>(git-conflict-theirs)')
+		-- vim.keymap.set('n', 'gcb', '<Plug>(git-conflict-both)')
+		-- vim.keymap.set('n', 'gc0', '<Plug>(git-conflict-none)')
 		-- vim.keymap.set('n', '[x', '<Plug>(git-conflict-prev-conflict)')
 		-- vim.keymap.set('n', ']x', '<Plug>(git-conflict-next-conflict)')
 	},
