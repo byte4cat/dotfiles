@@ -40,7 +40,6 @@ vim.opt.selection = "inclusive" -- 選取時包含最後一個字元
 vim.opt.splitbelow = true -- 水平分割視窗在下方開啟
 vim.opt.splitright = true -- 垂直分割視窗在右方開啟
 vim.opt.mouse = "a" -- 啟用滑鼠支援
-vim.opt.clipboard = "unnamedplus" -- 與系統剪貼簿同步
 vim.opt.autochdir = false -- 不要自動切換工作目錄 (避免插件抓不到 root)
 
 -- 命令列補全模式 (按 Tab 的行為)
@@ -74,4 +73,4 @@ vim.opt.pumheight = 10 -- 選單最大高度
 vim.opt.pumblend = 10 -- 選單透明度 (10%)
 vim.opt.winblend = 0 -- 浮動視窗透明度
 
-vim.lsp.set_log_level("warn")
+vim.lsp.log.set_level("warn")

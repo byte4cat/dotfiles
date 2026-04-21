@@ -1,7 +1,7 @@
+require("neil.sync_clipboard")
 require("neil.vim")
 require("neil.filetype")
 require("neil.lazy")
 require("neil.utils")
 require("neil.key-mapping")
 require("neil.lsp-key-mapping")
-require("neil.sync_clipboard")

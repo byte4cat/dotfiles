@@ -12,7 +12,7 @@ return {
 			_99.setup({
 				-- provider = _99.Providers.ClaudeCodeProvider,  -- default: OpenCodeProvider
 				provider = _99.Providers.OpenCodeProvider,
-				model = "github-copilot/gpt-5-mini",
+				model = "github-copilot/gpt-4.1",
 				logger = {
 					level = _99.DEBUG,
 					path = "/tmp/" .. basename .. ".99.debug",
@@ -84,20 +84,48 @@ return {
 			-- so i have this set to visual mode so i dont screw up and use an
 			-- old visual selection
 			--
-			-- likely ill add a mode check and assert on required visual mode
-			-- so just prepare for it now
-			vim.keymap.set("v", "<leader>9v", function()
-				_99.visual()
-			end)
+			-- Improved keymaps for 99.nvim: mode checks, safe calls, and better notifications
+			local function in_visual_mode()
+				local m = vim.api.nvim_get_mode().mode
+				-- 'v' = visual char, 'V' = visual line, '\22' = visual block (CTRL-V)
+				return m == "v" or m == "V" or m == string.char(22)
+			end
 
-			--- if you have a request you dont want to make any changes, just cancel it
+			local function safe_call(fn, name)
+				local ok, err = pcall(fn)
+				if not ok then
+					vim.notify((name or "function") .. " failed: " .. tostring(err), vim.log.levels.ERROR)
+				end
+				return ok
+			end
+
+			-- Visual mapping: require an active visual selection and call _99.visual
+			-- map in both 'x' (visual) and 'v' (visual/select) modes to be robust
+			vim.keymap.set({ "x", "v" }, "<leader>9v", function()
+				if not in_visual_mode() then
+					vim.notify("99: <leader>9v requires an active visual selection", vim.log.levels.WARN)
+					return
+				end
+
+				-- Use pcall to guard against runtime errors from the plugin
+				safe_call(function()
+					_99.visual()
+				end, "_99.visual")
+			end, { noremap = true, silent = true, desc = "99: Send visual selection to AI (99.visual)" })
+
+			-- Stop all requests: safe, user-facing notification on error
 			vim.keymap.set("n", "<leader>9x", function()
-				_99.stop_all_requests()
-			end)
+				safe_call(function()
+					_99.stop_all_requests()
+				end, "_99.stop_all_requests")
+			end, { noremap = true, silent = true, desc = "99: Cancel/stop all in-flight AI requests" })
 
+			-- Search with AI: wrap for safety and clear description
 			vim.keymap.set("n", "<leader>9s", function()
-				_99.search()
-			end)
+				safe_call(function()
+					_99.search()
+				end, "_99.search")
+			end, { noremap = true, silent = true, desc = "99: Search codebase with AI (99.search)" })
 		end,
 	},
 }

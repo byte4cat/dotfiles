@@ -14,6 +14,9 @@ gtk-titlebar = false
 
 confirm-close-surface = false
 
+clipboard-read = allow
+clipboard-write = allow
+
 
 # ctrl a is a command prefix
 keybind = "ctrl+a>ctrl+shift+s=text:ts\x0d"
