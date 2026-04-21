@@ -66,12 +66,12 @@
     "when": "vim.mode == 'Normal' && editorTextFocus"
   },
   {
-    "key": "shift-k",
+    "key": "alt-k",
     "command": "editor.action.moveLinesUpAction",
     "when": "vim.mode == 'VisualLine' && editorTextFocus"
   },
   {
-    "key": "shift-j",
+    "key": "alt-j",
     "command": "editor.action.moveLinesDownAction",
     "when": "vim.mode == 'VisualLine' && editorTextFocus"
   },
@@ -101,27 +101,27 @@
     "when": "(vim.mode == 'Normal' && editorTextFocus) || !inputFocus"
   },
   {
-    "key": "Space space",
+    "key": "Space p f",
     "command": "workbench.action.quickOpen",
     "when": "vim.mode == 'Normal' && (editorTextFocus || !inputFocus)"
   },
   {
-    "key": "Space g d",
+    "key": "g d",
     "command": "editor.action.revealDefinition",
     "when": "vim.mode == 'Normal' && editorTextFocus"
   },
   {
-    "key": "Space g r",
+    "key": "g r",
     "command": "editor.action.goToReferences",
     "when": "vim.mode == 'Normal' && editorTextFocus"
   },
   {
-    "key": "Space g i",
+    "key": "g i",
     "command": "editor.action.goToImplementation",
     "when": "vim.mode == 'Normal' && editorTextFocus"
   },
   {
-    "key": "Space s g",
+    "key": "Space p s",
     "command": "workbench.action.findInFiles",
     "when": "vim.mode == 'Normal' && (editorTextFocus || !inputFocus)"
   },
