@@ -66,6 +66,9 @@ vim.api.nvim_set_keymap("n", "<leader>s", ":split<CR>", { noremap = true, silent
 -- Pressing <Esc> in Normal mode will clear the highlight
 vim.keymap.set("n", "<Esc>", "<cmd>nohlsearch<CR>", { noremap = true, silent = true, desc = "Clear Search Highlight" })
 
+-- Buffer
+vim.keymap.set("n", "<leader>bd", ":bd<CR>", { desc = "Delete Buffer" })
+
 -- lsp restart
 vim.keymap.set("n", "<leader>R", function()
 	vim.cmd("LspRestart")
@@ -141,6 +144,7 @@ vim.api.nvim_set_keymap(
 	":Telescope live_grep<CR>",
 	{ noremap = true, silent = true, desc = "Live Grep (Text Search)" }
 )
+vim.keymap.set("n", "<leader>cs", ":Telescope lsp_document_symbols<CR>", { desc = "LSP Symbols" })
 -- vim.api.nvim_set_keymap(
 -- 	"n",
 -- 	"<leader>fh",
@@ -270,7 +274,7 @@ end, {
 
 -- Harpoon
 local harpoon = require("harpoon")
-vim.keymap.set("n", "<leader>ah", function()
+vim.keymap.set("n", "<leader>a", function()
 	harpoon:list():add()
 end, { noremap = true, silent = true, desc = "Harpoon: Add File" })
 

@@ -76,19 +76,22 @@ local themes = {
 	{ "eldritch-theme/eldritch.nvim", name = "eldritch", lazy = true, opts = { transparent = true } },
 }
 
+local last = get_last_theme()
+set_theme(last)
+
 -- 啟動與快捷鍵邏輯
 vim.schedule(function()
-	-- 啟動時讀取
-	local last = get_last_theme()
-	set_theme(last)
-	apply_transparency()
-
 	vim.api.nvim_create_autocmd("ColorScheme", {
 		pattern = "*",
 		callback = function()
 			apply_transparency()
 		end,
 	})
+
+	local last = get_last_theme()
+	set_theme(last)
+	-- just in case
+	apply_transparency()
 
 	local w = vim.loop.new_fs_event()
 	w:start(

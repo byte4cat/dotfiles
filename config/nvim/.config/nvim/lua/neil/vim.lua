@@ -73,4 +73,4 @@ vim.opt.pumheight = 10 -- 選單最大高度
 vim.opt.pumblend = 10 -- 選單透明度 (10%)
 vim.opt.winblend = 0 -- 浮動視窗透明度
 
-vim.lsp.log.set_level("warn")
+vim.lsp.log.set_level("error")
