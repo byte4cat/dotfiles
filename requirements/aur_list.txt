@@ -30,6 +30,8 @@ fcitx5-mcbopomofo-git-debug
 freelens-bin
 fresh-editor-bin
 fzf-tab
+geocode-glib-2
+geocode-glib-common
 gitlab-ci-local
 google-chrome
 gxml
@@ -54,6 +56,7 @@ sunshine-debug
 swayosd-git
 swayosd-git-debug
 walker-bin
+webkit2gtk
 wlogout-debug
 wombat-bin
 wombat-bin-debug

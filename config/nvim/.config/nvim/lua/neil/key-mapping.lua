@@ -20,6 +20,19 @@ vim.api.nvim_set_keymap("n", "<C-n>", "<C-w>w", { noremap = true, silent = true,
 -- previous window
 vim.api.nvim_set_keymap("n", "<C-p>", "<C-w>p", { noremap = true, silent = true, desc = "Previous Window" })
 
+-- move lines up and down
+-- normal
+vim.keymap.set("n", "<A-j>", ":m .+1<CR>==", { noremap = true, silent = true, desc = "Move Line Down" })
+vim.keymap.set("n", "<A-k>", ":m .-2<CR>==", { noremap = true, silent = true, desc = "Move Line Up" })
+
+-- insert
+vim.keymap.set("i", "<A-j>", "<Esc>:m .+1<CR>==gi", { noremap = true, silent = true, desc = "Move Line Down (Insert)" })
+vim.keymap.set("i", "<A-k>", "<Esc>:m .-2<CR>==gi", { noremap = true, silent = true, desc = "Move Line Up (Insert)" })
+
+-- visual with multiple lines selected, move the block up and down
+vim.keymap.set("v", "<A-j>", ":m '>+1<CR>gv=gv", { noremap = true, silent = true, desc = "Move Block Down" })
+vim.keymap.set("v", "<A-k>", ":m '<-2<CR>gv=gv", { noremap = true, silent = true, desc = "Move Block Up" })
+
 -- nvim-tmux-navigator (會覆蓋 <C-h/j/k/l> 的視窗切換)
 vim.api.nvim_set_keymap(
 	"n",
@@ -257,7 +270,7 @@ end, {
 
 -- Harpoon
 local harpoon = require("harpoon")
-vim.keymap.set("n", "<leader>a", function()
+vim.keymap.set("n", "<leader>ah", function()
 	harpoon:list():add()
 end, { noremap = true, silent = true, desc = "Harpoon: Add File" })
 
@@ -266,11 +279,11 @@ vim.keymap.set("n", "<leader>fj", function()
 end, { noremap = true, silent = true, desc = "Harpoon: Quick Menu" })
 
 -- Toggle previous & next juffers stored within Harpoon list
-vim.keymap.set("n", "<A-k>", function()
+vim.keymap.set("n", "<A-h>", function()
 	harpoon:list():prev()
 end, { noremap = true, silent = true, desc = "Harpoon: Previous File" })
 
-vim.keymap.set("n", "<A-j>", function()
+vim.keymap.set("n", "<A-l>", function()
 	harpoon:list():next()
 end, { noremap = true, silent = true, desc = "Harpoon: Next File" })
 
