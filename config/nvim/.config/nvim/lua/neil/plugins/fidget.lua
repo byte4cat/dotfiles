@@ -3,7 +3,7 @@ return {
 		"j-hui/fidget.nvim",
 		config = function()
 			-- vim.api.nvim_set_hl(0, "FidgetTransparent", { fg = "#a89984", bg = "NONE" }) -- or use NormalFloat
-			vim.api.nvim_set_hl(0, "FidgetTransparent", { bg = "NONE" })
+			vim.api.nvim_set_hl(0, "FidgetTransparent", { bg = "None" })
 
 			require("fidget").setup({
 				notification = {

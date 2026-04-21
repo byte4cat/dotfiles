@@ -24,12 +24,12 @@ return {
 					html = { "prettierd" },
 					-- Others
 					rust = { "trim_whitespace", "rustfmt" },
-					proto = { "buf" },
+					-- proto = { "buf" },
 					templ = { "templ" },
 					sh = { "shfmt" },
 					sql = { "sql_formatter" },
 					-- Normal
-					["*"] = { "codespell" },
+					-- ["*"] = { "codespell" },
 					["_"] = { "trim_whitespace" },
 					json = { "prettierd" },
 				},
