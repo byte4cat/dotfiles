@@ -12,7 +12,8 @@ return {
 			hijack_cursor = false,
 			sync_root_with_cwd = true,
 			view = {
-				adaptive_size = false,
+				adaptive_size = true,
+				side = "right",
 			},
 			renderer = {
 				full_name = true,

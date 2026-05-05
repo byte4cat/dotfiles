@@ -71,10 +71,11 @@ vim.keymap.set("n", "<leader>bd", ":bd<CR>", { desc = "Delete Buffer" })
 
 -- lsp restart
 vim.keymap.set("n", "<leader>R", function()
-	vim.cmd("LspRestart")
-	vim.notify("Language server restarted", "info", {
-		title = "LSP",
-	})
+	vim.lsp.stop_client(vim.lsp.get_clients())
+	vim.defer_fn(function()
+		vim.cmd("edit") -- 重新載入檔案會觸發原生 vim.lsp.enable
+	end, 100)
+	vim.notify("LSP Clients stopped & reloaded", "info", { title = "LSP" })
 end, { noremap = true, silent = true, desc = "LSP Restart" })
 
 -- Nvim tree

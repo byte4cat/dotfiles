@@ -1,7 +1,7 @@
 [user]
 	name = yimintsai
     email = byte4cat@gmail.com
-	signingkey = DE2110637E8BCF37
+	signingkey = 7DE0B627750BE9BDC010CA679D530A65D5E87608
 
 [alias]
     co = checkout

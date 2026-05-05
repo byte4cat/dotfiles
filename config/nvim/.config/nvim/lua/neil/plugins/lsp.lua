@@ -39,7 +39,7 @@ return {
 				"jsonls",
 				"dockerls",
 				"docker_compose_language_service",
-				"markdown_oxide",
+				-- "markdown_oxide",
 				"sqls",
 				"taplo",
 				"yamlls",
@@ -93,12 +93,13 @@ return {
 				vim.lsp.enable(name)
 			end
 
-			local base_config = {
-				capabilities = capabilities,
-				on_attach = on_attach,
+			local skip_servers = {
+				"rust_analyzer",
+				"emmet_language_server",
+				"tailwindcss",
+				"vue_ls",
+				"ts_ls",
 			}
-
-			local skip_servers = { "rust_analyzer", "tailwindcss" }
 
 			for _, server in ipairs(servers) do
 				local skip = false
@@ -133,7 +134,94 @@ return {
 			})
 
 			apply_lsp_config("emmet_language_server", {
-				filetypes = { "html", "typescriptreact", "javascriptreact", "css", "sass", "scss", "less", "templ" },
+				capabilities = capabilities,
+				on_attach = on_attach,
+				filetypes = {
+					"css",
+					"sass",
+					"scss",
+					"less",
+					"templ",
+					"astro",
+					"svelte",
+					"eruby",
+					"html",
+					"htmlangular",
+					"htmldjango",
+					"javascriptreact",
+					"typescriptreact",
+				},
+			})
+
+			-- apply_lsp_config("markdown_oxide", {
+			-- 	filetypes = { "markdown" },
+			-- })
+			--
+			-- apply_lsp_config("htmx", {
+			-- 	filetypes = { "html", "templ", "handlebars" },
+			-- })
+
+			apply_lsp_config("vue_ls", {
+				capabilities = capabilities,
+				on_attach = on_attach,
+				-- Hybrid Mode, just like Volar's Take Over Mode but without the need of Volar
+			})
+
+			local mason_path = vim.fn.stdpath("data") .. "/mason"
+
+			local vue_plugin_rel_path = "/packages/vue-language-server/node_modules/@vue/typescript-plugin"
+			local vue_ts_plugin_location = mason_path .. vue_plugin_rel_path
+
+			local is_vue_project = function()
+				local f = io.open(vim.fn.getcwd() .. "/package.json", "r")
+				if f then
+					local content = f:read("*all")
+					f:close()
+					return content:find("vue") ~= nil
+				end
+				return false
+			end
+
+			local ts_plugins = {}
+			if is_vue_project() then
+				table.insert(ts_plugins, {
+					name = "@vue/typescript-plugin",
+					location = vue_ts_plugin_location,
+					languages = { "vue" },
+				})
+			end
+
+			apply_lsp_config("ts_ls", {
+				capabilities = capabilities,
+				on_attach = on_attach,
+				init_options = {
+					plugins = ts_plugins,
+				},
+				filetypes = {
+					"javascript",
+					"javascriptreact",
+					"javascript.jsx",
+					"typescript",
+					"typescriptreact",
+					"typescript.tsx",
+					"vue",
+				},
+			})
+
+			apply_lsp_config("eslint", {
+				capabilities = capabilities,
+				settings = {
+					workingDirectory = { mode = "auto" },
+					nodePath = vim.fn.getcwd() .. "/node_modules",
+				},
+				on_attach = function(client, bufnr)
+					on_attach(client, bufnr)
+					-- ESLint 儲存時自動修復
+					vim.api.nvim_create_autocmd("BufWritePre", {
+						buffer = bufnr,
+						command = "EslintFixAll",
+					})
+				end,
 			})
 
 			mason.setup()

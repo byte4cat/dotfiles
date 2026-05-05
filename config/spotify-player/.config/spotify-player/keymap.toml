@@ -1,0 +1,7 @@
+[[keymaps]]
+command = "Quit"
+key_sequence = "C-q"
+
+[[keymaps]]
+command = "None"
+key_sequence = "q"
