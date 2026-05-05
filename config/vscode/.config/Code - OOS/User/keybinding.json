@@ -100,10 +100,11 @@
     "command": "workbench.action.closeOtherEditors",
     "when": "(vim.mode == 'Normal' && editorTextFocus) || !inputFocus"
   },
+
   {
-    "key": "Space p f",
+    "key": "Space Space",
     "command": "workbench.action.quickOpen",
-    "when": "vim.mode == 'Normal' && (editorTextFocus || !inputFocus)"
+    "when": "vim.mode == 'Normal'"
   },
   {
     "key": "g d",
@@ -121,7 +122,7 @@
     "when": "vim.mode == 'Normal' && editorTextFocus"
   },
   {
-    "key": "Space p s",
+    "key": "Space f s",
     "command": "workbench.action.findInFiles",
     "when": "vim.mode == 'Normal' && (editorTextFocus || !inputFocus)"
   },

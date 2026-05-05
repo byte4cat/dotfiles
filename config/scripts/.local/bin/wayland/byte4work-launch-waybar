@@ -4,14 +4,26 @@ CONFIG_SRC="$HOME/.config/waybar/config.jsonc"
 STYLE_SRC="$HOME/.config/waybar/style.css"
 TMP_CFG="/tmp/waybar_cfg"
 
-# 檢查 PRIMARY_MONITOR 是否真的存在於目前系統
-# 如果抓不到，就 Fallback 到第一個偵測到的螢幕
-MONITOR=$(hyprctl monitors -j | jq -r ".[] | select(.name == \"$PRIMARY_MONITOR\") | .name")
-if [ -z "$MONITOR" ]; then
-    MONITOR=$(hyprctl monitors -j | jq -r '.[0].name')
+# 抓取 JSON 格式的螢幕資訊
+MONITOR_JSON=$(hyprctl monitors -j)
+
+# 檢查是否有抓到 DP-1，如果沒有則抓第一個
+MONITOR=$(echo "$MONITOR_JSON" | jq -r '.[] | select(.name == "DP-1") | .name')
+
+if [ -z "$MONITOR" ] || [ "$MONITOR" == "null" ]; then
+    # 如果連 DP-1 都抓不到，隨便抓一個現有的
+    MONITOR=$(echo "$MONITOR_JSON" | jq -r '.[0].name')
 fi
 
-sed "s/__PRIMARY_MONITOR__/$MONITOR/g" "$CONFIG_SRC" > "$TMP_CFG"
+# 如果還是空的 (例如連 JSON 都沒產出)，強制指定為 DP-1
+if [ -z "$MONITOR" ] || [ "$MONITOR" == "null" ]; then
+    MONITOR="DP-1"
+fi
 
-killall waybar 2>/dev/null
+# 替換設定檔並啟動
+sed "s/__PRIMARY_MONITOR__/$MONITOR/g" "$CONFIG_SRC" >"$TMP_CFG"
+
+pkill -9 waybar 2>/dev/null
+
+sleep 0.2
 waybar -c "$TMP_CFG" -s "$STYLE_SRC" &

@@ -128,3 +128,4 @@ dmypy.json
 # custom
 leetcode-cli
 **/tmp
+hide/

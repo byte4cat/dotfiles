@@ -15,6 +15,7 @@ function M.setup(bufnr)
 		require("lsp_signature").toggle_float_win()
 	end, { silent = true, noremap = true, desc = "LSP: Toggle Signature Help" })
 	vim.keymap.set("n", "K", vim.lsp.buf.hover, opts)
+	-- vim.keymap.set("n", "K", "<cmd>Lspsaga hover_doc<CR>", opts)
 	-- vim.keymap.set("n", "<leader>cn", "<cmd>Lspsaga rename<CR>", opts)
 
 	vim.keymap.set("n", "<C-d>", "<cmd>Lspsaga peek_definition<CR>", opts)

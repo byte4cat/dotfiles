@@ -10,7 +10,8 @@ set $mod Mod4
 set $altMod Mod1
 
 # 設置你的程式
-set $terminal ghostty
+# set $terminal ghostty
+set $terminal alacritty
 set $fileManager thunar
 set $menu rofi -show drun
 set $browser librewolf
