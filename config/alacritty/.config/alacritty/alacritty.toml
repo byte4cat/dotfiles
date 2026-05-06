@@ -11,7 +11,7 @@ style = "Regular"
 
 [font.bold]
 family = "Comic Code"
-style = "Regular"
+style = "bold"
 
 [mouse]
 hide_when_typing = true

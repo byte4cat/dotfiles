@@ -10,10 +10,10 @@ set $mod Mod4
 set $altMod Mod1
 
 # 設置你的程式
-# set $terminal ghostty
-set $terminal alacritty
+set $terminal ghostty
+# set $terminal alacritty
 set $fileManager thunar
-set $menu rofi -show drun
+set $launcher rofi -show drun
 set $browser librewolf
 set $workmsg flatpak run dev.vencord.Vesktop
 
@@ -99,7 +99,7 @@ bindsym $mod+e exec $fileManager
 bindsym $mod+f fullscreen toggle
 bindsym $mod+Shift+f floating toggle
 bindsym $mod+b exec $browser
-bindsym $altMod+space exec $menu
+bindsym $altMod+space exec $launcher
 
 bindsym $mod+v exec ~/.local/bin/x11/byte4work-rofi-quick-memu
 bindsym $mod+Shift+e exec ~/.local/bin/x11/byte4work-rofi-emoji
