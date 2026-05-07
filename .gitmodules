@@ -1,4 +1,4 @@
 [submodule "private"]
 	path = private
-	url = git@github.com:byte4cat/dotfiles-private.git
+    url = git@git.byte4cat.dev:byte4cat/dotfiles-private.git
 
