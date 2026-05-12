@@ -10,12 +10,12 @@ return {
 				auto_trigger = true, -- 💡 打字時自動顯示建議
 				debounce = 250,
 				keymap = {
-					accept = "<Tab>",
+					accept = "<M-l>",
 					accept_word = false,
 					accept_line = false,
 					next = "<M-]>",
 					prev = "<M-[>",
-					dismiss = "<Esc>",
+					dismiss = "<C-e>",
 				},
 			},
 			filetypes = {

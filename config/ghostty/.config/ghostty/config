@@ -3,9 +3,15 @@
 theme = "Ultra Dark"
 background-opacity = 1.0
 
-font-family = "Comic Code"
-font-family = "Jetbrains Mono Nerd Font"
-font-family = "LXGWWenKai Mono" # 霞鶩文楷
+font-family = "monospace"
+# we set font order by .config/fontconfig/fonts.conf
+# Comic Code
+# JetBrainsMono Nerd Font Mono
+# LXGW WenKai Mono 霞鶩文楷
+# Noto Sans Mono CJK TC
+# Noto Mono Mono CJK JP
+# Noto Mono Mono CJK KR
+# Noto Color Emoji😀
 
 font-feature = "calt"
 font-feature = "liga"

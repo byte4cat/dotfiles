@@ -5,13 +5,26 @@ TERM = "xterm-256color"
 size = 14
 
 [font.normal]
-family = "Comic Code"
+family = "monospace"
 style = "Regular"
-
-
 [font.bold]
-family = "Comic Code"
+family = "monospace"
 style = "bold"
+[font.italic]
+family = "monospace"
+style = "italic"
+[font.bold_italic]
+family = "monospace"
+style = "Bold Italic"
+
+# we set font order by .config/fontconfig/fonts.conf
+# Comic Code
+# JetBrainsMono Nerd Font Mono
+# LXGW WenKai Mono 霞鶩文楷
+# Noto Sans Mono CJK TC
+# Noto Mono Mono CJK JP
+# Noto Mono Mono CJK KR
+# Noto Color Emoji😀
 
 [mouse]
 hide_when_typing = true

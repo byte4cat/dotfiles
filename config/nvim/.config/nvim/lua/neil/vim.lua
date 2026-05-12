@@ -27,8 +27,8 @@ vim.opt.smartcase = true -- 若搜尋詞包含大寫，則轉為精確匹配
 vim.opt.tabstop = 4 -- Tab 顯示寬度
 vim.opt.softtabstop = 4 -- 退格鍵刪除的空白數
 vim.opt.shiftwidth = 4 -- 自動縮排的寬度
-vim.opt.expandtab = true -- 將 Tab 轉換為空白鍵
-vim.opt.smartindent = true -- 開啟智慧縮排
+vim.opt.expandtab = false -- 將 Tab 轉換為空白鍵
+vim.opt.smartindent = false -- 開啟智慧縮排
 vim.opt.autoindent = true -- 延續上一行的縮排
 vim.opt.wrap = false -- 關閉自動換行 (長代碼不折行)
 vim.opt.iskeyword:append("-") -- 將 "-" 視為單字的一部分 (如 CSS class-name)
