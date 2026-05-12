@@ -1,0 +1,61 @@
+urls-source "miniflux"
+
+miniflux-url "https://rss.byte4cat.com"
+
+miniflux-token "3a6e98faaf82b67ffda3ad0c868954f3d080f5c6b1f3356ec64b7e029c9fb50a"
+
+# Options for miniflux:
+
+# 是否顯示「已加星號」的特殊頻道 (預設為 yes)
+miniflux-show-special-feeds "yes"
+
+# 設定快速標記（按複選鍵時，標記 a 為加星號）
+miniflux-flag-star "a"
+
+# 啟動時自動同步
+auto-reload yes
+
+# Keybinding
+
+# 使用 hjkl 導航
+bind-key j down
+bind-key k up
+bind-key l open         # l 進入選取的頻道或文章
+bind-key h quit         # h 退回上一層清單
+
+# 快速跳轉 (翻頁)
+bind-key g home
+bind-key G end
+bind-key d halfpagedown
+bind-key u halfpageup
+# 設定翻整頁 (Page Up / Page Down)
+bind-key ^F pagedown
+bind-key ^B pageup
+
+bind-key n next-unread       # 找下一篇未讀
+bind-key p prev-unread       # 找前一篇未讀
+bind-key f set-tag           # 類似選取分類
+bind-key r reload            # 重新整理 current feed (Sync with Miniflux)
+bind-key R reload-all        # 重新整理 all feed (Sync with Miniflux)
+bind-key a mark-feed-read    # 把當前feed標記為已讀
+
+bind-key H toggle-show-read-feeds
+bind-key C clear-filter
+bind-key q quit
+bind-key Q hard-quit
+bind-key s sort
+bind-key S rev-sort
+bind-key m bookmark
+bind-key A mark-all-above-as-read
+
+
+# 按 o 使用 LibreWolf 開啟網頁
+browser "librewolf %u"
+bind-key o open-in-browser
+
+# 進入文章時，不要自動標記為已讀
+mark-as-read-on-hover no
+show-read-feeds yes
+show-read-articles yes
+
+datetime-format "%Y-%m-%d %H:%M"

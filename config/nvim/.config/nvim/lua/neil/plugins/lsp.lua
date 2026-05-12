@@ -99,6 +99,7 @@ return {
 				"tailwindcss",
 				"vue_ls",
 				"ts_ls",
+				"clangd",
 			}
 
 			for _, server in ipairs(servers) do
@@ -126,6 +127,41 @@ return {
 					},
 				},
 			})
+
+			-- apply_lsp_config("clangd", {
+			-- 	capabilities = capabilities,
+			-- 	on_attach = function(client, bufnr)
+			-- 		-- 呼叫你原本通用的 on_attach (處理快速鍵等)
+			-- 		if on_attach then
+			-- 			on_attach(client, bufnr)
+			-- 		end
+			--
+			-- 		-- 設定 C 檔案存檔時自動呼叫 LSP 格式化
+			-- 		vim.api.nvim_create_autocmd("BufWritePre", {
+			-- 			buffer = bufnr,
+			-- 			callback = function()
+			-- 				vim.lsp.buf.format({
+			-- 					bufnr = bufnr,
+			-- 					async = false, -- 同步執行確保存檔前完成
+			-- 					-- 這裡強迫只用 clangd 格式化，避免跟 conform 撞車
+			-- 					filter = function(c)
+			-- 						return c.name == "clangd"
+			-- 					end,
+			-- 				})
+			-- 			end,
+			-- 		})
+			-- 	end,
+			-- 	-- 設定啟動參數
+			-- 	cmd = {
+			-- 		"clangd",
+			-- 		"--background-index",
+			-- 		"--clang-tidy",
+			-- 		"--header-insertion=iwyu",
+			-- 		"--completion-style=detailed",
+			-- 		"--function-arg-placeholders",
+			-- 		"--fallback-style=llvm", -- 如果找不到 .clang-format 才用這個
+			-- 	},
+			-- })
 
 			apply_lsp_config("tailwindcss", {
 				capabilities = capabilities,

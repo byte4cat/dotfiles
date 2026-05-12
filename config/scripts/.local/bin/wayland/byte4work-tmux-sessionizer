@@ -33,6 +33,7 @@ pick_project() {
         "${HOME}/Development/note"
         "${HOME}/Development/working/infra"
         "${HOME}/Documents/Personal/Notes"
+        "${HOME}/Development/homelab"
         # Add more fixed paths if you want
     )
 
