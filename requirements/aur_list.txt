@@ -36,6 +36,7 @@ gitlab-ci-local
 google-chrome
 gxml
 gxml-debug
+hyprshade
 localsend-bin
 mongodb-compass-bin
 networkmanager-fortisslvpn
@@ -55,6 +56,7 @@ spotify
 sunshine-debug
 swayosd-git
 swayosd-git-debug
+ttf-comic-mono-git
 walker-bin
 webkit2gtk
 wlogout-debug

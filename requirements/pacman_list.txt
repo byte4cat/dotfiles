@@ -9,6 +9,7 @@ apache
 awww
 bat
 bc
+bear
 bibata-cursor-theme-bin
 bind
 binder_linux-dkms-git
@@ -27,6 +28,7 @@ cachyos-keyring
 cachyos-mirrorlist
 cachyos-v3-mirrorlist
 cachyos-v4-mirrorlist
+cava
 chatty
 chromium
 clang
@@ -78,6 +80,7 @@ freetube
 fresh-editor-bin
 fzf-tab
 gamescope
+gdb
 ghex
 ghostty
 gimp
@@ -106,6 +109,7 @@ hyperv
 hypridle
 hyprland
 hyprlock
+hyprshade
 hyprshot
 i3blocks
 i3lock
@@ -141,13 +145,17 @@ lightdm
 lightdm-gtk-greeter
 linux
 linux-firmware
+linux-headers
 linux-lts
+lldb
 localsend-bin
 lshw
 lua51
 luarocks
 lxqt-policykit
 ly
+lynx
+lzip
 mesa-utils
 mingw-w64-gcc
 mold
@@ -158,10 +166,12 @@ networkmanager
 network-manager-applet
 networkmanager-fortisslvpn
 networkmanager-openvpn
+newsboat
 nmap
 noto-fonts-cjk
 noto-fonts-emoji
 noto-fonts-extra
+npm
 nvtop
 nwg-look
 obsidian
@@ -210,6 +220,8 @@ python-screeninfo
 qemu-full
 qimgv-git
 qpdf
+qt5-graphicaleffects
+qt5-multimedia
 qt5-remoteobjects
 qt5-wayland
 qt5-webchannel
@@ -218,6 +230,7 @@ qt6-wayland
 radeontop
 reflector
 remmina
+river
 rofi
 rustup
 samba
@@ -233,8 +246,10 @@ smartmontools
 socat
 solaar
 spotify
+spotify-player
 steam
 stow
+stress
 sudo
 sunshine
 swaync
@@ -260,6 +275,7 @@ ttf-bigblueterminal-nerd
 ttf-bitstream-vera-mono-nerd
 ttf-cascadia-code-nerd
 ttf-cascadia-mono-nerd
+ttf-comic-mono-git
 ttf-cousine-nerd
 ttf-d2coding-nerd
 ttf-daddytime-mono-nerd
@@ -311,7 +327,9 @@ turbostat
 ueberzugpp
 ufw
 usbip
+uv
 uwsm
+valgrind
 vesktop-bin
 vlc
 vlc-plugin-ffmpeg
@@ -324,11 +342,13 @@ vulkan-radeon
 vulkan-tools
 walker-bin
 waybar
+waydroid
 waypaper
 wev
 wget
 wireplumber
 wlogout
+wlroots0.19
 wofi
 wombat-bin
 wpa_supplicant
