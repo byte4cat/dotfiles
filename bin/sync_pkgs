@@ -1,25 +1,42 @@
 #!/bin/bash
 
-# use BASH_SOURCE to get the script actual path
-# SCRIPT_DIR will be: ~/dotfiles/bin
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# Exit immediately if a command exits with a non-zero status,
+# treat unset variables as an error, and catch errors in pipelines.
+set -euo pipefail
 
-# ~/dotfiles/requirements
+# Get the script's actual path using BASH_SOURCE
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REQUIREMENTS_DIR="$(dirname "$SCRIPT_DIR")/requirements"
 
-echo "Generating pacman_list.txt..."
+# Ensure the requirements directory exists
+mkdir -p "$REQUIREMENTS_DIR"
 
-# Exports all explicitly installed packages (not dependencies) using pacman -Qe.
-# Excludes common base system packages (adjust this exclusion list as needed).
-pacman -Qeq | grep -v 'archlinux-keyring\|base\|bash\|btrfs-progs\|coreutils\|device-mapper\|diffutils\|e2fsprogs\|file\|filesystem\|findutils\|gawk\|gcc-libs\|glibc\|grep\|gzip\|iproute2\|iputils\|less\|libcap\|logrotate\|lvm2\|man-db\|man-pages\|mdadm\|nano\|netctl\|pacman\|pacman-mirrorlist\|pciutils\|procps-ng\|psmisc\|sed\|shadow\|systemd\|systemd-sysv\|tar\|texinfo\|util-linux\|vi\|which' | sort >"$REQUIREMENTS_DIR/pacman_list.txt"
+echo "Analyzing system packages..."
 
-echo "pacman_list.txt updated."
+# Temporary files for fast set operations
+TMP_EXPLICIT=$(mktemp)
+TMP_REPOS=$(mktemp)
 
-echo "Generating aur_list.txt..."
+# Clean up temporary files on script exit
+trap 'rm -f "$TMP_EXPLICIT" "$TMP_REPOS"' EXIT
 
-# Exports all packages installed from the AUR.
-yay -Qmq >"$REQUIREMENTS_DIR/aur_list.txt"
+# Get sorted list of all explicitly installed packages
+yay -Qeq | sort >"$TMP_EXPLICIT"
 
-echo "aur_list.txt updated."
+# Dynamically get all unique package names available in active synced repositories
+# (Automatically covers core, extra, multilib, and ALL CachyOS architecture repos)
+pacman -Slq | sort -u >"$TMP_REPOS"
 
+echo "Generating pacman_list.txt (Official/Synced Repos)..."
+# comm -12 outputs lines common to both files (Intersection)
+comm -12 "$TMP_EXPLICIT" "$TMP_REPOS" >"$REQUIREMENTS_DIR/pacman_list.txt"
+
+echo "Generating aur_list.txt (AUR/Foreign)..."
+# Filter out *-debug packages right from the start
+yay -Qmq | grep -v '\-debug$' | sort >"$REQUIREMENTS_DIR/aur_list.txt"
+
+echo "----------------------------------------"
+echo "Update complete!"
+echo "- Official Repos: $REQUIREMENTS_DIR/pacman_list.txt"
+echo "- AUR Packages:   $REQUIREMENTS_DIR/aur_list.txt"
 echo "Please review the generated files and manually remove any unwanted packages."
