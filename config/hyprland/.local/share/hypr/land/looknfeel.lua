@@ -1,3 +1,7 @@
+---------------------
+---- Look & Feel ----
+---------------------
+
 -- 顏色變數
 local activeBorderColor = { colors = { "rgba(33ccffee)", "rgba(00ff99ee)" }, angle = 45 }
 local inactiveBorderColor = "rgba(595959aa)"
@@ -69,9 +73,8 @@ hl.config({
 	},
 })
 
--- Layer Rules
-hl.layer_rule({ name = "blur", match = "namespace:lockscreen", value = "yes" })
-hl.layer_rule({ name = "ignore_alpha", match = "namespace:lockscreen", value = "0.7" })
+hl.layer_rule({ name = "blur", match = "namespace:lockscreen" })
+hl.layer_rule({ name = "ignorealpha 0.7", match = "namespace:lockscreen" })
 
 -- 動態自定義貝茲曲線與動畫
 hl.curve("myBezier", { type = "bezier", points = { { 0.10, 0.9 }, { 0.1, 1.05 } } })

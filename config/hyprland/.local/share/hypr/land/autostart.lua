@@ -45,7 +45,7 @@ hl.on("hyprland.start", function()
 	-- exec("hyprpm reload")
 	exec("byte4work-watch-dots")
 
-	-- 特定 Workspace 預載應用 (引用你之前的變數)
+	-- 特定 Workspace 預載應用
 	exec("sleep 3")
 	-- 終端機與 tmux
 	exec(
