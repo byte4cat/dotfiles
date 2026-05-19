@@ -24,60 +24,60 @@ mapfile -t AUR_PKGS <"$REQUIREMENTS_DIR/aur_list.txt"
 
 # --- Ensure yay exists ---
 install_yay() {
-    if command -v yay &>/dev/null; then
-        success "yay already installed."
-        return
-    fi
-    warn "AUR helper 'yay' not found. Installing..."
-    sudo pacman -S --noconfirm --needed base-devel git
-    tmpdir=$(mktemp -d)
-    git clone https://aur.archlinux.org/yay.git "$tmpdir"
-    (cd "$tmpdir" && makepkg -si --noconfirm)
-    rm -rf "$tmpdir"
-    success "yay installed successfully."
+	if command -v yay &>/dev/null; then
+		success "yay already installed."
+		return
+	fi
+	warn "AUR helper 'yay' not found. Installing..."
+	yay -S --noconfirm --needed base-devel git
+	tmpdir=$(mktemp -d)
+	git clone https://aur.archlinux.org/yay.git "$tmpdir"
+	(cd "$tmpdir" && makepkg -si --noconfirm)
+	rm -rf "$tmpdir"
+	success "yay installed successfully."
 }
 
 # --- Package Installation ---
 install_packages() {
-    info "Installing pacman packages..."
-    sudo pacman -Syu --noconfirm
-    for p in "${PACMAN_PKGS[@]}"; do
-        if ! pacman -Q "$p" &>/dev/null; then
-            info "Installing: $p"
-            sudo pacman -S --noconfirm --needed "$p"
-        else
-            warn "$p already installed, skipping."
-        fi
-    done
+	info "Installing pacman packages..."
+	yay -Syu --noconfirm
+	for p in "${PACMAN_PKGS[@]}"; do
+		if ! pacman -Q "$p" &>/dev/null; then
+			info "Installing: $p"
+			yay -S --noconfirm --needed "$p"
+		else
+			warn "$p already installed, skipping."
+		fi
+	done
 
-    info "Installing AUR packages..."
-    for p in "${AUR_PKGS[@]}"; do
-        if ! yay -Q "$p" &>/dev/null; then
-            info "Installing (AUR): $p"
-            yay -S --noconfirm --needed "$p"
-        else
-            warn "(AUR) $p already installed, skipping."
-        fi
-    done
+	info "Installing AUR packages..."
+	for p in "${AUR_PKGS[@]}"; do
+		if ! yay -Q "$p" &>/dev/null; then
+			info "Installing (AUR): $p"
+			yay -S --noconfirm --needed "$p"
+		else
+			warn "(AUR) $p already installed, skipping."
+		fi
+	done
 }
 
 # --- Post Installation ---
 post_install() {
-    mkdir -p "$HOME/Screenshots"
-    sudo systemctl enable --now docker.service || true
-    sudo usermod -aG docker "$USER"
-    warn "Re-login required for Docker group permissions."
-    sudo gtk-update-icon-cache /usr/share/icons/hicolor
-    success "Post-installation steps completed."
+	mkdir -p "$HOME/Screenshots"
+	sudo systemctl enable --now docker.service || true
+	sudo usermod -aG docker "$USER"
+	warn "Re-login required for Docker group permissions."
+	sudo gtk-update-icon-cache /usr/share/icons/hicolor
+	success "Post-installation steps completed."
 }
 
 # --- Main ---
 main() {
-    [[ -f /etc/arch-release ]] || error "This script is only for Arch Linux."
-    install_yay
-    install_packages
-    post_install
-    success "✅ Arch Linux environment setup completed!"
+	[[ -f /etc/arch-release ]] || error "This script is only for Arch Linux."
+	install_yay
+	install_packages
+	post_install
+	success "✅ Arch Linux environment setup completed!"
 }
 
 main "$@"
