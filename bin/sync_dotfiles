@@ -17,85 +17,107 @@ source "$DOTFILES_DIR/lib/common"
 cd_or_error "$DOTFILES_DIR"
 
 link_librewolf_chrome() {
-    local lw_config_dir="$HOME/.config/librewolf/librewolf"
-    local dotfiles_chrome_src="$DOTFILES_DIR/config/librewolf/chrome"
+	local lw_config_dir="$HOME/.config/librewolf/librewolf"
+	local dotfiles_chrome_src="$DOTFILES_DIR/config/librewolf/chrome"
 
-    if [ -d "$lw_config_dir" ] && [ -d "$dotfiles_chrome_src" ]; then
-        info "🔗 Linking LibreWolf chrome to random profile(s)..."
+	if [ -d "$lw_config_dir" ] && [ -d "$dotfiles_chrome_src" ]; then
+		info "🔗 Linking LibreWolf chrome to random profile(s)..."
 
-        # 尋找所有以 .default-default 結尾的資料夾
-        for profile in "$lw_config_dir"/*.default-default; do
-            [ -d "$profile" ] || continue
+		# 尋找所有以 .default-default 結尾的資料夾
+		for profile in "$lw_config_dir"/*.default-default; do
+			[ -d "$profile" ] || continue
 
-            info "  > Target profile: $(basename "$profile")"
+			info "  > Target profile: $(basename "$profile")"
 
-            local target="$profile/chrome"
-            info "  > Target profile: $(basename "$profile")"
-            if [ -L "$target" ] || [ -e "$target" ]; then
-                rm -rf "$target"
-            fi
+			local target="$profile/chrome"
+			info "  > Target profile: $(basename "$profile")"
+			if [ -L "$target" ] || [ -e "$target" ]; then
+				rm -rf "$target"
+			fi
 
-            # 建立符號連結，使用 -sf 確保重複執行時會覆蓋
-            ln -sf "$dotfiles_chrome_src" "$profile/chrome"
-        done
-        success "✅ LibreWolf chrome linked."
-    else
-        warn "⚠️ LibreWolf config or dotfiles source not found, skipping link."
-    fi
+			# 建立符號連結，使用 -sf 確保重複執行時會覆蓋
+			ln -sf "$dotfiles_chrome_src" "$profile/chrome"
+		done
+		success "✅ LibreWolf chrome linked."
+	else
+		warn "⚠️ LibreWolf config or dotfiles source not found, skipping link."
+	fi
 }
 
 cleanup_orphans() {
-    info "Cleaning up broken symlinks in ~/.config and ~/.local/private..."
-    # 尋找目錄下指向 dotfiles 但原始檔案已不存在的斷頭連結並刪除
-    # -L 是找連結，! -e 是找指向目標不存在的
-    find "$HOME/.config" "$HOME/.local/private" -xtype l -delete 2>/dev/null || true
+	info "Cleaning up broken symlinks in ~/.config and ~/.local/private..."
+	# 尋找目錄下指向 dotfiles 但原始檔案已不存在的斷頭連結並刪除
+	# -L 是找連結，! -e 是找指向目標不存在的
+	find "$HOME/.config" "$HOME/.local/private" -xtype l -delete 2>/dev/null || true
 
-    # 清理空目錄
-    find "$HOME/.config" "$HOME/.local/private" -type d -empty -delete 2>/dev/null || true
+	# 清理空目錄
+	find "$HOME/.config" "$HOME/.local/private" -type d -empty -delete 2>/dev/null || true
 }
 
 stow_dotfiles() {
-    cleanup_orphans
+	cleanup_orphans
 
-    info "Stowing dotfiles from: $DOTFILES_DIR"
-    [ -d "config" ] || error "'stow' directory not found."
+	info "Stowing dotfiles from: $DOTFILES_DIR"
+	[ -d "config" ] || error "'stow' directory not found."
 
-    info "Stowing config packages..."
-    for pkg in config/*; do
-        [ -d "$pkg" ] || continue
-        pkg_name=$(basename "$pkg")
+	info "Stowing config packages..."
+	for pkg in config/*; do
+		[ -d "$pkg" ] || continue
+		pkg_name=$(basename "$pkg")
+		info "  > Preparing config: $pkg_name"
 
-        info "  > Stowing config: $pkg_name"
-        stow -d config -t "$HOME" --restow --no-folding "$pkg_name"
-    done
+		stow -d "$HOME/dotfiles/config" -t "$HOME" -D "$pkg_name" 2>/dev/null || true
 
-    if [ -d "private" ]; then
-        info "Stowing private packages..."
+		local target="$HOME/.config/$pkg_name"
+		if [ -L "$target" ]; then
+			rm "$target"
+		fi
 
-        for p_pkg in private/*; do
-            [ -d "$p_pkg" ] || continue
-            p_pkg_name=$(basename "$p_pkg")
+		info "  > Stowing config: $pkg_name"
+		stow -d config -t "$HOME" --restow --adopt --no-folding "$pkg_name"
 
-            info "  > Stowing private: $p_pkg_name"
-            stow -d private -t "$HOME" --restow --no-folding "$p_pkg_name"
-        done
-    fi
+		# 當 stow --adopt 發現目標是實體檔案時會把內容寫回你的 dotfiles，我們執行完還原它
+		git checkout -- "$pkg" 2>/dev/null || true
+	done
 
-    success "✅ All dotfiles stowed successfully."
+	if [ -d "private" ]; then
+		info "Stowing private packages..."
+
+		for p_pkg in private/*; do
+			[ -d "$p_pkg" ] || continue
+			p_pkg_name=$(basename "$p_pkg")
+			info "  > Preparing config: $pkg_name"
+
+			stow -d "$HOME/dotfiles/private" -t "$HOME" -D "$pkg_name" 2>/dev/null || true
+
+			local target="$HOME/.local/private/$p_pkg_name"
+			if [ -L "$target" ]; then
+				info "  > Removing existing symlink for $p_pkg_name to prevent conflict..."
+				rm "$target"
+			fi
+
+			info "  > Stowing private: $p_pkg_name"
+			stow -d private -t "$HOME" --restow --adopt --no-folding "$p_pkg_name"
+			# 當 stow --adopt 發現目標是實體檔案時會把內容寫回你的 dotfiles，我們執行完還原它
+			git checkout -- "$p_pkg" 2>/dev/null || true
+		done
+	fi
+
+	success "✅ All dotfiles stowed successfully."
 }
 
 main() {
-    check_command git stow
-    stow_dotfiles
+	check_command git stow
+	stow_dotfiles
 
-    link_librewolf_chrome
+	link_librewolf_chrome
 
-    if command -v systemctl >/dev/null; then
-        info "Reloading systemd user daemon..."
-        systemctl --user daemon-reload
-    fi
+	if command -v systemctl >/dev/null; then
+		info "Reloading systemd user daemon..."
+		systemctl --user daemon-reload
+	fi
 
-    success "🎉 Dotfiles deployment completed!"
+	success "🎉 Dotfiles deployment completed!"
 }
 
 main "$@"
