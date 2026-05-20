@@ -1,0 +1,1 @@
+export PATH="$HOME/.local/bin/x11:$HOME/.local/private/bin:$PATH"
