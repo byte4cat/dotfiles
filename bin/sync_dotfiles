@@ -64,20 +64,8 @@ stow_dotfiles() {
 	for pkg in config/*; do
 		[ -d "$pkg" ] || continue
 		pkg_name=$(basename "$pkg")
-		info "  > Preparing config: $pkg_name"
-
-		stow -d "$HOME/dotfiles/config" -t "$HOME" -D "$pkg_name" 2>/dev/null || true
-
-		local target="$HOME/.config/$pkg_name"
-		if [ -L "$target" ]; then
-			rm "$target"
-		fi
-
 		info "  > Stowing config: $pkg_name"
 		stow -d config -t "$HOME" --restow --adopt --no-folding "$pkg_name"
-
-		# 當 stow --adopt 發現目標是實體檔案時會把內容寫回你的 dotfiles，我們執行完還原它
-		git checkout -- "$pkg" 2>/dev/null || true
 	done
 
 	if [ -d "private" ]; then
@@ -86,20 +74,8 @@ stow_dotfiles() {
 		for p_pkg in private/*; do
 			[ -d "$p_pkg" ] || continue
 			p_pkg_name=$(basename "$p_pkg")
-			info "  > Preparing config: $pkg_name"
-
-			stow -d "$HOME/dotfiles/private" -t "$HOME" -D "$pkg_name" 2>/dev/null || true
-
-			local target="$HOME/.local/private/$p_pkg_name"
-			if [ -L "$target" ]; then
-				info "  > Removing existing symlink for $p_pkg_name to prevent conflict..."
-				rm "$target"
-			fi
-
 			info "  > Stowing private: $p_pkg_name"
 			stow -d private -t "$HOME" --restow --adopt --no-folding "$p_pkg_name"
-			# 當 stow --adopt 發現目標是實體檔案時會把內容寫回你的 dotfiles，我們執行完還原它
-			git checkout -- "$p_pkg" 2>/dev/null || true
 		done
 	fi
 

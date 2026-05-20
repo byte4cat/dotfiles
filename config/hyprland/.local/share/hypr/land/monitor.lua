@@ -1,0 +1,28 @@
+------------------
+---- MONITORS ----
+------------------
+
+-- https://wiki.hypr.land/Configuring/Basics/Monitors/
+
+-- 主螢幕：DP-1 (4K @ 60Hz, 坐標 0x0, 縮放 1.5, 開啟 VRR)
+hl.monitor({
+	output = "DP-1",
+	mode = "3840x2160@60",
+	position = "0x0",
+	scale = 1.5,
+	vrr = 1,
+})
+
+-- 副螢幕：HDMI-A-1 (1200p @ 60Hz, 垂直旋轉, 放置於主螢幕左側, 開啟 VRR)
+hl.monitor({
+	output = "HDMI-A-1",
+	mode = "1920x1200@60",
+	position = "auto-left",
+	scale = 1,
+	transform = 1,
+	vrr = 1,
+})
+
+-- [[ 設定範例 ]]
+-- hl.monitor({ output = "DP-1", mode = "1920x1080@60", position = "0x0", scale = 1, vrr = 1 })
+-- hl.monitor({ output = "", mode = "preferred", position = "auto", scale = 1 })
