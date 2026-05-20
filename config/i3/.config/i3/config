@@ -1,129 +1,138 @@
-# i3 Configuration File based on Hyprland settings
+# i3 Configuration File - Migrated from Hyprland Setup
 
 ####################
 ### 1. 變數設定 ###
 ####################
 font pango:monospace 14
 
-# 設置 Mod 鍵為 Super
+# 設置 Mod 鍵
 set $mod Mod4
 set $altMod Mod1
 
-# 設置你的程式
+# 核心路徑與工具定義 (完美同步你的 Hyprland 配置)
 set $terminal ghostty
-# set $terminal alacritty
-set $fileManager thunar
-set $launcher rofi -show drun
 set $browser librewolf
-set $workmsg flatpak run dev.vencord.Vesktop
+set $launcher byte4work-walker
+set $fileManager GTK_THEME=adw-gtk3-dark thunar
+set $terminalFileManager ghostty -e yazi ~/Downloads
+set $babycam byte4work-babycam
+set $quickmenu byte4work-walker-quick-menu
+set $powermenu byte4work-walker-power-menu
 
 ############################
-### 2. 環境變數/佈景主題 ###
+### 2. 環境變數/多螢幕與 X11 設置 ###
 ############################
 
-# 設定 GTK/Qt 主題
+# 設置 X11 下的 Xcursor 大小
+exec --no-startup-id xsetroot -cursor_name left_ptr
+exec --no-startup-id xrdb -merge <<< "Xcursor.size: 24"
+
+# 設置 GTK/Qt 暗色主題偏好
 exec --no-startup-id gsettings set org.gnome.desktop.interface color-scheme "prefer-dark"
 exec --no-startup-id gsettings set org.gnome.desktop.interface gtk-theme "adw-gtk3"
-# i3/X11 的環境變數設定
-exec --no-startup-id xrandr --output HDMI-A-1 --mode 1920x1200 --pos 0x0 --rotate left --output DisplayPort-1 --mode 3840x2160 --pos 1200x0 --primary
 
-# 開機啟動
-# set $ws1 "1:Term"
-# set $ws2 "2:Web"
-#
-# assign [class="Ghostty"] $ws1
-# assign [class="Chromium"] $ws2
+# 【關鍵修正】多螢幕佈局：HDMI-A-1 垂直旋轉置於 DP-1 左側
+# 旋轉後 HDMI-A-1 解析度變為 1200x1920，起點為 0x0
+# 因此右邊的主螢幕 DisplayPort-1 起點必須向右偏移 1200 像素，即 1200x0
+exec --no-startup-id xrandr --output HDMI-A-0 --mode 1920x1200 --pos 0x0 --rotate left --output DisplayPort-0 --mode 2560x1440 --pos 1200x0 --primary
 
-exec --no-startup-id dunst
-# exec --no-startup-id $browser
-
-exec --no-startup-id xsetroot -cursor_name left_ptr
+# 視窗間距 (Gaps) 設置
 set $gaps_in 5
 set $gaps_out 10
+gaps inner $gaps_in
+gaps outer $gaps_out
 
 ###################
 ### 3. AUTOSTART ###
 ###################
 
+# 壁紙與合成器
 exec_always --no-startup-id feh --bg-fill ~/.local/share/wallpapers/171652.jpg
+exec_always --no-startup-id picom --config ~/.config/picom/picom.conf -b
+
+# 系統元件
+exec --no-startup-id dunst
 exec --no-startup-id polybar
-# exec --no-startup-id i3bar # 如果你使用內建的 i3status
 exec --no-startup-id fcitx5
-# X11 上的剪貼簿歷史管理，需要安裝 clipmenud
-exec --no-startup-id clipmenud &
-# Mapping capslock to ctrl
-exec --no-startup-id sleep 3 && setxkbmap -option ctrl:nocaps
-# 啟用 Polkit
 exec --no-startup-id /usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1
-# xhost +SI:localuser:root (在 X11 上保留此項以防萬一，但通常不必要)
-# exec --no-startup-id xhost +SI:localuser:root
-# --- 新增 Picom 啟動 ---
-exec --no-startup-id picom --config ~/.config/picom/picom.conf
+
+# 鍵盤映射 (Capslock 轉 Ctrl)
+exec --no-startup-id sleep 3 && setxkbmap -option ctrl:nocaps
+
+# 剪貼簿歷史管理 (X11 專用環境)
+exec --no-startup-id clipmenud &
+
+
 
 #########################
 ### 4. 視窗外觀與規則 ###
 #########################
 
-# 視窗邊框設定 (模擬你的 Hyprland 設定)
-gaps inner $gaps_in
-gaps outer $gaps_out
-
-# 視窗邊框設定 (模擬你的 Hyprland 設定)
-# 預設邊框為 1 像素 (i3 的 'pixel' 邊框類型)
+# 預設 1 像素邊框
 default_border pixel 1
-
-# i3 的 fullscreen 模式通常會自動隱藏邊框，但若沒有，
-# 則確保所有視窗的預設 border style 適用 1 像素。
 for_window [class="^.*"] border pixel 1
 
-# 視窗圓角 (i3 不原生支援，但某些 Compositor 如 picom 可以實現)
-exec --no-startup-id picom -b # 啟用 picom 模擬模糊和陰影
-
-# 模擬浮動視窗規則 (i3 的 float rule)
-# 浮動應用程式 (例如你的 wofi/rofi, Nautilus/Nemo, Wlogout)
-for_window [class="Rofi|Wofi"] floating enable
-for_window [class="Rofi|Wofi"] focus_on_window activation
-for_window [class="Rofi|Wofi"] move position center
-
-# 模擬 Hyprland 的全螢幕閒置抑制 (需要 xautolock/i3lock)
-# exec --no-startup-id xautolock -time 10 -locker 'i3lock -i /path/to/lock.png' # 閒置鎖定範例
+# 浮動視窗規則
+for_window [class="Rofi|Wofi|Walker"] floating enable
+for_window [class="Rofi|Wofi|Walker"] focus_on_window activation
+for_window [class="Rofi|Wofi|Walker"] move position center
 
 ###################
 ### 5. 按鍵綁定 ###
 ###################
 
-# 基礎操作
+# === 基礎核心操作 ===
 bindsym $mod+Return exec $terminal
 bindsym $mod+q kill
-bindsym $mod+e exec $fileManager
-bindsym $mod+f fullscreen toggle
-bindsym $mod+Shift+f floating toggle
+bindsym $mod+m exec $powermenu
 bindsym $mod+b exec $browser
-bindsym $altMod+space exec $launcher
+bindsym $mod+Shift+e exec $fileManager
+bindsym $mod+e exec $terminalFileManager
+bindsym $mod+d exec $launcher
 
-bindsym $mod+v exec ~/.local/bin/x11/byte4work-rofi-quick-memu
-bindsym $mod+Shift+e exec ~/.local/bin/x11/byte4work-rofi-emoji
+# === 視窗狀態操作 ===
+bindsym $mod+Shift+f floating toggle
+bindsym $mod+f fullscreen toggle
+bindsym $mod+p layout toggle split       # 模擬 pseudo 效果
+bindsym $mod+n focus next                # 切換下一個視窗
+bindsym $mod+c exec $quickmenu
+bindsym $mod+w exec byte4work-waypaper-selector
+bindsym $mod+Shift+b exec $babycam
 
-# 浮動視窗
-# Use Mouse+$mod to drag floating windows to their wanted position
-floating_modifier $mod
-# move tiling windows via drag & drop by left-clicking into the title bar,
-# or left-clicking anywhere into the window while holding the floating modifier.
-tiling_drag modifier titlebar
+# === 剪貼簿歷史 ===
+bindsym $mod+$altMod+c exec clipmenu
 
-# 專注移動 (與 Hyprland 相同)
+# === 移動焦點 (Vim Style) ===
 bindsym $mod+h focus left
-bindsym $mod+l focus right
-bindsym $mod+k focus up
 bindsym $mod+j focus down
+bindsym $mod+k focus up
+bindsym $mod+l focus right
 
-# 視窗移動 (與 Hyprland 相同)
+# === 移動視窗位置 ===
 bindsym $mod+Shift+h move left
-bindsym $mod+Shift+l move right
-bindsym $mod+Shift+k move up
 bindsym $mod+Shift+j move down
+bindsym $mod+Shift+k move up
+bindsym $mod+Shift+l move right
 
-# 工作區切換 (與 Hyprland 相同)
+# === 【直覺式智慧縮放】(免進入 Resize 模式) ===
+bindsym $mod+Ctrl+Shift+h resize shrink width 30 px or 2 ppt
+bindsym $mod+Ctrl+Shift+j resize grow height 30 px or 2 ppt
+bindsym $mod+Ctrl+Shift+k resize shrink height 30 px or 2 ppt
+bindsym $mod+Ctrl+Shift+l resize grow width 30 px or 2 ppt
+
+# === 【關鍵設定】工作區與螢幕絕對綁定 (1~9 歸主螢幕，10 歸副螢幕) ===
+workspace 1 output DisplayPort-0
+workspace 2 output DisplayPort-0
+workspace 3 output DisplayPort-0
+workspace 4 output DisplayPort-0
+workspace 5 output DisplayPort-0
+workspace 6 output DisplayPort-0
+workspace 7 output DisplayPort-0
+workspace 8 output DisplayPort-0
+workspace 9 output DisplayPort-0
+workspace 10 output HDMI-A-0
+
+# === 工作區快速切換 (1-10) ===
 bindsym $mod+1 workspace number 1
 bindsym $mod+2 workspace number 2
 bindsym $mod+3 workspace number 3
@@ -135,7 +144,7 @@ bindsym $mod+8 workspace number 8
 bindsym $mod+9 workspace number 9
 bindsym $mod+0 workspace number 10
 
-# 移動視窗到工作區 (與 Hyprland 相同)
+# === 移動視窗到指定工作區 ===
 bindsym $mod+Shift+1 move container to workspace number 1
 bindsym $mod+Shift+2 move container to workspace number 2
 bindsym $mod+Shift+3 move container to workspace number 3
@@ -147,101 +156,53 @@ bindsym $mod+Shift+8 move container to workspace number 8
 bindsym $mod+Shift+9 move container to workspace number 9
 bindsym $mod+Shift+0 move container to workspace number 10
 
-# 佈局切換 (i3 內建)
-bindsym $mod+s layout stacking
-bindsym $mod+w layout tabbed
-bindsym $mod+t layout toggle split
+# 回到上一次使用的工作區 (同 $mod+TAB)
+bindsym $mod+Tab workspace back_and_forth
 
-# Workspace
-workspace 1 output DisplayPort-1
-workspace 2 output DisplayPort-1
-workspace 3 output DisplayPort-1
-workspace 4 output DisplayPort-1
-workspace 5 output DisplayPort-1
-workspace 6 output HDMI-A-1
-workspace 7 output HDMI-A-1
-workspace 8 output HDMI-A-1
-workspace 9 output HDMI-A-1
-workspace 10 output HDMI-A-1
+# === 滑鼠拖曳與縮放綁定 ===
+floating_modifier $mod
+tiling_drag modifier titlebar
 
-# 截圖 (替換 hyprshot，使用 X11 截圖工具 scrot)
-# scrot -s 選擇區域, -u 選擇視窗, -d 1 延遲 1 秒, -c 複製到剪貼簿 (需要 xclip)
-# Region screenshot
-bindsym $mod+Control+3 exec ~/.local/bin/x11/byte4work-screenshot region
-
-# Window screenshot
+# === 截圖系統 (因應 X11 精準調整) ===
+# 呼叫你原本存在 ~/.local/bin/x11/ 下的 x11 專用腳本
+bindsym $mod+Control+1 exec ~/.local/bin/x11/byte4work-screenshot window  # 全螢幕/視窗
 bindsym $mod+Control+2 exec ~/.local/bin/x11/byte4work-screenshot window
-
-# Fullscreen screenshot
-bindsym $mod+Control+1 exec ~/.local/bin/x11/byte4work-screenshot window
-
-# Selection + Save
+bindsym $mod+Control+3 exec ~/.local/bin/x11/byte4work-screenshot region
+bindsym $mod+Control+Shift+1 exec ~/.local/bin/x11/byte4work-screenshot save-full
+bindsym $mod+Control+Shift+2 exec ~/.local/bin/x11/byte4work-screenshot save-window
 bindsym $mod+Control+Shift+3 exec ~/.local/bin/x11/byte4work-screenshot save-region
 
-# Window + Save
-bindsym $mod+Control+Shift+2 exec ~/.local/bin/x11/byte4work-screenshot save-window
-
-# Fullscreen + Save
-bindsym $mod+Control+Shift+1 exec ~/.local/bin/x11/byte4work-screenshot save-full
-
-# 剪貼簿歷史 (替換 wl-copy/cliphist，使用 X11 剪貼簿工具)
-# 需要安裝 clipmenu
-bindsym $mod+$altMod+c exec sh -c 'clipmenu'
-
-# 媒體鍵 (保持 wpctl 和 brightnessctl)
+# === 多媒體控制與音量 ===
 bindsym XF86AudioRaiseVolume exec wpctl set-volume -l 1 @DEFAULT_AUDIO_SINK@ 5%+
+bindsym $mod+bracketright exec wpctl set-volume -l 1 @DEFAULT_AUDIO_SINK@ 5%+
 bindsym XF86AudioLowerVolume exec wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-
+bindsym $mod+bracketleft exec wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-
 bindsym XF86AudioMute exec wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle
-bindsym XF86AudioMicMute exec wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle
+bindsym $mod+backslash exec wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle
+
+# 亮度控制
 bindsym XF86MonBrightnessUp exec brightnessctl -e4 -n2 set 5%+
 bindsym XF86MonBrightnessDown exec brightnessctl -e4 -n2 set 5%-
-bindsym XF86AudioNext exec playerctl next
-bindsym XF86AudioPause exec playerctl play-pause
-bindsym XF86AudioPlay exec playerctl play-pause
-bindsym XF86AudioPrev exec playerctl previous
 
-# 退出 i3
+# 多媒體播放播放控制
+bindsym XF86AudioNext exec playerctl next
+bindsym XF86AudioPrev exec playerctl previous
+bindsym XF86AudioPlay exec playerctl play-pause
+bindsym XF86AudioPause exec playerctl play-pause
+
+# === 退出 i3 會話 ===
 bindsym $mod+Shift+m exec i3-nagbar -t warning -m 'You pressed the exit shortcut. Do you really want to exit i3? This will end your X session.' -B 'Yes, exit i3' 'i3-msg exit'
 
-########################
-### 6. Scratchpad 模擬 ###
-########################
-
-# bindsym $mod+a [class="ttrm"] scratchpad show; move position center
-# bindsym $mod+d [class="wmsg"] scratchpad show; move position center
-#
-# exec --no-startup-id $terminal --class ttrm,ttrm -e fastfetch
-# exec --no-startup-id $workmsg --class wmsg,wmsg
-#
-# for_window [class="ttrm"] move scratchpad
-# for_window [class="wmsg"] move scratchpad
-#
-# bindsym $mod+Shift+a [class="ttrm"] move scratchpad
-# bindsym $mod+Shift+d [class="wmsg"] move scratchpad
-
-# resize window (you can also use the mouse for that)
+############################
+### 6. 傳統 RESIZE 模式 (保留) ###
+############################
 mode "resize" {
-        # These bindings trigger as soon as you enter the resize mode
-
-        # Pressing left will shrink the window’s width.
-        # Pressing right will grow the window’s width.
-        # Pressing up will shrink the window’s height.
-        # Pressing down will grow the window’s height.
         bindsym h resize shrink width 10 px or 10 ppt
         bindsym j resize grow height 10 px or 10 ppt
         bindsym k resize shrink height 10 px or 10 ppt
         bindsym l resize grow width 10 px or 10 ppt
-
-        # same bindings, but for the arrow keys
-        bindsym Left resize shrink width 10 px or 10 ppt
-        bindsym Down resize grow height 10 px or 10 ppt
-        bindsym Up resize shrink height 10 px or 10 ppt
-        bindsym Right resize grow width 10 px or 10 ppt
-
-        # back to normal: Enter or Escape or $mod+r
         bindsym Return mode "default"
         bindsym Escape mode "default"
         bindsym $mod+r mode "default"
 }
-
 bindsym $mod+r mode "resize"

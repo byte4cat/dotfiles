@@ -33,3 +33,34 @@ for _, file in ipairs(modules) do
 end
 
 load_if_exists(private_config)
+
+--------------------------------------------------------------------------------
+-- NOTE: WORKAROUND FOR HARDWARE HOTPLUG & EXPLICIT SYNC CRASH
+--
+-- [Issue]
+--   Hyprland (v0.55.2) crashed with Signal 6 (ABRT) during monitor hotplug / sleep resume.
+--   CLI `hyprland --systeminfo` also triggered SIGSEGV at `Helpers::SystemInfo::getSystemInfo`.
+--
+-- [Root Cause]
+--   1. Under Linux Kernel 7.0.x and AMD Granite Ridge Graphics, changes in sysfs/DRM
+--      structures caused unexpected pointer failures during hardware topology detection.
+--   2. The new rendering backend (Aquamarine) failed to negotiate Explicit Sync fences
+--      on hotplug events, throwing:
+--      "ERR [EGL] Command eglDupNativeFenceFDANDROID errored out with EGL_BAD_PARAMETER".
+--
+-- [Workaround]
+--   Disable explicit synchronization and direct scanout to fall back to stable implicit
+--   sync rendering, preventing EGL/DRM race conditions during CRTC reconfiguration.
+--------------------------------------------------------------------------------
+
+-- 關閉明確同步，改走隱式同步，防止 EGL 柵欄參數出錯 (EGL_BAD_PARAMETER)
+--hl.render.explicit_sync = 0
+
+-- 關閉直接掃描輸出，避免熱插拔時雙螢幕 CRTC 重新配置導致 Aquamarine 炸開
+-- hl.render.direct_scanout = 0
+
+hl.render = {
+	explicit_sync = 0,
+	direct_scanout = 0,
+	-- ... 其他原本的 render 設定
+}
