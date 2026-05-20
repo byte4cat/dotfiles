@@ -12,12 +12,12 @@ set $altMod Mod1
 # 核心路徑與工具定義 (完美同步你的 Hyprland 配置)
 set $terminal ghostty
 set $browser librewolf
-set $launcher byte4work-walker
+set $launcher rofi -show drun
 set $fileManager GTK_THEME=adw-gtk3-dark thunar
 set $terminalFileManager ghostty -e yazi ~/Downloads
 set $babycam byte4work-babycam
-set $quickmenu byte4work-walker-quick-menu
-set $powermenu byte4work-walker-power-menu
+set $quickmenu byte4work-rofi-quick-menu
+set $powermenu byte4work-rofi-power-menu
 
 ############################
 ### 2. 環境變數/多螢幕與 X11 設置 ###
