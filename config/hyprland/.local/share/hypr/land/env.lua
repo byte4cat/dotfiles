@@ -7,7 +7,7 @@
 local home = os.getenv("HOME")
 local p = {}
 p.mainMod = "SUPER"
-p.altMod = "ALT" -- Sets "Alt" key as secondary modifier
+p.secMod = "ALT" -- Sets "Alt" key as secondary modifier
 
 p.primaryMonitor = "DP-1"
 
