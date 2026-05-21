@@ -1,15 +1,19 @@
-show=drun
-width=25%
-height=50%
-prompt=Search...
-normal_window=true
+# --- 基礎模式 ---
+mode=drun
+
+# --- 幾何位置 ---
 location=center
-gtk-dark=true
+width=800
+height=400
+
+# --- 行為與外觀 ---
+prompt=Search...
+gtk_dark=true
 allow_images=true
 image_size=32
 insensitive=true
 allow_markup=true
 no_actions=true
 orientation=vertical
-halign=fill
-content_halign=fill
+# 讓它在居中時更像一個彈出視窗
+hide_search=false

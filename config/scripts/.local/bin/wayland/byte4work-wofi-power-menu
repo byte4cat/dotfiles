@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+WOFI_CMD="wofi --show dmenu --width 600 --height 350"
+
 OPTIONS=(
 	"🟢 Logout"
 	"☯ Shutdown"
@@ -10,7 +12,7 @@ OPTIONS=(
 	"❌ Cancel"
 )
 
-selection=$(printf "%s\n" "${OPTIONS[@]}" | walker --dmenu --width 644 --minheight 1 --maxheight 300 -p "Select option…")
+selection=$(printf "%s\n" "${OPTIONS[@]}" | $WOFI_CMD --prompt "Power Menu…")
 
 if [[ -z "$selection" ]]; then
 	exit 0
@@ -40,7 +42,6 @@ case "$selection" in
 	if [ "$XDG_CURRENT_DESKTOP" = "Hyprland" ]; then
 		hyprlock
 	else
-		# Sway 通常使用 swaylock 或 swaylock-effects
 		swaylock -f -c 000000
 	fi
 	;;

@@ -1,0 +1,15 @@
+#!/bin/bash
+
+# 強制指定一個完全沒有 Adwaita 資源依賴的環境
+export GTK_THEME=Adwaita
+export GDK_BACKEND=wayland
+
+if swaymsg -t get_tree | grep -q "spotify-player"; then
+	swaymsg "[title=\"spotify-player\"] scratchpad show"
+else
+	ghostty --title="spotify-player" -e spotify_player &
+
+	# 給予 Sway 處理時間，讓 for_window 規則生效
+	sleep 0.5
+	swaymsg "[title=\"spotify-player\"] scratchpad show"
+fi

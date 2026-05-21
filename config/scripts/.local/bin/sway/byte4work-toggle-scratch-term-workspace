@@ -1,0 +1,20 @@
+#!/bin/bash
+
+# 與 player 一致的環境隔離
+export GTK_THEME=Adwaita
+export GDK_BACKEND=wayland
+
+# 強制獲取 SWAYSOCK
+export SWAYSOCK=$(ls /run/user/$(id -u)/sway-ipc.*.sock 2>/dev/null | head -n 1)
+
+TITLE="scratchpad-term"
+
+if swaymsg -t get_tree | grep -q "$TITLE"; then
+	swaymsg "[title=\"$TITLE\"] scratchpad show"
+else
+	# 確保參數與 player 一致
+	ghostty --title="$TITLE" -e bash -c 'tmux new-session -A -s scratchpad; exec bash' &
+
+	sleep 0.5
+	swaymsg "[title=\"$TITLE\"] scratchpad show"
+fi

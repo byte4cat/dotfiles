@@ -1,0 +1,27 @@
+#!/bin/bash
+
+WORKSPACE="sw_signal"
+APP="signal-desktop"
+
+# 如果當前已經在目標工作區，則跳回上一個工作區
+CURRENT_WS=$(swaymsg -t get_workspaces | jq -r '.[] | select(.focused==true).name')
+
+# 如果當前已經在目標工作區，則跳回上一個工作區
+if [ "$CURRENT_WS" == "$WORKSPACE" ]; then
+	swaymsg workspace back_and_forth
+	exit 0
+fi
+
+# 這裡使用 .. (遞迴搜尋) 找出所有 type 為 workspace 且 name 為目標的節點，再取出其 nodes 長度
+IS_EMPTY=$(swaymsg -t get_tree | jq -r ".. | objects | select(.type==\"workspace\" and .name==\"$WORKSPACE\") | .nodes | length")
+
+if [ -z "$IS_EMPTY" ]; then
+	IS_EMPTY=0
+fi
+
+if [ "$IS_EMPTY" == "0" ]; then
+	swaymsg workspace "$WORKSPACE"
+	$APP &
+else
+	swaymsg workspace "$WORKSPACE"
+fi
