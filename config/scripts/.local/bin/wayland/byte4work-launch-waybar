@@ -11,13 +11,13 @@ MONITOR_JSON=$(hyprctl monitors -j)
 MONITOR=$(echo "$MONITOR_JSON" | jq -r '.[] | select(.name == "DP-1") | .name')
 
 if [ -z "$MONITOR" ] || [ "$MONITOR" == "null" ]; then
-    # 如果連 DP-1 都抓不到，隨便抓一個現有的
-    MONITOR=$(echo "$MONITOR_JSON" | jq -r '.[0].name')
+	# 如果連 DP-1 都抓不到，隨便抓一個現有的
+	MONITOR=$(echo "$MONITOR_JSON" | jq -r '.[0].name')
 fi
 
 # 如果還是空的 (例如連 JSON 都沒產出)，強制指定為 DP-1
 if [ -z "$MONITOR" ] || [ "$MONITOR" == "null" ]; then
-    MONITOR="DP-1"
+	MONITOR="DP-1"
 fi
 
 # 替換設定檔並啟動

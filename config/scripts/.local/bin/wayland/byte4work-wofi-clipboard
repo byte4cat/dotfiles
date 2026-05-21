@@ -1,0 +1,37 @@
+#!/bin/bash
+
+# export PATH=$PATH:/usr/local/bin:/usr/bin:/bin
+#
+# # 執行剪貼簿選取與處理
+# # 使用 wofi 的 dmenu 模式
+# selected=$(cliphist list | wofi --dmenu --prompt "Clipboard" --width 800 --height 400 --lines 10)
+#
+# # 如果有選取內容，才進行 decode 與複製
+# if [ -n "$selected" ]; then
+# 	echo "$selected" | cliphist decode | wl-copy
+# fi
+
+#!/bin/bash
+
+# 設定暫存路徑
+CACHE_DIR="$HOME/.cache/cliphist/images"
+mkdir -p "$CACHE_DIR"
+
+# 取得清單，並針對圖片項目進行處理
+# cliphist list 輸出會標記 <meta type="image/png"> 等，我們需要將其過濾並解碼
+# 這裡我們使用一個臨時檔案來存取選擇
+selected=$(cliphist list | wofi --dmenu --allow-images --prompt "Clipboard" --width 800 --height 600)
+
+if [ -n "$selected" ]; then
+	# 判斷是否為圖片：cliphist 顯示圖片時通常帶有 meta 資訊
+	if echo "$selected" | grep -q "image/"; then
+		# 解碼圖片到指定位置
+		img_path="$CACHE_DIR/$(date +%s).png"
+		echo "$selected" | cliphist decode >"$img_path"
+		# 將路徑放入剪貼簿 (或者你可以使用 wl-copy 複製該圖片檔案)
+		wl-copy <"$img_path"
+	else
+		# 純文字處理
+		echo "$selected" | cliphist decode | wl-copy
+	fi
+fi
