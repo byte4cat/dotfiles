@@ -79,11 +79,11 @@
     "format": "{}",
     "tooltip": false
   },
-  "wlr/taskbar": {
-    "on-click": "activate",
-    "ignore-list": ["alacritty"],
-    "cursor": true
-  },
+  // "wlr/taskbar": {
+  //   "on-click": "activate",
+  //   "ignore-list": ["alacritty"],
+  //   "cursor": true
+  // },
 
   "sway/workspaces": {
     "format": "{icon}",

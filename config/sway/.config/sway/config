@@ -25,6 +25,31 @@ exec awww img ~/.local/share/wallpapers/wp14362312-linux-minimalist-wallpapers.j
 exec --no-startup-id signal-desktop
 exec --no-startup-id vesktop
 
+# --- 閒置與鎖定設定 ---
+# 說明：
+# - 閒置 5 秒：隱藏滑鼠游標。
+# - 閒置 300 秒(5分鐘): 啟動帶有特效的鎖定畫面。
+# - 閒置 600 秒(10分鐘): 關閉螢幕電源(DPMS)。
+# - 恢復時：觸發輕微移動以喚醒游標。
+# 定義鎖定指令變數:
+set $lock_cmd 'swaylock --screenshots --clock --indicator --indicator-radius 100 --indicator-thickness 7 --effect-blur 7x5 --effect-vignette 0.5:0.5 --ring-color 3b4252 --key-hl-color 88c0d0 --inside-color 2e344088 --separator-color 00000000 --font "JetBrainsMono Nerd Font" --text-color d8dee9'
+
+exec swayidle -w \
+    timeout 5 'swaymsg seat seat0 hide_cursor 5000' \
+    resume 'swaymsg seat seat0 cursor move 0 0' \
+    timeout 300 $lock_cmd \
+    timeout 600 'swaymsg "output * dpms off"' \
+    resume 'swaymsg "output * dpms on"' \
+    before-sleep $lock_cmd
+
+# 設定視窗間隙 (Gaps)
+gaps inner 10
+gaps outer 5
+
+# 設定智慧型間隙 (如果只有一個視窗則關閉間隙)
+smart_gaps on
+smart_borders on
+
 # -- auto apps --
 exec swaymsg 'workspace 1; exec $terminal'
 exec swaymsg 'workspace 2; exec $browser'
@@ -234,22 +259,25 @@ bindsym $mainMod+Control+Shift+2 exec grim -g "$(slurp)" - | satty --filename -
 # 截圖選取區域並用 satty 編輯 (Ctrl+Shift+3)
 bindsym $mainMod+Control+Shift+3 exec grim -g "$(slurp)" - | satty --filename -
 
-# bar {
-#     swaybar_command swaybar
-# 
-#     # 設定顯示位置
-#     position top
-#     
-#     # 設定狀態列資訊 (預設使用 i3status)
-#     status_command i3status
-# 
-#     # 設定顏色 (這跟 waybar 的 css 完全不同，是這裡自己定義)
-#     colors {
-#         statusline #ffffff
-#         background #282828
-#         inactive_workspace #323232 #323232 #888888
-#         focused_workspace  #4c7899 #285577 #ffffff
-#     }
-# }
+
+bar {
+    swaybar_command swaybar
+
+    # 設定顯示位置
+    position top
+    
+    # 設定狀態列資訊 (預設使用 i3status)
+    status_command i3status
+
+    # 設定顏色 (這跟 waybar 的 css 完全不同，是這裡自己定義)
+
+	# Nord
+	colors {
+    background #2e3440
+    statusline #d8dee9
+    focused_workspace #88c0d0 #88c0d0 #2e3440
+    inactive_workspace #3b4252 #3b4252 #d8dee9
+	}
+}
 
 include /home/neil/.local/private/sway/config

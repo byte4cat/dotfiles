@@ -89,8 +89,20 @@ for i = 1, 10 do
 	hl.bind(mainMod .. " + SHIFT + " .. key, hl.dsp.window.move({ workspace = i }))
 end
 
--- Tab 切換前一個工作區
-hl.bind(mainMod .. " + TAB", hl.dsp.focus({ workspace = "previous" }))
+-- Group
+hl.bind(mainMod .. " + G", function()
+	hl.dispatch(hl.dsp.group.toggle())
+end)
+hl.bind(mainMod .. " + TAB", function()
+	hl.dispatch(hl.dsp.group.next())
+end)
+hl.bind(mainMod .. " + SHIFT + TAB", function()
+	hl.dispatch(hl.dsp.group.prev())
+end)
+-- 工作區管理修正
+hl.bind(mainMod .. " + GRAVE", function()
+	hl.dispatch(hl.dsp.workspace.focus("previous"))
+end)
 
 -- =========
 -- 滑鼠綁定
