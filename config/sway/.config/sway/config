@@ -6,7 +6,7 @@ set $mainMod Mod4
 set $secMod Mod1
 set $terminal PATH=$my_path ghostty
 set $browser librewolf
-set $menu wofi
+set $menu wofi --show drun
 set $file_manager thunar
 set $PRIMARY_MONITOR DP-1
 
@@ -16,11 +16,14 @@ exec_always gpg-connect-agent updatestartuptty /bye
 exec_always gnome-keyring-daemon --start --components=secrets,pkcs11,ssh
 exec_always awww-daemon
 exec_always wl-paste --type text --watch cliphist store
-# exec_always pkill waybar; PATH=$my_path byte4work-launch-waybar
-exec_always pkill swaync; uwsm-app -- swaync
-exec_always uwsm-app -- fcitx5 -d
-exec_always pkill swayosd-server; uwsm-app -- swayosd-server
+exec_always pkill waybar; PATH=$my_path byte4work-launch-waybar
+exec_always pkill swaync; swaync
+exec_always fcitx5 -d
+exec_always pkill swayosd-server; swayosd-server
+
 exec awww img ~/.local/share/wallpapers/wp14362312-linux-minimalist-wallpapers.jpg
+exec --no-startup-id signal-desktop
+exec --no-startup-id vesktop
 
 # -- auto apps --
 exec swaymsg 'workspace 1; exec $terminal'
@@ -29,10 +32,15 @@ exec swaymsg 'workspace 0; exec $browser'
 
 # --- 外觀設定 ---
 exec gsettings set org.gnome.desktop.interface color-scheme prefer-dark
-#exec gsettings set org.gnome.desktop.interface gtk-theme adw-gtk3-dark
 exec gsettings set org.gnome.desktop.interface font-name "sans-serif 11"
 
-client.focused #4c7899 #285577 #ffffff #2e9ef4 #285577
+client.focused          #87CEFA #444444 #ffffff #87CEFA #87CEFA
+client.focused_inactive #333333 #222222 #888888 #333333 #333333
+client.unfocused        #222222 #222222 #444444 #222222 #222222
+
+# 將所有新開啟的視窗預設為只有邊框，且寬度為 2 像素
+default_border pixel 2
+default_floating_border pixel 2
 
 # --- hot reload ---
 bindsym $mainMod+Shift+c reload
@@ -69,12 +77,16 @@ workspace 2 layout tabbed
 for_window [workspace="2"] layout tabbed
 
 # --- 視窗規則 ---
+assign [class="Signal"] workspace "sw_signal"
+assign [class="vesktop"] workspace "sw_vesktop"
+
 for_window [class="^.*$"] opacity 0.96
 for_window [app_id="^(firefox|brave-browser|librewolf)$"] opacity 1.0
 for_window [class="^(vesktop|Signal)$"] opacity 1.0
-for_window [class="com.mitchellh.ghostty"] opacity 0.80
+for_window [app_id="com.mitchellh.ghostty"] opacity 0.80
 for_window [app_id="walker"] floating enable, border none, focus, move center
 for_window [app_id="wofi"] floating enable, move center, focus
+for_window [app_id="waypaper"] floating enable, move center, focus
 for_window [app_id="com.mitchellh.ghostty" title="spotify-player"] {
     floating enable
     move position center
@@ -94,9 +106,25 @@ for_window [app_id="satty"] {
 }
 for_window [con_mark="browser_auto"] {
     move container to workspace 2
-    workspace 2
+	# not move to workspace 2, but set the layout of workspace 2 to tabbed and unmark the container
+    # workspace 2 
     layout tabbed
     unmark browser_auto
+}
+
+# 進入 resize 模式
+bindsym $mainMod+r mode "resize"
+
+mode "resize" {
+    # 透過方向鍵調整大小
+    bindsym h resize shrink width 10 px or 10 ppt
+    bindsym j resize grow height 10 px or 10 ppt
+    bindsym k resize shrink height 10 px or 10 ppt
+    bindsym l resize grow width 10 px or 10 ppt
+
+    # 回到預設模式
+    bindsym Return mode "default"
+    bindsym Escape mode "default"
 }
 
 # --- 視窗控制 ---
@@ -139,20 +167,17 @@ bindsym $mainMod+Shift+9 move container to workspace number 9
 bindsym $mainMod+Shift+0 move container to workspace number 10
 
 # --- 聲音與媒體 (SwayOSD) ---
-bindsym --release XF86AudioRaiseVolume exec "wpctl set-volume -l 1 @DEFAULT_AUDIO_SINK@ 5%+ && swayosd-client --output-volume raise"
-bindsym --release XF86AudioLowerVolume exec "wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%- && swayosd-client --output-volume lower"
-bindsym --release XF86AudioMute exec "swayosd-client --output-volume mute-toggle"
-bindsym --release XF86AudioMicMute exec "wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle && swayosd-client --input-volume mute-toggle"
+bindsym --release XF86AudioRaiseVolume exec "wpctl set-volume -l 1 @DEFAULT_AUDIO_SINK@ 5%+ && swayosd-client --output-volume raise --monitor $PRIMARY_MONITOR"
+bindsym --release XF86AudioLowerVolume exec "wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%- && swayosd-client --output-volume lower --monitor $PRIMARY_MONITOR"
+bindsym --release XF86AudioMute exec "swayosd-client --output-volume mute-toggle --monitor $PRIMARY_MONITOR"
+bindsym --release XF86AudioMicMute exec "wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle && swayosd-client --input-volume mute-toggle --monitor $PRIMARY_MONITOR"
 
 # --- 聲音控制 (Mod + [ / ]) ---
-# 提高音量：Mod + ]
-bindsym $mainMod+bracketright exec "wpctl set-volume -l 1 @DEFAULT_AUDIO_SINK@ 5%+ && swayosd-client --output-volume raise"
-# 降低音量：Mod + [
-bindsym $mainMod+bracketleft exec "wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%- && swayosd-client --output-volume lower"
-# 靜音切換：Mod + \ (放在 ] 旁邊，順手)
-bindsym $mainMod+backslash exec "swayosd-client --output-volume mute-toggle"
-# 麥克風靜音：Mod + Shift + \
-bindsym $mainMod+Shift+backslash exec "wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle && swayosd-client --input-volume mute-toggle"
+bindsym $mainMod+bracketright exec "wpctl set-volume -l 1 @DEFAULT_AUDIO_SINK@ 5%+ && swayosd-client --output-volume raise --monitor $PRIMARY_MONITOR"
+bindsym $mainMod+bracketleft exec "wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%- && swayosd-client --output-volume lower --monitor $PRIMARY_MONITOR"
+bindsym $mainMod+backslash exec "swayosd-client --output-volume mute-toggle --monitor $PRIMARY_MONITOR"
+# Mute 麥克風
+bindsym $mainMod+Shift+backslash exec "wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle && swayosd-client --input-volume mute-toggle --monitor $PRIMARY_MONITOR"
 
 # --- 亮度 ---
 bindsym XF86MonBrightnessUp exec "brightnessctl set 5%+ && swayosd-client --brightness raise"
@@ -177,8 +202,11 @@ bindsym $mainMod+Shift+s move container to workspace "sw_vesktop"; workspace "sw
 bindsym $mainMod+a exec PATH=$my_path byte4work-toggle-scratch-term-workspace
 bindsym $mainMod+v exec PATH=$my_path byte4work-toggle-music-workspace
 
+# Waybar
+bindsym $mainMod+Shift+t exec PATH=$my_path byte4work-wofi-switch-waybar-theme
+
 # 啟動器與工具
-bindsym $mainMod+d exec pgrep wofi && pkill wofi || $menu
+bindsym $mainMod+d exec pgrep wofi && pkill wofi || XDG_DATA_DIRS=$HOME/.local/share:$XDG_DATA_DIRS PATH=$my_path wofi --show drun
 bindsym $mainMod+t exec PATH=$my_path byte4work-switch-waybar-theme; exec swaymsg focus
 bindsym $mainMod+n cyclenext
 bindsym $mainMod+Shift+n exec swaync-client -t
@@ -206,20 +234,22 @@ bindsym $mainMod+Control+Shift+2 exec grim -g "$(slurp)" - | satty --filename -
 # 截圖選取區域並用 satty 編輯 (Ctrl+Shift+3)
 bindsym $mainMod+Control+Shift+3 exec grim -g "$(slurp)" - | satty --filename -
 
-bar {
-    swaybar_command swaybar
+# bar {
+#     swaybar_command swaybar
+# 
+#     # 設定顯示位置
+#     position top
+#     
+#     # 設定狀態列資訊 (預設使用 i3status)
+#     status_command i3status
+# 
+#     # 設定顏色 (這跟 waybar 的 css 完全不同，是這裡自己定義)
+#     colors {
+#         statusline #ffffff
+#         background #282828
+#         inactive_workspace #323232 #323232 #888888
+#         focused_workspace  #4c7899 #285577 #ffffff
+#     }
+# }
 
-    # 設定顯示位置
-    position top
-    
-    # 設定狀態列資訊 (預設使用 i3status)
-    status_command i3status
-
-    # 設定顏色 (這跟 waybar 的 css 完全不同，是這裡自己定義)
-    colors {
-        statusline #ffffff
-        background #282828
-        inactive_workspace #323232 #323232 #888888
-        focused_workspace  #4c7899 #285577 #ffffff
-    }
-}
+include /home/neil/.local/private/sway/config

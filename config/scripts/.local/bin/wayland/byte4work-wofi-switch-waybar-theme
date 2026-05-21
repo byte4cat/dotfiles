@@ -29,7 +29,7 @@ fi
 # --- Use Walker for Selection ---
 # Format the presets list and pipe to walker using the dmenu mode arguments.
 PRESET=$(printf "%s\n" "$AVAILABLE_PRESETS" |
-	walker --dmenu --width 644 --minheight 1 --maxheight 300 -p "󰸭 Select Waybar Preset…")
+	wofi --dmenu --width 600 --height 300 --prompt "Select Waybar Preset…")
 
 # Check if the user made a selection (exit if canceled or empty)
 [ -z "$PRESET" ] && exit 0
