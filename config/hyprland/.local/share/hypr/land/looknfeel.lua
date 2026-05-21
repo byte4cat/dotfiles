@@ -2,9 +2,38 @@
 ---- Look & Feel ----
 ---------------------
 
--- 顏色變數
+-- ==========================================
+-- 顏色風格選單
+-- ==========================================
+
+-- [Original] 北歐青 (Nordic Aqua) - 沉穩、專業
+-- local activeBorderColor = { colors = { "0x33ccffee", "0x00ff99ee" }, angle = 45 }
+-- local inactiveBorderColor = "0x595959aa"
+
+-- [Cyberpunk] 霓虹粉藍 (Vaporwave) - 高對比
+-- local activeBorderColor = { colors = { "0xff00ffee", "0x00ffffee" }, angle = 45 }
+-- local inactiveBorderColor = "0x444444aa"
+
+-- [Lava] 地獄烈焰 (Magma) - 侵略性
+-- local activeBorderColor = { colors = { "0xff4500ee", "0x800080ee" }, angle = 45 }
+-- local inactiveBorderColor = "0x333333aa"
+
+-- [Electric] 電子脈衝 (Pulse) - 極致亮眼
+-- local activeBorderColor = { colors = { "0xffff00ee", "0x8a2be2ee" }, angle = 45 }
+-- local inactiveBorderColor = "0x2a2a2aaa"
+
+-- [Forest] 深邃翡翠 (Emerald) - 高雅護眼
+-- local activeBorderColor = { colors = { "0x00ff9f99", "0x006633ee" }, angle = 45 }
+-- local inactiveBorderColor = "0x202020aa"
+
+-- [NeonGreen] 極致亮綠
+-- local activeBorderColor = { colors = { "rgba(39ff14ee)", "rgba(008f11ee)" }, angle = 45 }
+-- local inactiveBorderColor = "rgba(404040aa)" -- 故意設得深一點，讓活躍的更跳出來
+
+-- [SkyBlue] 天空藍
 local activeBorderColor = { colors = { "rgba(33ccffee)", "rgba(00ff99ee)" }, angle = 45 }
 local inactiveBorderColor = "rgba(595959aa)"
+
 local shadowColor = "rgba(1a1a1aee)"
 
 hl.config({
@@ -37,16 +66,16 @@ hl.config({
 	},
 
 	group = {
-		["col.border_active"] = activeBorderColor,
-		["col.border_inactive"] = inactiveBorderColor,
+		auto_group = true,
 		groupbar = {
-			enabled = false,
+			enabled = true,
+			height = 20,
 			font_size = 12,
 			font_family = "comic code",
-			height = 22,
+			render_titles = true,
 			col = {
-				active = "rgba(00000040)",
-				inactive = "rgba(00000020)",
+				active = "0xff39ff14",
+				inactive = "0xff204020",
 			},
 		},
 	},
