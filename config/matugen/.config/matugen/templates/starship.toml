@@ -1,0 +1,8 @@
+[character]
+success_symbol = "[➜]({{colors.primary.default.hex}})"
+error_symbol = "[➜]({{colors.error.default.hex}})"
+
+[directory]
+style = "bold {{colors.tertiary.default.hex}}"
+truncation_length = 3
+truncation_symbol = "…/"
