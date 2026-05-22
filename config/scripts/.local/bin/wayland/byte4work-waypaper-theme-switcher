@@ -1,0 +1,77 @@
+#!/bin/bash
+
+STATE_FILE="$HOME/.local/state/waypaper/default.toml"
+mkdir -p "$(dirname "$STATE_FILE")"
+FOLDERS=(
+	"$HOME/.local/share/wallpapers"
+)
+
+FOLDER_ARGS=()
+for f in "${FOLDERS[@]}"; do
+	FOLDER_ARGS+=("$f")
+done
+
+if [ ! -f "$STATE_FILE" ]; then
+	echo "Error: $STATE_FILE not exists"
+	exit 1
+fi
+
+waypaper --state-file "$STATE_FILE" --folder "${FOLDER_ARGS[@]}"
+
+RAW_PATH=$(grep 'wallpaper =' "$STATE_FILE" | head -n 1 | sed 's/.*= //;s/"//g')
+SELECTED_WALLPAPER="${RAW_PATH/#\~/$HOME}"
+
+echo "RAW_PATH: $RAW_PATH"
+echo "SELECTED_WALLPAPER: $SELECTED_WALLPAPER"
+
+if [ -z "$SELECTED_WALLPAPER" ]; then
+	notify-send "Theme" "can not read wallpaper location" -t 2000
+	exit 1
+fi
+
+CONFIG_DIR="/tmp"
+APPS=(
+	"waybar"
+	"wofi"
+	"kitty"
+	"ghostty"
+	"starship"
+	"gtk"
+	"neovim"
+)
+
+# make sure dir is exists, change to for loop?
+for app in "${APPS[@]}"; do
+	mkdir -p "$CONFIG_DIR/$APP"
+done
+
+matugen image "$SELECTED_WALLPAPER" --quiet --source-color-index 0
+
+notify-send "Theme" "Sync successful!" -i "$SELECTED_WALLPAPER" -t 1500
+
+# --- 顯示同步結果 ---
+#echo -e "\n\033[1;32m=== 全系統配色同步完成 ===\033[0m"
+#echo "壁紙: $SELECTED_WALLPAPER"
+#
+#for app in "${APPS[@]}"; do
+#	FILE_PATH="$CONFIG_DIR/$app/colors.css"
+#
+#	# 判斷檔案是否存在 (因為有些模版可能還沒寫好)
+#	if [ -f "$FILE_PATH" ]; then
+#		echo -e "\n\033[1;36m====== $app ======\033[0m"
+#		cat "$FILE_PATH"
+#	else
+#		# 嘗試找看看是否有其他副檔名 (如 .conf, .toml)
+#		FILE_PATH_ANY=$(ls "$CONFIG_DIR/$app/"* 2>/dev/null | head -n 1)
+#		if [ -n "$FILE_PATH_ANY" ]; then
+#			echo -e "\n\033[1;36m====== $app (Found: $(basename "$FILE_PATH_ANY")) ======\033[0m"
+#			cat "$FILE_PATH_ANY"
+#		else
+#			echo -e "\n\033[1;33m====== $app (無生成的檔案) ======\033[0m"
+#		fi
+#	fi
+#done
+
+#echo -e "\n\033[1;32m===========================\033[0m"
+
+echo "Colors updated for $SELECTED_WALLPAPER"

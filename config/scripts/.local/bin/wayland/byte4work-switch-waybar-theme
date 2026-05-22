@@ -5,27 +5,26 @@
 # --- 1. Define Paths ---
 WAYBAR_CONFIG_DIR="$HOME/.config/waybar"
 CONFIG_DIR="$WAYBAR_CONFIG_DIR/modules"
-STYLE_DIR="$WAYBAR_CONFIG_DIR/styles"
 
 # --- 2. Discover Available Preset Names ---
 # Finds all *.jsonc files and extracts the PRESET name.
 AVAILABLE_PRESETS=$(
-    find "$CONFIG_DIR" -maxdepth 1 -name "*.jsonc" -exec basename {} \; |
-        sed -E -e 's/^config-//' -e 's/\.jsonc$//' |
-        sort
+	find "$CONFIG_DIR" -maxdepth 1 -name "*.jsonc" -exec basename {} \; |
+		sed -E -e 's/^config-//' -e 's/\.jsonc$//' |
+		sort
 )
 
 # Error handling: Check if any presets were found
 if [ -z "$AVAILABLE_PRESETS" ]; then
-    echo "Error: No Waybar presets (*.jsonc) found in $CONFIG_DIR." >&2
-    exit 1
+	echo "Error: No Waybar presets (*.jsonc) found in $CONFIG_DIR." >&2
+	exit 1
 fi
 
 # --- 3. Use Walker for Selection ---
 
 # Format the presets list and pipe to walker using the dmenu mode arguments.
 PRESET=$(printf "%s\n" "$AVAILABLE_PRESETS" |
-    walker --dmenu --width 644 --minheight 1 --maxheight 300 -p "󰸭 Select Waybar Preset…")
+	walker --dmenu --width 644 --minheight 1 --maxheight 300 -p "󰸭 Select Waybar Preset…")
 
 # Check if the user made a selection (exit if canceled or empty)
 [ -z "$PRESET" ] && exit 0
@@ -34,11 +33,9 @@ PRESET=$(printf "%s\n" "$AVAILABLE_PRESETS" |
 
 # Delete old symlinks
 rm -f "$WAYBAR_CONFIG_DIR/config.jsonc"
-rm -f "$WAYBAR_CONFIG_DIR/style.css"
 
 # Create new symlinks
 ln -s "$CONFIG_DIR/$PRESET.jsonc" "$WAYBAR_CONFIG_DIR/config.jsonc"
-ln -s "$STYLE_DIR/$PRESET.css" "$WAYBAR_CONFIG_DIR/style.css"
 
 # fallback
 MONITOR=${PRIMARY_MONITOR:-$(hyprctl monitors -j | jq -r '.[0].name')}

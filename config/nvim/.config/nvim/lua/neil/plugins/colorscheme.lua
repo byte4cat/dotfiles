@@ -10,11 +10,34 @@ local function get_last_theme()
 	return "nightfox"
 end
 
+local function apply_transparency()
+	pcall(function()
+		local groups = { "Normal", "NormalFloat", "NormalNC", "SignColumn", "EndOfBuffer" }
+		for _, group in ipairs(groups) do
+			vim.api.nvim_set_hl(0, group, { bg = "none", ctermbg = "none" })
+		end
+	end)
+end
+
+local function apply_matugen_colors()
+	local matugen_path = os.getenv("HOME") .. "/.config/nvim/generated.lua"
+	print("Loading matugen from: " .. matugen_path)
+	local ok, err = pcall(dofile, matugen_path)
+	if not ok then
+		vim.notify("Matugen loading failed: " .. tostring(err), vim.log.levels.WARN)
+	else
+		vim.g.colors_name = "matugen"
+		apply_transparency()
+	end
+end
+
 local function set_theme(name)
-	if name and name ~= "" then
+	if name == "matugen" then
+		apply_matugen_colors()
+	elseif name and name ~= "" then
 		local ok, err = pcall(vim.cmd.colorscheme, name)
 		if not ok then
-			vim.notify("Theme switch error: " .. name, vim.log.levels.DEBUG)
+			vim.notify("Theme" .. name .. "switch error: " .. err, vim.log.levels.DEBUG)
 		end
 		-- apply_transparency 會由 ColorScheme Autocmd 自動觸發
 	end
@@ -26,15 +49,6 @@ local function save_theme(theme)
 		f:write(theme)
 		f:close()
 	end
-end
-
-local function apply_transparency()
-	pcall(function()
-		local groups = { "Normal", "NormalFloat", "NormalNC", "SignColumn", "EndOfBuffer" }
-		for _, group in ipairs(groups) do
-			vim.api.nvim_set_hl(0, group, { bg = "none", ctermbg = "none" })
-		end
-	end)
 end
 
 -- 主題清單
@@ -88,6 +102,16 @@ vim.schedule(function()
 		end,
 	})
 
+	-- 監聽 Matugen 更新訊號
+	vim.api.nvim_create_autocmd("Signal", {
+		pattern = "SIGUSR1",
+		callback = function()
+			-- 當收到訊號時，自動把主題切換到 matugen 並存檔
+			set_theme("matugen")
+			save_theme("matugen")
+		end,
+	})
+
 	local last = get_last_theme()
 	set_theme(last)
 	-- just in case
@@ -117,6 +141,10 @@ vim.schedule(function()
 
 		builtin.colorscheme({
 			enable_preview = true,
+			-- 過濾掉 matugen
+			filter = function(choice)
+				return choice ~= "matugen"
+			end,
 			-- 在預覽切換時暫時關閉所有 Autocmd
 			attach_mappings = function(prompt_bufnr, map)
 				-- 這裡攔截 Telescope 的預覽行為

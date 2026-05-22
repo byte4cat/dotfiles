@@ -1,6 +1,7 @@
 # Ghostty Config
 
-theme = "Ultra Dark"
+# theme = "Ultra Dark"
+theme = "Matugen"
 background-opacity = 1.0
 
 font-family = "monospace"

@@ -1,0 +1,59 @@
+[config]
+# 'content' 比較柔和，'vibrant' 比較鮮豔
+color_mode = "content"
+
+# NOTE: DONE
+[templates.gtk3]
+input_path = '~/.config/matugen/templates/gtk-colors.css'
+output_path = '~/.config/gtk-3.0/colors.css'
+post_hook = 'gsettings set org.gnome.desktop.interface gtk-theme ""; gsettings set org.gnome.desktop.interface gtk-theme adw-gtk3-dark'
+
+# NOTE: DONE
+[templates.gtk4]
+input_path = '~/.config/matugen/templates/gtk-colors.css'
+output_path = '~/.config/gtk-4.0/colors.css'
+post_hook = '~/.config/matugen/post-hook-scripts/gtk-themes-reload'
+
+# [templates.qt]
+# input_path = '~/.config/matugen/templates/qt.conf'
+# output_path = '/tmp/qt/colors.conf'
+
+# NOTE: DONE
+[templates.waybar]
+input_path = '~/.config/matugen/templates/waybar-V7.1.css'
+output_path = '~/.config/waybar/style.css'
+post_hook = 'pkill -SIGUSR2 waybar'
+
+[templates.hyprland]
+input_path = '~/.config/matugen/templates/hyprland-colors.conf'
+output_path = '~/.local/share/hypr/land/colors.conf'
+
+[templates.yazi]
+input_path = '~/.config/matugen/templates/yazi-theme.toml'
+output_path = '~/.config/yazi/theme.toml'
+
+# [templates.wofi]
+# input_path = '~/.config/matugen/templates/wofi.css'
+# output_path = "~/.config/wofi/colors.css"
+
+# [templates.kitty]
+# input_path = '~/.config/matugen/templates/kitty.conf'
+# output_path = '/tmp/kitty/colors.conf'
+# post_hook = 'kitty @ set-colors --all --configured /tmp/kitty/colors.conf'
+
+# NOTE: DONE
+[templates.ghostty]
+input_path = '~/.config/matugen/templates/ghostty.theme'
+output_path = '~/.config/ghostty/themes/Matugen'
+post_hook = 'pkill -SIGUSR2 ghostty'
+
+# [templates.starship]
+# input_path = '~/.config/matugen/templates/starship.toml'
+# output_path = '/tmp/starship/colors.toml'
+# 注意：Starship 需要你設定 STARSHIP_CONFIG 環境變數指向這個路徑
+
+# NOTE: DONE
+[templates.nvim]
+input_path = '~/.config/matugen/templates/nvim-template.lua'
+output_path = '~/.config/nvim/generated.lua'
+post_hook = 'pkill -SIGUSR1 nvim'

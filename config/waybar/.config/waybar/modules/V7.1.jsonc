@@ -12,7 +12,7 @@
   "group/left1": {
     "orientation": "inherit",
     "modules": [
-      // "custom/omarchy",
+      "custom/omarchy",
       "hyprland/workspaces"
     ]
   },
@@ -72,7 +72,8 @@
   "custom/omarchy": {
 	"format": "",
     "on-click": "omarchy-menu",
-    "on-click-right": "xdg-terminal-exec"
+    "on-click-right": "xdg-terminal-exec",
+    "tooltip-format": "Omarchy Menu\n\nSuper + Alt + Space"
   },
   "custom/update": {
     "format": "",
