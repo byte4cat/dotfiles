@@ -5,6 +5,11 @@
 local mainMod = (myEnv and myEnv.mainMod) or "SUPER"
 local secMod = (myEnv and myEnv.secMod) or "ALT"
 
+-- 輔助函數, 簡化 exec 呼叫 (確保指令傳遞給 shell)
+local function sh_exec(cmd)
+	return hl.dsp.exec_cmd("sh -c '" .. cmd .. "'")
+end
+
 -- ===================
 -- 應用程式與視窗操作
 -- ===================
@@ -113,13 +118,45 @@ hl.bind(mainMod .. " + mouse:273", hl.dsp.window.resize(), { mouse = true })
 -- ===========
 -- SCREENSHOT
 -- ===========
-hl.bind(mainMod .. " + CONTROL + 1", hl.dsp.exec_cmd("hyprshot -m output --clipboard-only"))
-hl.bind(mainMod .. " + CONTROL + 2", hl.dsp.exec_cmd("hyprshot -m window --clipboard-only"))
-hl.bind(mainMod .. " + CONTROL + 3", hl.dsp.exec_cmd("hyprshot -m region --clipboard-only"))
 
-hl.bind(mainMod .. " + CONTROL + SHIFT + 1", hl.dsp.exec_cmd("hyprshot -m output --raw | satty --filename -"))
-hl.bind(mainMod .. " + CONTROL + SHIFT + 2", hl.dsp.exec_cmd("hyprshot -m window --raw | satty --filename -"))
-hl.bind(mainMod .. " + CONTROL + SHIFT + 3", hl.dsp.exec_cmd("hyprshot -m region --raw | satty --filename -"))
+-- NOTE: OLD WAY
+--
+-- hl.bind(mainMod .. " + CONTROL + 1", hl.dsp.exec_cmd("hyprshot -m output --clipboard-only"))
+-- hl.bind(mainMod .. " + CONTROL + 2", hl.dsp.exec_cmd("hyprshot -m window --clipboard-only"))
+-- hl.bind(mainMod .. " + CONTROL + 3", hl.dsp.exec_cmd("hyprshot -m region --clipboard-only"))
+--
+-- hl.bind(mainMod .. " + CONTROL + SHIFT + 1", hl.dsp.exec_cmd("hyprshot -m output --raw | satty --filename -"))
+-- hl.bind(mainMod .. " + CONTROL + SHIFT + 2", hl.dsp.exec_cmd("hyprshot -m window --raw | satty --filename -"))
+-- hl.bind(mainMod .. " + CONTROL + SHIFT + 3", hl.dsp.exec_cmd("hyprshot -m region --raw | satty --filename -"))
+
+-- TODO: NEW WAY, NOT test YET:
+-- 定義存放路徑
+local screenshot_dir = os.getenv("HOME") .. "/Pictures/Screenshots"
+
+-- 截圖指令定義
+local cmd_full = "grim - | tee "
+	.. screenshot_dir
+	.. "/$(date +'%Y%m%d-%H%M%S').png | wl-copy && notify-send 'Screenshot saved & copied'"
+local cmd_slurp = 'grim -g "$(slurp)" - | tee '
+	.. screenshot_dir
+	.. "/$(date +'%Y%m%d-%H%M%S').png | wl-copy && notify-send 'Screenshot saved & copied'"
+
+-- 普通截圖
+hl.bind(mainMod .. " + CONTROL + 1", sh_exec(cmd_full))
+hl.bind(mainMod .. " + CONTROL + 2", sh_exec(cmd_slurp))
+hl.bind(mainMod .. " + CONTROL + 3", sh_exec(cmd_slurp))
+
+-- Satty 編輯
+local satty_full = "grim - | satty --filename - --fullscreen --output-filename "
+	.. screenshot_dir
+	.. "/$(date +'%Y%m%d-%H%M%S').png"
+local satty_slurp = 'grim -g "$(slurp)" - | satty --filename - --output-filename '
+	.. screenshot_dir
+	.. "/$(date +'%Y%m%d-%H%M%S').png"
+
+hl.bind(mainMod .. " + CONTROL + SHIFT + 1", sh_exec(satty_full))
+hl.bind(mainMod .. " + CONTROL + SHIFT + 2", sh_exec(satty_slurp))
+hl.bind(mainMod .. " + CONTROL + SHIFT + 3", sh_exec(satty_slurp))
 
 -- =====
 -- ZOOM
