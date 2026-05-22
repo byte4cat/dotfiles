@@ -371,7 +371,7 @@
   "custom/power_menu": {
     "format": "",
     // "on-click": "pkill -x wlogout || wlogout -b 4",
-    "on-click": "$HOME/.local/bin/byte4work-walker-power-menu",
+    "on-click": "$HOME/.local/bin/byte4work-wofi-power-menu",
     "tooltip-format": "Power Menu"
   },
 

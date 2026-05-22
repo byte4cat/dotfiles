@@ -1,0 +1,60 @@
+#!/bin/bash
+
+# NOTE: SHOULD SET PRIMARY_MONITOR as env variable to let this script work
+
+COMPOSITOR=$(echo "$XDG_CURRENT_DESKTOP" | tr '[:upper:]' '[:lower:]')
+if [ "$COMPOSITOR" != "hyprland" ] && [ "$COMPOSITOR" != "sway" ]; then
+	COMPOSITOR="hyprland"
+fi
+
+# --- Define Paths ---
+WAYBAR_CONFIG_DIR="$HOME/.config/waybar"
+CONFIG_DIR="$WAYBAR_CONFIG_DIR/modules/$COMPOSITOR"
+STYLE_DIR="$WAYBAR_CONFIG_DIR/styles"
+
+# --- Discover Available Preset Names ---
+# Finds all *.jsonc files and extracts the PRESET name.
+AVAILABLE_PRESETS=$(
+	find "$CONFIG_DIR" -maxdepth 1 -name "*.jsonc" -exec basename {} \; |
+		sed -E -e 's/^config-//' -e 's/\.jsonc$//' |
+		sort
+)
+
+# Error handling: Check if any presets were found
+if [ -z "$AVAILABLE_PRESETS" ]; then
+	echo "Error: No Waybar presets (*.jsonc) found in $CONFIG_DIR." >&2
+	exit 1
+fi
+
+# --- Use Walker for Selection ---
+# Format the presets list and pipe to walker using the dmenu mode arguments.
+PRESET=$(printf "%s\n" "$AVAILABLE_PRESETS" |
+	wofi --dmenu --width 600 --height 300 --prompt "Select Waybar Preset…")
+
+# Check if the user made a selection (exit if canceled or empty)
+[ -z "$PRESET" ] && exit 0
+
+# --- Symlink Switching Logic ---
+
+# Delete old symlinks
+rm -f "$WAYBAR_CONFIG_DIR/config.jsonc"
+rm -f "$WAYBAR_CONFIG_DIR/style.css"
+
+# Create new symlinks
+ln -s "$CONFIG_DIR/$PRESET.jsonc" "$WAYBAR_CONFIG_DIR/config.jsonc"
+ln -s "$STYLE_DIR/$PRESET.css" "$WAYBAR_CONFIG_DIR/style.css"
+
+# fallback
+if [ "$COMPOSITOR" == "hyprland" ]; then
+	MONITOR=$(hyprctl monitors -j | jq -r '.[0].name')
+else
+	# Sway gets the focused monitor, which is more dynamic and works better with multiple monitors
+	MONITOR=$(swaymsg -t get_outputs | jq -r '.[] | select(.focused) | .name')
+fi
+
+sed "s/__PRIMARY_MONITOR__/${PRIMARY_MONITOR}/g" "$WAYBAR_CONFIG_DIR/config.jsonc" >/tmp/waybar_cfg
+
+# --- Restart Waybar ---
+echo "Switching to preset: $PRESET"
+killall waybar
+waybar -c /tmp/waybar_cfg -s "$WAYBAR_CONFIG_DIR/style.css" &

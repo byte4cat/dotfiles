@@ -136,6 +136,6 @@
     "custom/power": {
         "format": "󰤆",
         "tooltip": false,
-        "on-click": "~/.local/bin/byte4work-walker-power-menu"
+        "on-click": "~/.local/bin/byte4work-wofi-power-menu"
     }
 }

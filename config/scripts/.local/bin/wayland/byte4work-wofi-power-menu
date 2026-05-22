@@ -1,0 +1,54 @@
+#!/usr/bin/env bash
+
+WOFI_CMD="wofi --show dmenu --width 600 --height 350"
+
+OPTIONS=(
+	"🟢 Logout"
+	"☯ Shutdown"
+	"🔄 Reboot"
+	"💤 Sleep"
+	"🛌🏻 Hibernate"
+	"🔒 Lock"
+	"❌ Cancel"
+)
+
+selection=$(printf "%s\n" "${OPTIONS[@]}" | $WOFI_CMD --prompt "Power Menu…")
+
+if [[ -z "$selection" ]]; then
+	exit 0
+fi
+
+case "$selection" in
+"🟢 Logout")
+	if [ "$XDG_CURRENT_DESKTOP" = "Hyprland" ]; then
+		hyprctl dispatch exit
+	else
+		swaymsg exit
+	fi
+	;;
+"☯ Shutdown")
+	systemctl poweroff --no-wall
+	;;
+"🔄 Reboot")
+	systemctl reboot --no-wall
+	;;
+"🛌🏻 Hibernate")
+	systemctl hibernate
+	;;
+"💤 Sleep")
+	systemctl suspend
+	;;
+"🔒 Lock")
+	if [ "$XDG_CURRENT_DESKTOP" = "Hyprland" ]; then
+		hyprlock
+	else
+		swaylock -f -c 000000
+	fi
+	;;
+"❌ Cancel")
+	exit 0
+	;;
+*)
+	exit 0
+	;;
+esac
