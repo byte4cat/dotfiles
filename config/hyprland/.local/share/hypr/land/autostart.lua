@@ -23,14 +23,14 @@ hl.on("hyprland.start", function()
 	exec("/usr/lib/polkit-kde-authentication-agent-1")
 	exec("gnome-keyring-daemon --start --components=secrets,pkcs11,ssh")
 
-	-- UI 相關應用 (使用 uwsm 確保與 Wayland 會話同步)
-	exec("sleep 1.5 && byte4work-launch-waybar")
-	exec("uwsm-app -- swaync")
-	exec("uwsm-app -- fcitx5 -d")
-	exec("uwsm-app -- elephant")
-	exec("uwsm-app -- walker --gapplication-service")
-	exec("uwsm-app -- swayosd-server")
-	exec("uwsm-app -- glint")
+	-- UI 相關應用
+	exec("byte4work-launch-waybar")
+	exec("swaync")
+	exec("fcitx5 -d")
+	exec("elephant")
+	exec("walker --gapplication-service")
+	exec("swayosd-server")
+	exec("glint")
 
 	-- 剪貼簿管理
 	exec("wl-paste --type text --watch cliphist store")

@@ -18,13 +18,13 @@ _G.myEnv = load_if_exists(config_path .. "env.lua") or {}
 -- 順序載入模組
 local modules = {
 	"monitor.lua",
+	"autostart.lua",
 	"looknfeel.lua",
 	"cursor.lua",
 	"input.lua",
 	"permission.lua",
 	"wnw.lua",
 	"keybindings.lua",
-	"autostart.lua",
 	"transparent.lua",
 }
 
@@ -62,5 +62,4 @@ load_if_exists(private_config)
 hl.render = {
 	explicit_sync = 0,
 	direct_scanout = 0,
-	-- ... 其他原本的 render 設定
 }

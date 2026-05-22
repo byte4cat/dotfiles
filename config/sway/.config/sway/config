@@ -15,7 +15,7 @@ exec_always --no-startup-id dbus-update-activation-environment PATH=$my_path DIS
 exec_always gpg-connect-agent updatestartuptty /bye
 exec_always gnome-keyring-daemon --start --components=secrets,pkcs11,ssh
 exec_always awww-daemon
-exec_always wl-paste --type text --watch cliphist store
+exec_always wl-paste --watch cliphist store
 exec_always pkill waybar; PATH=$my_path byte4work-launch-waybar
 exec_always pkill swaync; swaync
 exec_always fcitx5 -d
