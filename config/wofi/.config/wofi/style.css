@@ -1,45 +1,34 @@
 window {
-  /* background-color: #171717; */
   background: #0a0a0a;
+  border: 2px solid #4a6c8c; /* 這裡加粗，確保看得見 */
+  border-radius: 0.8rem;
+  box-shadow: 0 0 15px rgba(74, 108, 140, 0.3);
 }
 
 * {
-  font-family: "Jetbrains Mono";
-  color: #fff;
+  font-family: "JetBrains Mono";
+  color: #e0e0e0;
 }
 
-#scroll {
-  padding: 0.5rem;
-}
-
+/* 輸入框外圈也加上邊框，與整體連動 */
 #input {
-  /* background-color: #262626; */
   background-color: #171717;
-  outline: none;
-  box-shadow: none;
-  border: 0;
-  border-radius: 0;
-  font-size: 1rem;
-  padding-left: 1rem;
-  padding-right: 1rem;
-  padding-top: 0.5rem;
-  padding-bottom: 0.5rem;
+  margin: 10px;
+  padding: 8px;
 }
 
-#inner-box {
-  margin: 0.5rem;
-  font-size: 1rem;
+/* 列表區容器 */
+#outer-box {
+  padding: 5px;
 }
 
-#img {
-  margin: 10px 10px;
-}
-
+/* 項目選擇區 */
 #entry {
-  border-radius: 0.5rem;
+  border-radius: 0.4rem;
+  margin: 2px 10px;
 }
 
 #entry:selected {
-  background-color: #262626;
-  outline: none;
+  background-color: #1a2a3a;
+  border: 2px solid #6c9dc8; /* 選中時的欄桿光影 */
 }
