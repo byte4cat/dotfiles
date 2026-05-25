@@ -16,7 +16,7 @@ return {
 			local mason_lspconfig = require("mason-lspconfig")
 			local mason_tool_installer = require("mason-tool-installer")
 			local cmp_lsp = require("cmp_nvim_lsp")
-			local keymap = require("neil.lsp-key-mapping")
+			local keymap = require("neil.lsp-keybindings")
 
 			local capabilities = vim.lsp.protocol.make_client_capabilities()
 			capabilities = cmp_lsp.default_capabilities(capabilities)
