@@ -21,7 +21,7 @@ end
 
 local function apply_matugen_colors()
 	local matugen_path = os.getenv("HOME") .. "/.config/nvim/generated.lua"
-	print("Loading matugen from: " .. matugen_path)
+	-- print("Loading matugen from: " .. matugen_path)
 	local ok, err = pcall(dofile, matugen_path)
 	if not ok then
 		vim.notify("Matugen loading failed: " .. tostring(err), vim.log.levels.WARN)

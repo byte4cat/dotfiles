@@ -1,5 +1,8 @@
 vim.api.nvim_set_keymap("i", "jk", "<Esc>", { noremap = true, silent = true, desc = "Exit Insert Mode" })
 
+-- 解决 visual 模式下 p (paste) 會覆蓋寄存器問題
+vim.keymap.set("v", "p", '"_dP', { desc = "Paste without overwriting register" })
+
 -- 使用 <F3> 交換當前視窗和下一個視窗的位置
 vim.api.nvim_set_keymap("n", "<F3>", "<C-w>x", { noremap = true, silent = true, desc = "Swap Window Position" })
 
