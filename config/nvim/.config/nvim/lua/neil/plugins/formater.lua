@@ -13,6 +13,7 @@ return {
 					c = { "clang-format" },
 					-- cpp = { "clang_format_linux_kernel_style" },
 					-- c = { "clang_format_linux_kernel_style" },
+					cs = { "csharpier" },
 					lua = { "stylua" },
 					-- Go
 					go = { "goimports", "gofumpt" },

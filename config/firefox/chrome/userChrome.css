@@ -129,4 +129,8 @@ See the above repository for updates as well as full license text. */
       text-align: center !important;
     }
   }
+  /* 確保全螢幕模式下，所有額外的工具列完全隱藏 */
+  #main-window[inDOMFullscreen="true"] #navigator-toolbox {
+    display: none !important;
+  }
 }
