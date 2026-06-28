@@ -1,0 +1,134 @@
+#!/usr/bin/env bash
+
+# ==============================================================================
+# Arch Linux System Core Component Installer
+# ==============================================================================
+set -euo pipefail
+
+# Dynamic path resolution aligned with standard repository skeleton
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+DOTFILES_DIR="$(dirname "$SCRIPT_DIR")"
+
+# Source centralized utilities
+source "$DOTFILES_DIR/lib/common"
+
+info "=== System Upgrade and Base Layer Tools ==="
+if confirm "Would you like to perform a full system upgrade now?"; then
+	sudo pacman -Syu --noconfirm
+else
+	warn "Skipping system upgrade. Proceeding at your own risk with package installation..."
+fi
+
+sudo pacman -S --noconfirm --needed git base-devel
+
+# === Install yay (AUR Helper) ===
+if ! command -v yay &>/dev/null; then
+	info "=== Installing yay ==="
+	_tmp_dir=$(mktemp -d /tmp/yay-build-XXXXXX)
+
+	# Safe navigation into the RAM-backed tmp filesystem
+	cd_or_error "$_tmp_dir"
+	git clone https://aur.archlinux.org/yay.git .
+	makepkg -si --noconfirm
+
+	# Clean up and safely return to dotfiles directory root
+	cd - >/dev/null
+	rm -rf "$_tmp_dir"
+else
+	success "yay is already installed, skipping."
+fi
+
+info "=== Core Fonts & Chinese Language Support ==="
+sudo pacman -S --noconfirm --needed \
+	noto-fonts-cjk \
+	noto-fonts-emoji \
+	noto-fonts-extra \
+	ttf-jetbrains-mono-nerd
+
+info "=== ZSH and Shell Plugins ==="
+sudo pacman -S --noconfirm --needed \
+	zsh \
+	zsh-autosuggestions \
+	zsh-history-substring-search \
+	zsh-syntax-highlighting
+# zsh-theme-powerlevel10k
+
+# Safely update user shell environment
+if [ "${SHELL:-}" != "/bin/zsh" ]; then
+	info "Changing default shell to ZSH..."
+	chsh -s /bin/zsh
+fi
+
+info "=== NVM (Node Version Manager) ==="
+export NVM_DIR="$HOME/.nvm"
+if [ ! -d "$NVM_DIR" ]; then
+	curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh | bash
+fi
+
+# Context isolation loading for current subshell workflow
+if [ -s "$NVM_DIR/nvm.sh" ]; then
+	source "$NVM_DIR/nvm.sh"
+	nvm install --lts
+else
+	warn "NVM environment core not found, skipping immediate node engine init."
+fi
+
+info "=== Core System Ecosystem (Rust / Zoxide / Tmux) ==="
+sudo pacman -S --noconfirm --needed \
+	fzf \
+	zoxide \
+	rustup \
+	tmux
+# gtk-engine-murrine
+
+# Default toolchain initialization
+rustup default stable
+
+# Setup Tmux Plugin Manager
+if [ ! -d "$HOME/.tmux/plugins/tpm" ]; then
+	info "Installing Tmux TPM..."
+	git clone https://github.com/tmux-plugins/tpm "$HOME/.tmux/plugins/tpm"
+fi
+
+info "=== Multimedia Codecs and VLC ==="
+sudo pacman -S --noconfirm --needed \
+	vlc \
+	vlc-plugin-ffmpeg \
+	vlc-plugin-live555 \
+	vlc-plugins-all \
+	vlc-plugins-extra \
+	libva-utils \
+	libvdpau
+
+info "=== Fcitx5 Framework and Input Engines ==="
+sudo pacman -S --noconfirm --needed \
+	fcitx5-chewing \
+	fcitx5-chinese-addons \
+	fcitx5-configtool \
+	fcitx5-gtk \
+	rime-double-pinyin
+
+info "=== Core Desktop & Window Manager Surroundings ==="
+sudo pacman -S --noconfirm --needed \
+	ghostty \
+	waybar \
+	waypaper \
+	wlroots0.19 \
+	yazi \
+	adw-gtk-theme \
+	awww \
+	firefox
+
+# NOTE: Commented out due to recent AUR security alerts / supply chain risks
+# info "=== AUR Custom Targets (yay) ==="
+# yay -S --noconfirm --needed \
+#      fcitx5-mcbopomofo-git \
+#      swayosd-git \
+#      librewolf-bin \
+#	   fzf-tab \
+#  	   hyprshade
+
+success "========================================="
+success "🎉 All packages installed successfully!"
+success "Please restart your terminal or log out to apply ZSH environment variables."
+success "========================================="

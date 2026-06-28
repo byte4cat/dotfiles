@@ -23,7 +23,7 @@ local modules = {
 	"cursor.lua",
 	"input.lua",
 	"permission.lua",
-	"wnw.lua",
+	"window_rule.lua",
 	"keybindings.lua",
 	"transparent.lua",
 }
@@ -63,4 +63,3 @@ hl.render = {
 	explicit_sync = 0,
 	direct_scanout = 0,
 }
-

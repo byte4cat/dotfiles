@@ -1,39 +1,85 @@
+# yay
+sudo pacman -S --needed git base-devel && git clone https://aur.archlinux.org/yay.git && cd yay && makepkg -si
+
 # chinese support
-sudo pacman -S noto-fonts-cjk noto-fonts-emoji noto-fonts-extra
+sudo pacman -S --noconfirm --needed noto-fonts-cjk noto-fonts-emoji noto-fonts-extra
 
 # fonts
-sudo pacman -S ttf-jetbrains-mono-nerd
+sudo pacman -S --noconfirm --needed ttf-jetbrains-mono-nerd
 
 # install zsh
-sudo pacman -S zsh
+sudo pacman -S --noconfirm --needed zsh \
+		 zsh-autosuggestions \
+		 zsh-history-substring-search \
+		 zsh-syntax-highlighting \
+		 zsh-theme-powerlevel10k-git
+
 chsh -s /bin/zsh
-
-# oh-my-zsh
-sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
-
-# zplug
-curl -sL --proto-redir -all,https https://raw.githubusercontent.com/zplug/installer/master/installer.zsh | zsh
 
 # nvm
 curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh | bash
 nvm install --lts
 
 # z
-sudo pacman -S zoxide
+sudo pacman -S --noconfirm --needed zoxide
 
 # rust
-sudo pacman -S rustup
+sudo pacman -S --noconfirm --needed rustup
 rustup default stable
 
-# yay -S awww-git
-
 # gtk-theme
-sudo pacman -S gtk-engine-murrine
+sudo pacman -S --noconfirm --needed gtk-engine-murrine
 
 # tmux
-sudo pacman -S tmux
+sudo pacman -S --noconfirm --needed tmux
 # and install tpm
 
 # vlc
-sudo pacman -S vlc
+sudo pacman -S --noconfirm --needed vlc \
+		 vlc-plugin-ffmpeg \
+		 vlc-plugin-live555 \
+		 vlc-plugins-all \
+		 vlc-plugins-extra
+
 sudo pacman -S --needed libva-utils vlc-codecs-extra libvdpau
+
+
+# fcitx5
+sudo pacman -S --noconfirm --needed fcitx5-chewing \
+		 fcitx5-chinese-addons \
+		 fcitx5-configtool \
+		 fcitx5-gtk \
+		 fcitx5-mcbopomofo-git \
+		 rime-double-pinyin
+
+# terminal
+sudo pacman -S --noconfirm --needed ghostty
+
+# others
+sudo pacman -S --noconfirm --needed waybar waypaper wlroots0.19 yazi \
+		 adw-gtk-theme \
+		 awww \
+		 fzf-tab \
+		 hyprshade
+
+# browser
+sudo pacman -S --noconfirm --needed firefox
+
+# yay -S --noconfirm --needed \
+# 		walker-bin \
+# 		elephant-bin \
+# 		elephant-bluetooth-bin \
+# 		elephant-calc-bin \
+# 		elephant-clipboard-bin \
+# 		elephant-desktopapplications-bin \
+# 		elephant-menus-bin \
+# 		elephant-symbols-bin \
+# 		elephant-todo-bin \
+# 		elephant-unicode-bin \
+# 		elephant-websearch-bin
+
+
+yay -S --noconfirm --needed \
+		swayosd-git
+		librewolf-bin
+
