@@ -28,9 +28,7 @@ hl.on("hyprland.start", function()
 	exec("swaync")
 	exec("fcitx5 -d")
 	exec("elephant")
-	exec("walker --gapplication-service")
 	exec("swayosd-server")
-	exec("glint")
 
 	-- 剪貼簿管理
 	exec("wl-paste --type text --watch cliphist store")

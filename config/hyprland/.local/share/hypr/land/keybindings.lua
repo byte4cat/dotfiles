@@ -5,7 +5,7 @@
 local mainMod = (myEnv and myEnv.mainMod) or "SUPER"
 local secMod = (myEnv and myEnv.secMod) or "ALT"
 
--- 輔助函數, 簡化 exec 呼叫 (確保指令傳遞給 shell)
+-- 輔助函數：簡化 shell 呼叫（比單純 exec_cmd 更穩定處理複雜 pipe 組合）
 local function sh_exec(cmd)
 	return hl.dsp.exec_cmd("sh -c '" .. cmd .. "'")
 end
@@ -15,9 +15,9 @@ end
 -- ===================
 hl.bind(mainMod .. " + RETURN", hl.dsp.exec_cmd(myEnv.terminal))
 hl.bind(mainMod .. " + Q", hl.dsp.window.close())
-hl.bind(mainMod .. " + M", hl.dsp.exec_cmd("byte4work-walker-power-menu"))
+hl.bind(mainMod .. " + M", hl.dsp.exec_cmd("byte4work-wofi-power-menu"))
 hl.bind(mainMod .. " + B", hl.dsp.exec_cmd(myEnv.browser))
-hl.bind(mainMod .. " + SHIFT + E", hl.dsp.exec_cmd(myEnv.fileManager))
+hl.bind(mainMod .. " + SHIFT + E", hl.dsp.exec_cmd(myEnv.emojiPicker))
 hl.bind(mainMod .. " + E", hl.dsp.exec_cmd(myEnv.terminalFileManager))
 
 -- =============
@@ -25,73 +25,67 @@ hl.bind(mainMod .. " + E", hl.dsp.exec_cmd(myEnv.terminalFileManager))
 -- =============
 hl.bind(mainMod .. " + SHIFT + F", hl.dsp.window.float({ action = "toggle" }))
 hl.bind(mainMod .. " + F", hl.dsp.window.fullscreen())
-hl.bind(mainMod .. " + D", hl.dsp.exec_cmd(myEnv.menu))
+hl.bind(mainMod .. " + D", hl.dsp.exec_cmd(myEnv.menu .. ' --show drun --prompt "Search Apps"'))
 hl.bind(mainMod .. " + P", hl.dsp.window.pseudo())
-hl.bind(mainMod .. " + T", hl.dsp.exec_cmd("byte4work-switch-waybar-theme"))
-
--- 切換下一個視窗
-hl.bind(mainMod .. " + N", hl.dsp.window.cycle_next({}))
-
-hl.bind(mainMod .. " + SHIFT + N", hl.dsp.exec_cmd("swaync-client -t"))
-hl.bind(mainMod .. " + C", hl.dsp.exec_cmd("byte4work-walker-quick-menu"))
-hl.bind(mainMod .. " + W", hl.dsp.exec_cmd("byte4work-waypaper-selector"))
-hl.bind(mainMod .. " + SHIFT + B", hl.dsp.exec_cmd(myEnv.babycam))
-hl.bind(mainMod .. " + SHIFT + P", hl.dsp.window.pin({})) -- set window float first?
-
--- 剪貼簿
-hl.bind(mainMod .. " + " .. secMod .. " + C", hl.dsp.exec_cmd(myEnv.menu .. " -m clipboard"))
-
--- 重啟 Waybar 組合包
 hl.bind(
 	mainMod .. " + SHIFT + R",
 	hl.dsp.exec_cmd("pkill glint; pkill swayosd-server; byte4work-launch-waybar & swayosd-server & glint &")
 )
 
--- =================
--- 視窗Resize與移動
--- =================
-hl.bind(mainMod, "R", function()
-	-- 進入模式時示
-	hl.dsp.exec_cmd("notify-send 'Resize Mode' 'Use HJKL to resize'")
-	hl.submap("resize")
-	hl.dsp.exec_cmd("notify-send 'Exit Resize Mode'")
-end)
+-- 視窗輪替與通知控制
+hl.bind(mainMod .. " + N", hl.dsp.window.cycle_next({}))
+hl.bind(mainMod .. " + SHIFT + N", hl.dsp.exec_cmd("swaync-client -t"))
 
-hl.submap("resize", {
-	{ key = "H", mod = "", cmd = "resizeactive -10 0", repeat_bind = true },
-	{ key = "J", mod = "", cmd = "resizeactive 0 10", repeat_bind = true },
-	{ key = "K", mod = "", cmd = "resizeactive 0 -10", repeat_bind = true },
-	{ key = "L", mod = "", cmd = "resizeactive 10 0", repeat_bind = true },
+-- 快捷選單與附加功能
+hl.bind(mainMod .. " + C", hl.dsp.exec_cmd("byte4work-wofi-quick-menu"))
+hl.bind(mainMod .. " + W", hl.dsp.exec_cmd("byte4work-waypaper-theme-switcher"))
+hl.bind(mainMod .. " + SHIFT + B", hl.dsp.exec_cmd("byte4work-babycam"))
+hl.bind(mainMod .. " + SHIFT + P", hl.dsp.exec_cmd("byte4work-hyprland-toggle-pin"))
 
-	-- 返回預設模式
-	{ key = "escape", mod = "", cmd = "submap reset" },
-	{ key = "return", mod = "", cmd = "submap reset" },
-})
+-- 剪貼簿管理
+hl.bind(mainMod .. " + " .. secMod .. " + C", hl.dsp.exec_cmd("byte4work-wofi-clipboard"))
 
--- 移動視窗 (Move window)
+-- ====================
+-- 視窗微調 (HJKL 移動與縮放)
+-- ====================
+
+-- 免進入 submap 的直覺縮放：mainMod + CONTROL + SHIFT + HJKL
+hl.bind(mainMod .. " + CONTROL + SHIFT + H", hl.dsp.window.resize({ size = "-30 0" }), { repeating = true })
+hl.bind(mainMod .. " + CONTROL + SHIFT + J", hl.dsp.window.resize({ size = "0 30" }), { repeating = true })
+hl.bind(mainMod .. " + CONTROL + SHIFT + K", hl.dsp.window.resize({ size = "0 -30" }), { repeating = true })
+hl.bind(mainMod .. " + CONTROL + SHIFT + L", hl.dsp.window.resize({ size = "30 0" }), { repeating = true })
+
+-- 移動視窗位置 (Move window)
 hl.bind(mainMod .. " + SHIFT + H", hl.dsp.window.move({ direction = "left" }))
 hl.bind(mainMod .. " + SHIFT + J", hl.dsp.window.move({ direction = "down" }))
 hl.bind(mainMod .. " + SHIFT + K", hl.dsp.window.move({ direction = "up" }))
 hl.bind(mainMod .. " + SHIFT + L", hl.dsp.window.move({ direction = "right" }))
 
--- 移動焦點 (Focus) - Vim Style
+-- 移動視窗焦點 (Focus) - Vim Style
 hl.bind(mainMod .. " + H", hl.dsp.focus({ direction = "left" }))
 hl.bind(mainMod .. " + L", hl.dsp.focus({ direction = "right" }))
 hl.bind(mainMod .. " + K", hl.dsp.focus({ direction = "up" }))
 hl.bind(mainMod .. " + J", hl.dsp.focus({ direction = "down" }))
 
--- ==================
--- 工作區切換 (1-10)
--- ==================
-for i = 1, 10 do
-	local key = i % 10
-	-- 切換工作區
-	hl.bind(mainMod .. " + " .. key, hl.dsp.focus({ workspace = i }))
-	-- 移動視窗到工作區
-	hl.bind(mainMod .. " + SHIFT + " .. key, hl.dsp.window.move({ workspace = i }))
-end
+-- 獨立 Resize Mode (保留，以防需要進入模式操作)
+-- hl.bind(mainMod, "R", function()
+-- 	hl.dsp.exec_cmd("notify-send 'Resize Mode' 'Use HJKL to resize'")
+-- 	hl.submap("resize")
+-- 	hl.dsp.exec_cmd("notify-send 'Exit Resize Mode'")
+-- end)
 
--- Group
+-- hl.submap("resize", {
+-- 	{ key = "H", mod = "", cmd = "resizeactive -10 0", repeat_bind = true },
+-- 	{ key = "J", mod = "", cmd = "resizeactive 0 10", repeat_bind = true },
+-- 	{ key = "K", mod = "", cmd = "resizeactive 0 -10", repeat_bind = true },
+-- 	{ key = "L", mod = "", cmd = "resizeactive 10 0", repeat_bind = true },
+-- 	{ key = "escape", mod = "", cmd = "submap reset" },
+-- 	{ key = "return", mod = "", cmd = "submap reset" },
+-- })
+
+-- ==========================
+-- 分組管理 (Group / Tab Mode)
+-- ==========================
 hl.bind(mainMod .. " + G", function()
 	hl.dispatch(hl.dsp.group.toggle())
 end)
@@ -101,36 +95,82 @@ end)
 hl.bind(mainMod .. " + SHIFT + TAB", function()
 	hl.dispatch(hl.dsp.group.prev())
 end)
--- 工作區管理修正
+hl.bind(mainMod .. " + SHIFT + G", function()
+	hl.dispatch(hl.dsp.group.move_out())
+end)
+
+-- ====================
+-- 工作區管理 (Workspaces)
+-- ====================
+
+-- 常規工作區螢幕分配
+for i = 1, 9 do
+	hl.workspace_rule({ workspace = tostring(i), monitor = myEnv.primaryMonitor })
+end
+hl.workspace_rule({ workspace = "10", monitor = "HDMI-A-1" })
+
+-- 動態創建 Special Workspaces 的空白預設
+hl.workspace_rule({
+	workspace = "special:scratchpad-term",
+	on_created_empty = myEnv.terminal .. " -e bash -c 'tmux new-session -A -s scratchpad; exec bash'",
+})
+hl.workspace_rule({ workspace = "special:music", on_created_empty = "[float] " .. myEnv.music })
+hl.workspace_rule({ workspace = "special:work-msg", on_created_empty = "[tiled] " .. myEnv.workMsg })
+hl.workspace_rule({ workspace = "special:temp" })
+
+-- 常規 1-10 快捷鍵綁定
+for i = 1, 10 do
+	local key = i % 10
+	hl.bind(mainMod .. " + " .. key, hl.dsp.focus({ workspace = i }))
+	hl.bind(mainMod .. " + SHIFT + " .. key, hl.dsp.window.move({ workspace = i }))
+end
+
+-- 鍵盤左右鍵切換工作區
+hl.bind(mainMod .. " + RIGHT", hl.dsp.workspace.focus({ offset = 1 }))
+hl.bind(mainMod .. " + LEFT", hl.dsp.workspace.focus({ offset = -1 }))
+
+-- 啟用工作區循環相容
+hl.config({ binds = { allow_workspace_cycles = true } })
 hl.bind(mainMod .. " + GRAVE", function()
 	hl.dispatch(hl.dsp.workspace.focus("previous"))
 end)
+
+-- =====================
+-- 特殊工作區 (Special)
+-- =====================
+
+hl.bind(myEnv.mainMod .. " + S", hl.dsp.workspace.toggle_special("work-msg"))
+hl.bind(myEnv.mainMod .. " + SHIFT + S", hl.dsp.window.move({ workspace = "special:work-msg" }))
+
+hl.bind(myEnv.mainMod .. " + V", function()
+	hl.dispatch(hl.dsp.focus({ monitor = myEnv.primaryMonitor }))
+	hl.dispatch(hl.dsp.workspace.toggle_special("music"))
+end)
+
+hl.bind(myEnv.mainMod .. " + X", hl.dsp.workspace.toggle_special("personal-msg"))
+hl.bind(myEnv.mainMod .. " + SHIFT + X", hl.dsp.window.move({ workspace = "special:personal-msg" }))
+
+hl.bind(myEnv.mainMod .. " + A", function()
+	hl.dispatch(hl.dsp.focus({ monitor = myEnv.primaryMonitor }))
+	hl.dispatch(hl.dsp.workspace.toggle_special("scratchpad-term"))
+end)
+
+hl.bind(myEnv.mainMod .. " + O", hl.dsp.workspace.toggle_special("temp"))
+hl.bind(myEnv.mainMod .. " + SHIFT + O", hl.dsp.window.move({ workspace = "special:temp" }))
 
 -- =========
 -- 滑鼠綁定
 -- =========
 hl.bind(mainMod .. " + mouse:272", hl.dsp.window.drag(), { mouse = true })
 hl.bind(mainMod .. " + mouse:273", hl.dsp.window.resize(), { mouse = true })
+hl.bind(mainMod .. " + mouse_up", hl.dsp.exec_cmd("hyprctl keyword cursor:zoom_factor 0.8"))
+hl.bind(mainMod .. " + mouse_down", hl.dsp.exec_cmd("hyprctl keyword cursor:zoom_factor 1.2"))
 
 -- ===========
 -- SCREENSHOT
 -- ===========
-
--- NOTE: OLD WAY
---
--- hl.bind(mainMod .. " + CONTROL + 1", hl.dsp.exec_cmd("hyprshot -m output --clipboard-only"))
--- hl.bind(mainMod .. " + CONTROL + 2", hl.dsp.exec_cmd("hyprshot -m window --clipboard-only"))
--- hl.bind(mainMod .. " + CONTROL + 3", hl.dsp.exec_cmd("hyprshot -m region --clipboard-only"))
---
--- hl.bind(mainMod .. " + CONTROL + SHIFT + 1", hl.dsp.exec_cmd("hyprshot -m output --raw | satty --filename -"))
--- hl.bind(mainMod .. " + CONTROL + SHIFT + 2", hl.dsp.exec_cmd("hyprshot -m window --raw | satty --filename -"))
--- hl.bind(mainMod .. " + CONTROL + SHIFT + 3", hl.dsp.exec_cmd("hyprshot -m region --raw | satty --filename -"))
-
--- TODO: NEW WAY, NOT test YET:
--- 定義存放路徑
 local screenshot_dir = os.getenv("HOME") .. "/Pictures/Screenshots"
 
--- 截圖指令定義
 local cmd_full = "grim - | tee "
 	.. screenshot_dir
 	.. "/$(date +'%Y%m%d-%H%M%S').png | wl-copy && notify-send 'Screenshot saved & copied'"
@@ -138,12 +178,10 @@ local cmd_slurp = 'grim -g "$(slurp)" - | tee '
 	.. screenshot_dir
 	.. "/$(date +'%Y%m%d-%H%M%S').png | wl-copy && notify-send 'Screenshot saved & copied'"
 
--- 普通截圖
 hl.bind(mainMod .. " + CONTROL + 1", sh_exec(cmd_full))
 hl.bind(mainMod .. " + CONTROL + 2", sh_exec(cmd_slurp))
 hl.bind(mainMod .. " + CONTROL + 3", sh_exec(cmd_slurp))
 
--- Satty 編輯
 local satty_full = "grim - | satty --filename - --fullscreen --output-filename "
 	.. screenshot_dir
 	.. "/$(date +'%Y%m%d-%H%M%S').png"
@@ -158,48 +196,46 @@ hl.bind(mainMod .. " + CONTROL + SHIFT + 3", sh_exec(satty_slurp))
 -- =====
 -- ZOOM
 -- =====
-local zoom_in_cmd =
-	"hyprctl -q keyword cursor:zoom_factor $(hyprctl getoption cursor:zoom_factor -j | jq '.float * 1.1')"
-hl.bind(mainMod .. " + equal", hl.dsp.exec_cmd(zoom_in_cmd), { repeating = true })
-hl.bind(mainMod .. " + KP_ADD", hl.dsp.exec_cmd(zoom_in_cmd), { repeating = true })
-
-local zoom_out_cmd =
-	"hyprctl -q keyword cursor:zoom_factor $(hyprctl getoption cursor:zoom_factor -j | jq '(.float * 0.9) | if . < 1 then 1 else . end')"
-hl.bind(mainMod .. " + minus", hl.dsp.exec_cmd(zoom_out_cmd), { repeating = true })
-hl.bind(mainMod .. " + KP_SUBTRACT", hl.dsp.exec_cmd(zoom_out_cmd), { repeating = true })
-
-local zoom_reset_cmd = "hyprctl -q keyword cursor:zoom_factor 1"
-hl.bind(mainMod .. " + SHIFT + minus", hl.dsp.exec_cmd(zoom_reset_cmd))
-hl.bind(mainMod .. " + SHIFT + KP_SUBTRACT", hl.dsp.exec_cmd(zoom_reset_cmd))
+hl.bind(mainMod .. " + equal", hl.dsp.exec_cmd("hyprctl keyword cursor:zoom_factor 1.5"), { repeating = true })
+hl.bind(mainMod .. " + minus", hl.dsp.exec_cmd("hyprctl keyword cursor:zoom_factor 1.0"), { repeating = true })
+hl.bind(mainMod .. " + SHIFT + 0", hl.dsp.exec_cmd("hyprctl keyword cursor:zoom_factor 1"))
 
 -- =====================
 -- MULTIMEDIA & SWAYOSD
 -- =====================
-local get_mon = myEnv.primaryMonitor
-local function swayosd_cmd(base_cmd)
-	return 'bash -c "' .. base_cmd .. " --monitor " .. get_mon .. '"'
+
+local function swayosd_exec(action_arg)
+	local target_cmd = string.format(
+		"swayosd-client --monitor \"$(hyprctl monitors -j | jq -r '.[] | select(.focused == true).name')\" %s",
+		action_arg
+	)
+	return target_cmd
 end
 
--- 音量控制
-local vol_up_base = swayosd_cmd("wpctl set-volume -l 1 @DEFAULT_AUDIO_SINK@ 5%+; swayosd-client --output-volume raise")
-local vol_down_base = swayosd_cmd("wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-; swayosd-client --output-volume lower")
-local vol_mute_base = swayosd_cmd("swayosd-client --output-volume mute-toggle")
+local vol_up_cmd = "wpctl set-volume -l 1 @DEFAULT_AUDIO_SINK@ 5%+; " .. swayosd_exec("--output-volume raise")
+local vol_down_cmd = "wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-; " .. swayosd_exec("--output-volume lower")
+local vol_mute_cmd = swayosd_exec("--output-volume mute-toggle")
+local mic_mute_cmd = "wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle; " .. swayosd_exec("--input-volume mute-toggle")
 
-hl.bind("XF86AudioRaiseVolume", hl.dsp.exec_cmd(vol_up_base), { locked = true, repeating = true })
-hl.bind(mainMod .. " + bracketright", hl.dsp.exec_cmd(vol_up_base), { locked = true, repeating = true })
-hl.bind("XF86AudioLowerVolume", hl.dsp.exec_cmd(vol_down_base), { locked = true, repeating = true })
-hl.bind(mainMod .. " + bracketleft", hl.dsp.exec_cmd(vol_down_base), { locked = true, repeating = true })
-hl.bind("XF86AudioMute", hl.dsp.exec_cmd(vol_mute_base), { locked = true, repeating = true })
-hl.bind(mainMod .. " + backslash", hl.dsp.exec_cmd(vol_mute_base), { locked = true, repeating = true })
+-- 筆電/標準多媒體鍵
+hl.bind("XF86AudioRaiseVolume", hl.dsp.exec_cmd(vol_up_cmd), { locked = true, repeating = true })
+hl.bind("XF86AudioLowerVolume", hl.dsp.exec_cmd(vol_down_cmd), { locked = true, repeating = true })
+hl.bind("XF86AudioMute", hl.dsp.exec_cmd(vol_mute_cmd), { locked = true, repeating = true })
+hl.bind("XF86AudioMicMute", hl.dsp.exec_cmd(mic_mute_cmd), { locked = true })
+
+-- Volum control
+hl.bind(mainMod .. " + bracketright", hl.dsp.exec_cmd(vol_up_cmd), { locked = true, repeating = true })
+hl.bind(mainMod .. " + bracketleft", hl.dsp.exec_cmd(vol_down_cmd), { locked = true, repeating = true })
+hl.bind(mainMod .. " + backslash", hl.dsp.exec_cmd(vol_mute_cmd), { locked = true, repeating = true })
 
 -- 亮度控制
-local br_up_base = swayosd_cmd("brightnessctl -e4 -n2 set 5%+; swayosd-client --brightness up")
-local br_down_base = swayosd_cmd("brightnessctl -e4 -n2 set 5%-; swayosd-client --brightness down")
+local br_up_cmd = "brightnessctl -e4 -n2 set 5%+; " .. swayosd_exec("--brightness up")
+local br_down_cmd = "brightnessctl -e4 -n2 set 5%-; " .. swayosd_exec("--brightness down")
 
-hl.bind("XF86MonBrightnessUp", hl.dsp.exec_cmd(br_up_base), { locked = true, repeating = true })
-hl.bind("XF86MonBrightnessDown", hl.dsp.exec_cmd(br_down_base), { locked = true, repeating = true })
+hl.bind("XF86MonBrightnessUp", hl.dsp.exec_cmd(br_up_cmd), { locked = true, repeating = true })
+hl.bind("XF86MonBrightnessDown", hl.dsp.exec_cmd(br_down_cmd), { locked = true, repeating = true })
 
--- 多媒體播放控制 (Playerctl)
+-- Playerctl 串流控制
 hl.bind("XF86AudioNext", hl.dsp.exec_cmd("playerctl next"), { locked = true })
 hl.bind("XF86AudioPrev", hl.dsp.exec_cmd("playerctl previous"), { locked = true })
 hl.bind("XF86AudioPlay", hl.dsp.exec_cmd("playerctl play-pause"), { locked = true })
