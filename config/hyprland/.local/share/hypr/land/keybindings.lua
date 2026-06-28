@@ -50,26 +50,23 @@ hl.bind(
 -- =================
 -- 視窗Resize與移動
 -- =================
-hl.bind(
-	mainMod .. " + " .. "CONTROL + SHIFT + H",
-	hl.dsp.window.resize({ x = -30, y = 0, relative = true }),
-	{ repeating = true }
-)
-hl.bind(
-	mainMod .. " + " .. "CONTROL + SHIFT + J",
-	hl.dsp.window.resize({ x = 0, y = 30, relative = true }),
-	{ repeating = true }
-)
-hl.bind(
-	mainMod .. " + " .. "CONTROL + SHIFT + K",
-	hl.dsp.window.resize({ x = 0, y = -30, relative = true }),
-	{ repeating = true }
-)
-hl.bind(
-	mainMod .. " + " .. "CONTROL + SHIFT + L",
-	hl.dsp.window.resize({ x = 30, y = 0, relative = true }),
-	{ repeating = true }
-)
+hl.bind(mainMod, "R", function()
+	-- 進入模式時示
+	hl.dsp.exec_cmd("notify-send 'Resize Mode' 'Use HJKL to resize'")
+	hl.submap("resize")
+	hl.dsp.exec_cmd("notify-send 'Exit Resize Mode'")
+end)
+
+hl.submap("resize", {
+	{ key = "H", mod = "", cmd = "resizeactive -10 0", repeat_bind = true },
+	{ key = "J", mod = "", cmd = "resizeactive 0 10", repeat_bind = true },
+	{ key = "K", mod = "", cmd = "resizeactive 0 -10", repeat_bind = true },
+	{ key = "L", mod = "", cmd = "resizeactive 10 0", repeat_bind = true },
+
+	-- 返回預設模式
+	{ key = "escape", mod = "", cmd = "submap reset" },
+	{ key = "return", mod = "", cmd = "submap reset" },
+})
 
 -- 移動視窗 (Move window)
 hl.bind(mainMod .. " + SHIFT + H", hl.dsp.window.move({ direction = "left" }))
