@@ -1,9 +1,0 @@
-#!/bin/bash
-
-if pgrep -x "hypridle" >/dev/null; then
-    pkill hypridle
-    notify-send "Hypridle" "已關閉 (休眠停用)" -i dialog-warning
-else
-    hypridle &
-    notify-send "Hypridle" "已啟動 (休眠啟用)" -i preferences-desktop-screensaver
-fi

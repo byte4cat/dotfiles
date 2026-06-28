@@ -97,7 +97,7 @@
   },
   "custom/power": {
     "tooltip": false,
-    "on-click": "$HOME/.local/bin/wayland/launch-walker-power-menu",
+    "on-click": "$HOME/.local/bin/wayland/launch-wofi-power-menu",
     "format": "⏻"
   },
   "custom/notification": {

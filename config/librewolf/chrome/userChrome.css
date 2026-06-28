@@ -1,109 +1,132 @@
-@-moz-document url(chrome://browser/content/browser.xhtml)
-{
-  /* tabs on bottom of window */
-  /* requires that you set
-	 * toolkit.legacyUserProfileCustomizations.stylesheets = true
-	 * in about:config
-	 * figure out current firefox's profile folder in about:support
-	 */
-  #main-window body {
-    flex-direction: column-reverse !important;
+/* Source file https://github.com/MrOtherGuy/firefox-csshacks/tree/master/chrome/tabs_below_content_v2.css made available under Mozilla Public License v. 2.0
+See the above repository for updates as well as full license text. */
+
+/* Requires Fx 133+ */
+@media -moz-pref("userchrome.force-window-controls-on-left.enabled") {
+  #nav-bar > .titlebar-buttonbox-container {
+    order: -1 !important;
+    > .titlebar-buttonbox {
+      flex-direction: row-reverse;
+    }
+  }
+}
+@media not -moz-pref("sidebar.verticalTabs") {
+  #main-window > body {
+    display: grid !important;
+    grid-template-rows: repeat(8, max-content) 1fr;
+    grid-auto-rows: auto;
   }
   #navigator-toolbox {
-    flex-direction: column-reverse !important;
+    display: contents;
   }
-  #urlbar-searchmode-switcher {
-    position: static !important;
+  :root[sizemode="fullscreen"]:not([inDOMFullscreen]) #toolbar-menubar {
+    min-height: 0 !important;
   }
-  #urlbar {
-    top: unset !important;
-    bottom: calc(
-      var(--urlbar-container-height) + 2 * var(--urlbar-padding-block)
-    ) !important;
-    box-shadow: none !important;
-    display: flex !important;
-    flex-direction: column !important;
+  #main-window #browser {
+    grid-row: 9/10;
   }
-  #urlbar > * {
-    flex: none;
+  #TabsToolbar {
+    grid-row: 10/11;
+    background-attachment: scroll;
+    background: inherit !important;
+    opacity: 1 !important;
   }
-  #urlbar .urlbar-input-container {
-    order: 2;
+  .browser-toolbar {
+    background: inherit;
+    background-attachment: fixed;
   }
-  #urlbar > .urlbarView {
-    order: 1;
-    border-bottom: 1px solid #666;
-  }
-  #urlbar-results {
-    display: flex;
-    flex-direction: column-reverse;
-  }
-  .search-one-offs {
-    display: none !important;
-  }
-  .tab-background {
-    border-top: none !important;
-  }
-  #navigator-toolbox::after {
-    border: none;
-  }
-  #TabsToolbar .tabbrowser-arrowscrollbox,
-  #tabbrowser-tabs,
-  .tab-stack {
-    min-height: 28px !important;
-  }
-  .tabbrowser-tab {
-    font-size: 80%;
-  }
-  .tab-content {
-    padding: 0 5px;
-  }
-  .tab-close-button .toolbarbutton-icon {
-    width: 12px !important;
-    height: 12px !important;
-  }
-  toolbox[inFullscreen="true"] {
+  #TabsToolbar > :is(.titlebar-buttonbox-container, .titlebar-spacer) {
     display: none;
   }
-  /*
-	 * the following makes it so that the on-click panels in the nav-bar
-	 * extend upwards, not downwards. some of them are in the #mainPopupSet
-	 * (hamburger + unified extensions), and the rest are in
-	 * #navigator-toolbox. They all end up with an incorrectly-measured
-	 * max-height (based on the distance to the _bottom_ of the screen), so
-	 * we correct that. The ones in #navigator-toolbox then adjust their
-	 * positioning automatically, so we can just set max-height. The ones
-	 * in #mainPopupSet do _not_, and so we need to give them a
-	 * negative margin-top to offset them *and* a fixed height so their
-	 * bottoms align with the nav-bar. We also calc to ensure they don't
-	 * end up overlapping with the nav-bar itself. The last bit around
-	 * cui-widget-panelview is needed because "new"-style panels (those
-	 * using "unified" panels) don't get flex by default, which results in
-	 * them being the wrong height.
-	 *
-	 * Oh, yeah, and the popup-notification-panel (like biometrics prompts)
-	 * of course follows different rules again, and needs its own special
-	 * rule.
-	 */
-  #mainPopupSet panel.panel-no-padding {
-    margin-top: calc(-50vh + 40px) !important;
+  :root[sizemode="fullscreen"] #nav-bar > .titlebar-buttonbox-container {
+    display: flex !important;
   }
-  #mainPopupSet .panel-viewstack,
-  #mainPopupSet popupnotification {
-    max-height: 50vh !important;
-    height: 50vh;
+  :root[customtitlebar]
+    #toolbar-menubar:is([autohide=""], [autohide="true"])
+    ~ #nav-bar {
+    > .titlebar-buttonbox-container {
+      display: flex !important;
+    }
+    :root[sizemode="normal"] & {
+      > .titlebar-spacer {
+        display: flex !important;
+      }
+    }
+    :root[sizemode="maximized"] & {
+      > .titlebar-spacer[type="post-tabs"] {
+        display: flex !important;
+      }
+    }
+    @media -moz-pref("userchrome.force-window-controls-on-left.enabled"),
+      (-moz-gtk-csd-reversed-placement),
+      (-moz-platform: macos) {
+      > .titlebar-spacer[type="post-tabs"] {
+        display: none !important;
+      }
+      > .titlebar-spacer[type="pre-tabs"] {
+        display: flex !important;
+      }
+    }
   }
-  #mainPopupSet panel.panel-no-padding.popup-notification-panel {
-    margin-top: calc(-50vh - 35px) !important;
-  }
-  #navigator-toolbox .panel-viewstack {
-    max-height: 75vh !important;
-  }
-  panelview.cui-widget-panelview {
-    flex: 1;
-  }
-  panelview.cui-widget-panelview > vbox {
-    flex: 1;
-    min-height: 50vh;
+  @media -moz-pref("browser.fullscreen.autohide") {
+    #main-window[sizemode="fullscreen"]:not([inDOMFullscreen]) {
+      > body {
+        grid-template-rows: repeat(8, 0px) 1fr;
+        grid-auto-rows: 0px;
+      }
+      & #nav-bar {
+        height: min-content;
+        z-index: 1;
+        transition: transform 133ms ease-in-out 400ms !important;
+        transform: rotateX(89.9deg);
+        transform-origin: top;
+        &:hover {
+          transition-delay: 0ms !important;
+          transform: rotateX(0deg);
+        }
+      }
+      & #TabsToolbar {
+        opacity: 0 !important;
+        will-change: unset !important;
+        transform: translateY(calc(100% - 1px));
+        transition:
+          transform 66.7ms ease-in-out 100ms,
+          opacity 66.7ms linear 66.7ms !important;
+        height: min-content;
+        align-self: end;
+        z-index: 2;
+        &:hover {
+          transition-delay: 0ms !important;
+          transform: translateY(0);
+          opacity: 1 !important;
+        }
+      }
+      &
+        #mainPopupSet:has(
+          > [panelopen]:not(
+              #ask-chat-shortcuts,
+              #selection-shortcut-action-panel,
+              #chat-shortcuts-options-panel,
+              #tab-preview-panel
+            )
+        )
+        ~ #navigator-toolbox
+        > #nav-bar {
+        transition-delay: 0ms !important;
+        transform: rotateX(0deg);
+      }
+      &
+        #mainPopupSet:has(> #tabContextMenu:hover)
+        ~ #navigator-toolbox
+        #TabsToolbar {
+        transition-delay: 0ms;
+        transform: translateY(0);
+        opacity: 1 !important;
+      }
+    }
+    #urlbar:not([focused]) #urlbar-input, /* ID for Firefox 70 */
+	#urlbar:not([focused]) .urlbar-input {
+      text-align: center !important;
+    }
   }
 }

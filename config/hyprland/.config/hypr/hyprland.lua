@@ -23,7 +23,7 @@ local modules = {
 	"cursor.lua",
 	"input.lua",
 	"permission.lua",
-	"wnw.lua",
+	"window_rule.lua",
 	"keybindings.lua",
 	"transparent.lua",
 }

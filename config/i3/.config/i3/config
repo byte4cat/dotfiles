@@ -11,8 +11,10 @@ set $altMod Mod1
 
 # 核心路徑與工具定義 (完美同步你的 Hyprland 配置)
 set $terminal ghostty
+# set $terminal alacritty
+set $fileManager thunar
 set $browser librewolf
-set $launcher rofi -show drun
+set $menu rofi -show drun
 set $fileManager GTK_THEME=adw-gtk3-dark thunar
 set $terminalFileManager ghostty -e yazi ~/Downloads
 set $babycam byte4work-babycam
@@ -88,7 +90,7 @@ bindsym $mod+m exec $powermenu
 bindsym $mod+b exec $browser
 bindsym $mod+Shift+e exec $fileManager
 bindsym $mod+e exec $terminalFileManager
-bindsym $mod+d exec $launcher
+bindsym $mod+d exec $menu
 
 # === 視窗狀態操作 ===
 bindsym $mod+Shift+f floating toggle

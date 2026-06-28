@@ -16,7 +16,7 @@ source "$DOTFILES_DIR/lib/common"
 
 cd_or_error "$DOTFILES_DIR"
 
-link_librewolf_chrome() {
+link_librewolf_css() {
 	local lw_config_dir="$HOME/.config/librewolf/librewolf"
 	local dotfiles_chrome_src="$DOTFILES_DIR/config/librewolf/chrome"
 
@@ -44,6 +44,34 @@ link_librewolf_chrome() {
 	fi
 }
 
+link_firefox_css() {
+	local config_dir="$HOME/.mozilla/firefox"
+	local dotfiles_chrome_src="$DOTFILES_DIR/config/firefox/chrome"
+
+	if [ -d "$config_dir" ] && [ -d "$dotfiles_chrome_src" ]; then
+		info "🔗 Linking Firefox chrome to random profile(s)..."
+
+		# 尋找所有以 .default-release 結尾的資料夾
+		for profile in "$config_dir"/*.default-release; do
+			[ -d "$profile" ] || continue
+
+			info "  > Target profile: $(basename "$profile")"
+
+			local target="$profile/chrome"
+			info "  > Target profile: $(basename "$profile")"
+			if [ -L "$target" ] || [ -e "$target" ]; then
+				rm -rf "$target"
+			fi
+
+			# 建立符號連結，使用 -sf 確保重複執行時會覆蓋
+			ln -sf "$dotfiles_chrome_src" "$profile/chrome"
+		done
+		success "✅ Firefox chrome linked."
+	else
+		warn "⚠️ Firefox config or dotfiles source not found, skipping link."
+	fi
+}
+
 cleanup_orphans() {
 	info "Cleaning up broken symlinks in ~/.config and ~/.local/private..."
 	# 尋找目錄下指向 dotfiles 但原始檔案已不存在的斷頭連結並刪除
@@ -57,15 +85,26 @@ cleanup_orphans() {
 stow_dotfiles() {
 	cleanup_orphans
 
+	local skip_pkgs=(
+		"firefox"
+		"librewolf"
+	)
+
 	info "Stowing dotfiles from: $DOTFILES_DIR"
 	[ -d "config" ] || error "'stow' directory not found."
-
 	info "Stowing config packages..."
+
 	for pkg in config/*; do
 		[ -d "$pkg" ] || continue
 		pkg_name=$(basename "$pkg")
+
+		if [[ " ${skip_pkgs[*]} " =~ " ${pkg_name} " ]]; then
+			info "  > Skipping stowing for: $pkg_name (Handled by custom script)"
+			continue
+		fi
+
 		info "  > Stowing config: $pkg_name"
-		stow -d config -t "$HOME" --restow --adopt --no-folding "$pkg_name"
+		stow -d config -t "$HOME" --restow --no-folding "$pkg_name"
 	done
 
 	if [ -d "private" ]; then
@@ -74,8 +113,9 @@ stow_dotfiles() {
 		for p_pkg in private/*; do
 			[ -d "$p_pkg" ] || continue
 			p_pkg_name=$(basename "$p_pkg")
+
 			info "  > Stowing private: $p_pkg_name"
-			stow -d private -t "$HOME" --restow --adopt --no-folding "$p_pkg_name"
+			stow -d private -t "$HOME" --restow --no-folding "$p_pkg_name"
 		done
 	fi
 
@@ -86,7 +126,8 @@ main() {
 	check_command git stow
 	stow_dotfiles
 
-	link_librewolf_chrome
+	link_librewolf_css
+	link_firefox_css
 
 	if command -v systemctl >/dev/null; then
 		info "Reloading systemd user daemon..."

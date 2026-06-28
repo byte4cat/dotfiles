@@ -12,14 +12,16 @@ p.secMod = "ALT" -- Sets "Alt" key as secondary modifier
 p.primaryMonitor = "DP-1"
 
 p.terminal = "ghostty"
-p.browser = "librewolf"
-p.menu = "byte4work-walker"
+p.browser = "firefox"
+p.menu = "wofi"
+p.emojiPicker = "rofimoji --selector $menu --action clipboard"
 p.workMsg = "vesktop"
 p.personalMsg = "signal-desktop"
 p.babycam = "byte4work-babycam"
 p.fileManager = "GTK_THEME=adw-gtk3-dark thunar"
 p.terminalFileManager = p.terminal .. " -e yazi ~/Downloads"
-p.music = p.terminal .. ' --title="spotify-player" -e spotify_player'
+-- p.music = p.terminal .. ' --title="spotify-player" -e spotify_player'
+p.music = "spotify"
 
 hl.env("PRIMARY_MONITOR", "DP-1")
 hl.env("XCURSOR_SIZE", "24")

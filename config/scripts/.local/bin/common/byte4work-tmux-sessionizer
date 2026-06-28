@@ -1,0 +1,106 @@
+#!/usr/bin/env bash
+
+# === Config ===
+SEARCH_DIRS=(
+	"${HOME}/Development/personal"
+	"${HOME}/Development/side_projects"
+	"${HOME}/Development/learning"
+	"${HOME}/Development/devops"
+	"${HOME}/Development/open_source"
+
+	"${HOME}/Development/working/backend"
+	"${HOME}/Development/working/web"
+	"${HOME}/Development/working/app"
+	"${HOME}/Development/working/cli"
+)
+
+SESSIONIZER_LOG="$HOME/.local/bin/logs/tmux-sessionizer.log"
+
+log() {
+	echo "$(date +'%F %T') - $*" | tee -a "$SESSIONIZER_LOG"
+}
+
+run_tmux() {
+	TMUX= command tmux "$@"
+}
+
+# === FZF-based project picker ===
+pick_project() {
+	local selected
+	local extra_repos=(
+		"${HOME}/dotfiles"
+		"${HOME}/Development/note"
+		"${HOME}/Development/working/infra"
+		"${HOME}/Documents/Personal/Notes"
+		"${HOME}/Development/homelab"
+		# Add more fixed paths if you want
+	)
+
+	selected=$(
+		{
+			# Print each extra repo if it exists and is a directory
+			for repo in "${extra_repos[@]}"; do
+				[ -d "$repo" ] && echo "$repo"
+			done
+			# Then print the normal search results
+			find "${SEARCH_DIRS[@]}" -mindepth 1 -maxdepth 1 -type d 2>/dev/null
+		} | sort | uniq |
+			fzf --height=40% --reverse --prompt="📁 Pick a project > " \
+				--preview 'tree -L 1 {} | head -100' \
+				--preview-window=right:50%
+	)
+
+	[[ -z "$selected" ]] && exit 1
+	echo "$selected"
+}
+
+# === Main logic ===
+PROJECT_DIR="$1"
+if [[ -z "$PROJECT_DIR" ]]; then
+	# log "Launching fzf to pick a project..."
+	PROJECT_DIR=$(pick_project)
+fi
+
+# log "DEBUG: Raw PROJECT_DIR is: '$PROJECT_DIR'"
+
+PROJECT_NAME="$(basename "$PROJECT_DIR")"
+# log "Selected project: $PROJECT_NAME at $PROJECT_DIR"
+# log "DEBUG: Calculated PROJECT_NAME is: '$PROJECT_NAME'"
+# log "DEBUG: PROJECT_NAME length is: ${#PROJECT_NAME}"
+
+# Check if session exists
+if run_tmux has-session -t="$PROJECT_NAME" 2>/dev/null; then
+	# log "Session $PROJECT_NAME already exists."
+	if [[ -n "$TMUX" ]]; then
+		# log "Inside tmux, switching client..."
+		run_tmux switch-client -t "$PROJECT_NAME" || {
+			# log "[warn] switch-client failed, creating new window..."
+			run_tmux new-window -t "$PROJECT_NAME" -c "$PROJECT_DIR"
+		}
+	else
+		# log "Outside tmux, attaching..."
+		run_tmux attach-session -t "$PROJECT_NAME"
+	fi
+	exit 0
+fi
+
+# Create session
+# log "Creating session $PROJECT_NAME..."
+run_tmux new-session -d -s "$PROJECT_NAME" -c "$PROJECT_DIR"
+
+# Wait a bit to catch any immediate exit
+sleep 0.2
+if ! run_tmux has-session -t="$PROJECT_NAME" 2>/dev/null; then
+	# log "[fatal] Session vanished. Shell likely exited immediately."
+	# log "[hint] Check shell rc files (.zshrc/.bashrc) for early exits."
+	exit 1
+fi
+
+# Switch or attach
+if [[ -n "$TMUX" ]]; then
+	# log "Inside tmux, switching..."
+	run_tmux switch-client -t "$PROJECT_NAME"
+else
+	# log "Outside tmux, attaching..."
+	run_tmux attach-session -t "$PROJECT_NAME"
+fi

@@ -6,7 +6,7 @@ is_floating=$(echo "$window_info" | jq '.floating')
 
 # 2. If it's pinned, we must unpin it first
 if [ "$is_pinned" = "true" ]; then
-    hyprctl dispatch pin
+	hyprctl dispatch pin
 fi
 
 # 3. Handle Fullscreen (Hyprland handles un-floating automatically for fullscreen)

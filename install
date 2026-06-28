@@ -13,19 +13,23 @@ DOTFILES_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$DOTFILES_DIR/lib/common"
 
 main() {
-    info "Starting full Dotfiles environment setup..."
-    
-    [[ -f /etc/arch-release ]] || error "This script is only for Arch Linux."
+	info "Starting full Dotfiles environment setup..."
 
-    # --- Install pkgs from requirements/*.txt ---
-    info "\n--- 2/3: Installing all required packages ---"
-    "$SCRIPT_DIR/bin/install_arch_pkgs"
+	[[ -f /etc/arch-release ]] || error "This script is only for Arch Linux."
 
-    info "\n--- 3/3: Deploying dotfiles using stow ---"
-    "$SCRIPT_DIR/bin/sync_dotfiles"
+	# --- Install pkgs default pkgs ---
+	info "\n--- 1/2: Installing all required packages ---"
+	"$SCRIPT_DIR/bin/install_default_arch_pkgs"
 
-    success "\n🎉 Full Dotfiles environment setup completed! 🎉"
-    warn "A full re-login may be required to apply all changes (Docker group, zsh, etc.)."
+	# --- Install pkgs from requirements/*.txt ---
+	# info "\n--- 2/3: Installing all required packages ---"
+	# "$SCRIPT_DIR/bin/install_arch_pkgs"
+
+	info "\n--- 2/2: Deploying dotfiles using stow ---"
+	"$SCRIPT_DIR/bin/sync_dotfiles"
+
+	success "\n🎉 Full Dotfiles environment setup completed! 🎉"
+	warn "A full re-login may be required to apply all changes (Docker group, zsh, etc.)."
 }
 
 main "$@"

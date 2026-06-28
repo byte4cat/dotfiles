@@ -13,7 +13,7 @@ vim.opt.termguicolors = true -- 開啟 24-bit RGB 真彩色支援
 vim.opt.signcolumn = "yes" -- 始終顯示左側狀態欄
 vim.opt.colorcolumn = "80" -- 在第 80 字元處顯示垂直線
 vim.opt.showmatch = true -- 輸入括號時閃爍對應括號
-vim.opt.cmdheight = 1 -- 命令列高度
+vim.opt.cmdheight = 0 -- 命令列高度
 vim.opt.showmode = false -- 不顯示 -- INSERT
 vim.opt.fillchars = { eob = " " } -- 隱藏檔案結尾處醜醜的波浪號 (~)
 

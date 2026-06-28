@@ -9,8 +9,15 @@ fi
 
 # --- Define Paths ---
 WAYBAR_CONFIG_DIR="$HOME/.config/waybar"
+<<<<<<< HEAD
 CONFIG_DIR="$WAYBAR_CONFIG_DIR/modules/$COMPOSITOR"
 STYLE_DIR="$WAYBAR_CONFIG_DIR/styles"
+||||||| ef15699
+CONFIG_DIR="$WAYBAR_CONFIG_DIR/modules"
+STYLE_DIR="$WAYBAR_CONFIG_DIR/styles"
+=======
+CONFIG_DIR="$WAYBAR_CONFIG_DIR/modules"
+>>>>>>> hyprland-lua-migration
 
 # --- Discover Available Preset Names ---
 # Finds all *.jsonc files and extracts the PRESET name.
@@ -38,11 +45,9 @@ PRESET=$(printf "%s\n" "$AVAILABLE_PRESETS" |
 
 # Delete old symlinks
 rm -f "$WAYBAR_CONFIG_DIR/config.jsonc"
-rm -f "$WAYBAR_CONFIG_DIR/style.css"
 
 # Create new symlinks
 ln -s "$CONFIG_DIR/$PRESET.jsonc" "$WAYBAR_CONFIG_DIR/config.jsonc"
-ln -s "$STYLE_DIR/$PRESET.css" "$WAYBAR_CONFIG_DIR/style.css"
 
 # fallback
 if [ "$COMPOSITOR" == "hyprland" ]; then

@@ -1,0 +1,106 @@
+/* Matugen generated styles for Waybar */
+@define-color background {{colors.background.default.hex}};
+@define-color foreground {{colors.on_background.default.hex}};
+@define-color primary {{colors.primary.default.hex}};
+@define-color error {{colors.error.default.hex}};
+
+* {
+  border: none;
+  border-radius: 0;
+  min-height: 0;
+  font-family: 'JetBrainsMono Nerd Font';
+  font-size: 14px;
+}
+
+#left1, #left-tomat, .modules-center, #right2, #right3, #mpris, #window {
+  background-color: @background;
+  border-radius: 20px;
+  padding: 0px 10px;
+  margin: 10px 5px;
+}
+
+#waybar {
+  background: transparent;
+}
+
+#workspaces {
+  background-color: alpha(@foreground, .05);
+  border: none;
+  padding: 0px;
+  margin: 5px 6px;
+  margin-right: 0px;
+  border-radius: 15px;
+}
+
+#workspaces button {
+  padding: 0px 8px;
+  margin: 0px 1px;
+  color: @background;
+  border-radius: 15px;
+  background-color: alpha(@foreground, .4);
+}
+
+#workspaces button.active {
+  background: @foreground;
+  color: @background;
+  border-radius: 15px;
+  opacity: 1;
+}
+
+#workspaces button.empty { opacity: 0.2; }
+#workspaces button.empty.active { opacity: 0.75; }
+
+#workspaces button.active:hover,
+#workspaces button:hover {
+  background-color: alpha(@foreground, .3);
+  color: @background;
+  opacity: 1;
+  transition: .7s;
+}
+
+/* 模組統一外觀 */
+#tray, #custom-weather, #memory, #backlight, #clock, #cpu, #battery, 
+#network, #bluetooth, #pulseaudio, #custom-screenrecording-indicator, 
+#custom-idle-indicator, #custom-notification-silencing-indicator, 
+#custom-voxtype, #custom-update {
+  background-color: alpha(@foreground, .6);
+  color: @background;
+  padding: 5px 12px;
+  margin: 5px 2px;
+  border-radius: 15px;
+}
+
+/* 錄製狀態特殊顏色 */
+#custom-voxtype.recording,
+#custom-screenrecording-indicator.active,
+#custom-idle-indicator.active,
+#custom-notification-silencing-indicator.active {
+  color: @error;
+  background: transparent;
+}
+
+#custom-omarchy, #battery {
+  background-color: @foreground;
+  color: @background;
+  min-width: 10px;
+  border-radius: 15px;
+  padding: 0 8px;
+  margin: 5px 0;
+}
+
+tooltip {
+  border-radius: 15px;
+  background: @background;
+  border: 2px solid alpha(@foreground, .5);
+}
+
+#custom-screenrecording-indicator.active {
+  background-color: transparent;
+  color: @error;
+  animation-name: blink-recording;
+  animation-duration: 0.5s;
+}
+
+@keyframes blink-recording {
+    to { color: @background; }
+}
