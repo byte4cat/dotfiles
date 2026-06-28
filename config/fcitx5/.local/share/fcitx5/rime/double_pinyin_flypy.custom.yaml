@@ -1,0 +1,4 @@
+patch:
+  schema/name: "鶴"                           # 小鶴雙拼                   
+  "switches/@2/reset": 1                      # 預設開啟第三個開關
+  "simplifier/opencc_config": s2twp.json      # 直接把原本的開關換成台灣詞彙模式

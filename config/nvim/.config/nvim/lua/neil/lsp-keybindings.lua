@@ -1,7 +1,7 @@
 local M = {}
 
 function M.setup(bufnr)
-	local opts = { buffer = bufnr, remap = false }
+	local opts = { buffer = bufnr, remap = false, silent = true }
 
 	-- vim.keymap.set("n", "gD", vim.lsp.buf.declaration, opts)
 	vim.keymap.set("n", "gd", function()
@@ -20,7 +20,7 @@ function M.setup(bufnr)
 
 	vim.keymap.set("n", "<C-d>", "<cmd>Lspsaga peek_definition<CR>", opts)
 	vim.keymap.set("n", "<leader>l", "<cmd>Lspsaga outline<CR>", opts)
-	vim.keymap.set("n", "gr", "<cmd>Lspsaga finder<CR>", opts)
+	vim.keymap.set("n", "gr", "<cmd>Lspsaga finder ref<CR>", opts)
 	vim.keymap.set("n", "<leader>ca", "<cmd>Lspsaga code_action<CR>", opts)
 	vim.keymap.set("n", "<leader>ci", "<cmd>Lspsaga incoming_calls<CR>", opts)
 	vim.keymap.set("n", "<leader>co", "<cmd>Lspsaga outcoming_calls<CR>", opts)
