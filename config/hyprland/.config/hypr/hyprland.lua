@@ -17,6 +17,7 @@ _G.myEnv = load_if_exists(config_path .. "env.lua") or {}
 
 -- 順序載入模組
 local modules = {
+	"colors.lua",
 	"monitor.lua",
 	"autostart.lua",
 	"looknfeel.lua",

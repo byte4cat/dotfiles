@@ -3,10 +3,6 @@
 ---------------------
 
 -- 載入 Matugen 生成的 Lua 色彩模組
--- 確保路徑在 package.path 中，或者直接使用絕對路徑載入
-package.path = package.path .. ";" .. os.getenv("HOME") .. "/.local/share/hypr/land/colors.lua"
-local c = require("colors")
-
 hl.config({
 	general = {
 		gaps_in = 5,
@@ -15,8 +11,8 @@ hl.config({
 
 		-- 直接讀取 Lua 表格中的色彩
 		col = {
-			active_border = c.primary,
-			inactive_border = c.outline_variant,
+			active_border = _G.colors.primary,
+			inactive_border = _G.colors.outline_variant,
 		},
 		resize_on_border = false,
 		allow_tearing = false,
@@ -30,7 +26,7 @@ hl.config({
 			enabled = false,
 			range = 2,
 			render_power = 3,
-			color = c.shadow,
+			color = _G.colors.shadow,
 		},
 		blur = {
 			enabled = true,
@@ -46,8 +42,8 @@ hl.config({
 
 	group = {
 		col = {
-			border_active = c.primary,
-			border_inactive = c.outline_variant,
+			border_active = _G.colors.primary,
+			border_inactive = _G.colors.outline_variant,
 		},
 		auto_group = true,
 
@@ -63,11 +59,11 @@ hl.config({
 			gaps_in = 5,
 			gaps_out = 5,
 
-			text_color = c.on_surface,
-			text_color_inactive = c.on_surface_variant,
+			text_color = _G.colors.on_surface,
+			text_color_inactive = _G.colors.on_surface_variant,
 			col = {
-				active = c.primary_container,
-				inactive = c.surface_variant,
+				active = _G.colors.primary_container,
+				inactive = _G.colors.surface_variant,
 			},
 			gradients = true,
 			gradient_rounding = 0,

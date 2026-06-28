@@ -49,11 +49,27 @@ hl.bind(mainMod .. " + " .. secMod .. " + C", hl.dsp.exec_cmd("byte4work-wofi-cl
 -- 視窗微調 (HJKL 移動與縮放)
 -- ====================
 
--- 免進入 submap 的直覺縮放：mainMod + CONTROL + SHIFT + HJKL
-hl.bind(mainMod .. " + CONTROL + SHIFT + H", hl.dsp.window.resize({ size = "-30 0" }), { repeating = true })
-hl.bind(mainMod .. " + CONTROL + SHIFT + J", hl.dsp.window.resize({ size = "0 30" }), { repeating = true })
-hl.bind(mainMod .. " + CONTROL + SHIFT + K", hl.dsp.window.resize({ size = "0 -30" }), { repeating = true })
-hl.bind(mainMod .. " + CONTROL + SHIFT + L", hl.dsp.window.resize({ size = "30 0" }), { repeating = true })
+-- Resize window
+hl.bind(
+	mainMod .. " + CONTROL + SHIFT + H",
+	hl.dsp.window.resize({ x = -30, y = 0, relative = true }),
+	{ repeat_bind = true }
+)
+hl.bind(
+	mainMod .. " + CONTROL + SHIFT + J",
+	hl.dsp.window.resize({ x = 0, y = 30, relative = true }),
+	{ repeat_bind = true }
+)
+hl.bind(
+	mainMod .. " + CONTROL + SHIFT + K",
+	hl.dsp.window.resize({ x = 0, y = -30, relative = true }),
+	{ repeat_bind = true }
+)
+hl.bind(
+	mainMod .. " + CONTROL + SHIFT + L",
+	hl.dsp.window.resize({ x = 30, y = 0, relative = true }),
+	{ repeat_bind = true }
+)
 
 -- 移動視窗位置 (Move window)
 hl.bind(mainMod .. " + SHIFT + H", hl.dsp.window.move({ direction = "left" }))
@@ -124,10 +140,6 @@ for i = 1, 10 do
 	hl.bind(mainMod .. " + " .. key, hl.dsp.focus({ workspace = i }))
 	hl.bind(mainMod .. " + SHIFT + " .. key, hl.dsp.window.move({ workspace = i }))
 end
-
--- 鍵盤左右鍵切換工作區
-hl.bind(mainMod .. " + RIGHT", hl.dsp.workspace.focus({ offset = 1 }))
-hl.bind(mainMod .. " + LEFT", hl.dsp.workspace.focus({ offset = -1 }))
 
 -- 啟用工作區循環相容
 hl.config({ binds = { allow_workspace_cycles = true } })

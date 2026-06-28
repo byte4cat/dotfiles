@@ -1,8 +1,8 @@
-local colors = {
+_G.colors = {
     image = "{{image}}",
 <* for name, value in colors *>
-    [{{name}}] = "rgba({{value.default.hex_stripped}}ff)",
+    ["{{name}}"] = "0xff{{value.default.hex_stripped}}",
 <* endfor *>
 }
 
-return colors
+return _G.colors
