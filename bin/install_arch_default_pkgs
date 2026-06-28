@@ -5,130 +5,81 @@
 # ==============================================================================
 set -euo pipefail
 
-# Dynamic path resolution aligned with standard repository skeleton
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 DOTFILES_DIR="$(dirname "$SCRIPT_DIR")"
-
-# Source centralized utilities
 source "$DOTFILES_DIR/lib/common"
 
-info "=== System Upgrade and Base Layer Tools ==="
+# System Upgrade & Base Layer
+info "=== System Base & Build Layer ==="
 if confirm "Would you like to perform a full system upgrade now?"; then
 	sudo pacman -Syu --noconfirm
-else
-	warn "Skipping system upgrade. Proceeding at your own risk with package installation..."
 fi
+sudo pacman -S --noconfirm --needed git base-devel ccache linux-headers p7zip unzip tar
 
-sudo pacman -S --noconfirm --needed git base-devel
-
-# === Install yay (AUR Helper) ===
+# AUR Helper (yay)
 if ! command -v yay &>/dev/null; then
 	info "=== Installing yay ==="
 	_tmp_dir=$(mktemp -d /tmp/yay-build-XXXXXX)
-
-	# Safe navigation into the RAM-backed tmp filesystem
 	cd_or_error "$_tmp_dir"
 	git clone https://aur.archlinux.org/yay.git .
 	makepkg -si --noconfirm
-
-	# Clean up and safely return to dotfiles directory root
-	cd - >/dev/null
-	rm -rf "$_tmp_dir"
+	cd - >/dev/null && rm -rf "$_tmp_dir"
 else
-	success "yay is already installed, skipping."
+	success "yay is already installed."
 fi
 
-info "=== Core Fonts & Chinese Language Support ==="
+# System Ecosystem, Audio, & Networking
+info "=== System Ecosystem & Networking ==="
 sudo pacman -S --noconfirm --needed \
-	noto-fonts-cjk \
-	noto-fonts-emoji \
-	noto-fonts-extra \
-	ttf-jetbrains-mono-nerd
+	networkmanager network-manager-applet bluez bluez-utils \
+	pipewire wireplumber pipewire-pulse pipewire-alsa \
+	openssh curl jq ripgrep fd bat eza tree btop htop ncdu
 
-info "=== ZSH and Shell Plugins ==="
+sudo systemctl enable --now NetworkManager bluetooth
+# Note: Pipewire is usually handled by user-space, no systemctl needed for session
+
+# Desktop & Hyprland Infrastructure
+info "=== Desktop & Hyprland Helpers ==="
 sudo pacman -S --noconfirm --needed \
-	zsh \
-	zsh-autosuggestions \
-	zsh-history-substring-search \
-	zsh-syntax-highlighting
-# zsh-theme-powerlevel10k
+	adw-gtk-theme nwg-look dunst waybar waypaper yazi libnotify \
+	xdg-desktop-portal-hyprland grim slurp satty wl-clipboard \
+	brightnessctl playerctl \
+	ttf-jetbrains-mono-nerd ttf-liberation noto-fonts-cjk noto-fonts-emoji noto-fonts-extra
 
-# Safely update user shell environment
+# Developer Tooling (Rust / Node / C / Go)
+info "=== Developer Tooling ==="
+sudo pacman -S --noconfirm --needed zsh rustup tmux gdb lld vlc go
+rustup default stable
+
+# ZSH Shell setup
 if [ "${SHELL:-}" != "/bin/zsh" ]; then
-	info "Changing default shell to ZSH..."
 	chsh -s /bin/zsh
 fi
+sudo pacman -S --noconfirm --needed zsh-autosuggestions zsh-history-substring-search zsh-syntax-highlighting
 
-info "=== NVM (Node Version Manager) ==="
+# NVM Environment
 export NVM_DIR="$HOME/.nvm"
 if [ ! -d "$NVM_DIR" ]; then
 	curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh | bash
 fi
+[ -s "$NVM_DIR/nvm.sh" ] && source "$NVM_DIR/nvm.sh" && nvm install --lts
 
-# Context isolation loading for current subshell workflow
-if [ -s "$NVM_DIR/nvm.sh" ]; then
-	source "$NVM_DIR/nvm.sh"
-	nvm install --lts
-else
-	warn "NVM environment core not found, skipping immediate node engine init."
-fi
-
-info "=== Core System Ecosystem (Rust / Zoxide / Tmux) ==="
+# Multimedia & Input
+info "=== Multimedia & Input ==="
 sudo pacman -S --noconfirm --needed \
-	fzf \
-	zoxide \
-	rustup \
-	tmux
-# gtk-engine-murrine
+	vlc-plugin-ffmpeg vlc-plugin-live555 vlc-plugins-all vlc-plugins-extra libva-utils libvdpau \
+	fcitx5-chewing fcitx5-chinese-addons fcitx5-configtool fcitx5-gtk rime-double-pinyin
 
-# Default toolchain initialization
-rustup default stable
+# Applications
+info "=== Applications ==="
+sudo pacman -S --noconfirm --needed ghostty awww firefox
 
 # Setup Tmux Plugin Manager
 if [ ! -d "$HOME/.tmux/plugins/tpm" ]; then
-	info "Installing Tmux TPM..."
 	git clone https://github.com/tmux-plugins/tpm "$HOME/.tmux/plugins/tpm"
 fi
 
-info "=== Multimedia Codecs and VLC ==="
-sudo pacman -S --noconfirm --needed \
-	vlc \
-	vlc-plugin-ffmpeg \
-	vlc-plugin-live555 \
-	vlc-plugins-all \
-	vlc-plugins-extra \
-	libva-utils \
-	libvdpau
-
-info "=== Fcitx5 Framework and Input Engines ==="
-sudo pacman -S --noconfirm --needed \
-	fcitx5-chewing \
-	fcitx5-chinese-addons \
-	fcitx5-configtool \
-	fcitx5-gtk \
-	rime-double-pinyin
-
-info "=== Core Desktop & Window Manager Surroundings ==="
-sudo pacman -S --noconfirm --needed \
-	ghostty \
-	waybar \
-	waypaper \
-	wlroots0.19 \
-	yazi \
-	adw-gtk-theme \
-	awww \
-	firefox
-
-# NOTE: Commented out due to recent AUR security alerts / supply chain risks
-# info "=== AUR Custom Targets (yay) ==="
-# yay -S --noconfirm --needed \
-#      fcitx5-mcbopomofo-git \
-#      swayosd-git \
-#      librewolf-bin \
-#	   fzf-tab \
-#  	   hyprshade
-
 success "========================================="
-success "🎉 All packages installed successfully!"
-success "Please restart your terminal or log out to apply ZSH environment variables."
+success "🎉 System deployment completed successfully!"
+success "Please log out and log back in to finalize environment settings."
 success "========================================="

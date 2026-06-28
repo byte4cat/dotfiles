@@ -84,22 +84,6 @@ hl.bind(mainMod .. " + L", hl.dsp.focus({ direction = "right" }))
 hl.bind(mainMod .. " + K", hl.dsp.focus({ direction = "up" }))
 hl.bind(mainMod .. " + J", hl.dsp.focus({ direction = "down" }))
 
--- 獨立 Resize Mode (保留，以防需要進入模式操作)
--- hl.bind(mainMod, "R", function()
--- 	hl.dsp.exec_cmd("notify-send 'Resize Mode' 'Use HJKL to resize'")
--- 	hl.submap("resize")
--- 	hl.dsp.exec_cmd("notify-send 'Exit Resize Mode'")
--- end)
-
--- hl.submap("resize", {
--- 	{ key = "H", mod = "", cmd = "resizeactive -10 0", repeat_bind = true },
--- 	{ key = "J", mod = "", cmd = "resizeactive 0 10", repeat_bind = true },
--- 	{ key = "K", mod = "", cmd = "resizeactive 0 -10", repeat_bind = true },
--- 	{ key = "L", mod = "", cmd = "resizeactive 10 0", repeat_bind = true },
--- 	{ key = "escape", mod = "", cmd = "submap reset" },
--- 	{ key = "return", mod = "", cmd = "submap reset" },
--- })
-
 -- ==========================
 -- 分組管理 (Group / Tab Mode)
 -- ==========================
