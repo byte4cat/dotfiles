@@ -1,0 +1,41 @@
+[timer]
+work = 50.0
+break = 15.0
+long_break = 30.0
+sessions = 4
+auto_advance = "none"
+
+[sound]
+mode = "embedded"
+volume = 0.5
+
+[notification]
+enabled = true
+timeout = 4000
+
+[display]
+text_format = "{icon} {time} {state}"
+
+# 自訂圖示與狀態符號
+[display.icons]
+work = "🍅"        # 工作/閒置時的圖示
+break = "☕"       # 短休息圖示
+long_break = "🏖️"  # 長休息圖示
+play = "󰐊"         # 乾淨的空心/線條播放箭頭 (Nerd Font)
+pause = "󰏤"        # 乾淨的空心/線條暫停雙線 (Nerd Font)
+stop = "󰓛"         # 乾淨的空心/線條停止正方形 (Nerd Font)
+
+# when the work session starts, play a sound to indicate that the work session has begun.
+[hooks.on_work_start]
+cmd = "mpv"
+args = ["--no-video", "--force-window=no", "/usr/share/sounds/freedesktop/stereo/complete.oga"]
+
+# should take a break
+[hooks.on_work_end]
+cmd = "mpv"
+args = ["--no-video", "--force-window=no", "/usr/share/sounds/freedesktop/stereo/alarm-clock-elapsed.oga"]
+
+# should go to work
+[hooks.on_break_end]
+cmd = "mpv"
+args = ["--no-video", "--force-window=no", "/usr/share/sounds/freedesktop/stereo/complete.oga"]

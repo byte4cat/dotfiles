@@ -12,7 +12,7 @@
   font-size: 14px;
 }
 
-#left1, .modules-center, #right2, #right3, #mpris, #window {
+#left1, #left-tomat, .modules-center, #right2, #right3, #mpris, #window {
   background-color: @background;
   border-radius: 20px;
   padding: 0px 10px;
