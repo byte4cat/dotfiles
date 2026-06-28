@@ -1,0 +1,52 @@
+#!/bin/bash
+
+STATE_FILE="$HOME/.local/state/waypaper/default.toml"
+mkdir -p "$(dirname "$STATE_FILE")"
+FOLDERS=(
+	"$HOME/.local/share/wallpapers"
+)
+
+FOLDER_ARGS=()
+for f in "${FOLDERS[@]}"; do
+	FOLDER_ARGS+=("$f")
+done
+
+if [ ! -f "$STATE_FILE" ]; then
+	echo "Error: $STATE_FILE not exists"
+	exit 1
+fi
+
+waypaper --state-file "$STATE_FILE" --folder "${FOLDER_ARGS[@]}"
+
+RAW_PATH=$(grep 'wallpaper =' "$STATE_FILE" | head -n 1 | sed 's/.*= //;s/"//g')
+SELECTED_WALLPAPER="${RAW_PATH/#\~/$HOME}"
+
+echo "RAW_PATH: $RAW_PATH"
+echo "SELECTED_WALLPAPER: $SELECTED_WALLPAPER"
+
+if [ -z "$SELECTED_WALLPAPER" ]; then
+	notify-send "Theme" "can not read wallpaper location" -t 2000
+	exit 1
+fi
+
+CONFIG_DIR="/tmp"
+APPS=(
+	"waybar"
+	"wofi"
+	"kitty"
+	"ghostty"
+	"starship"
+	"gtk"
+	"neovim"
+)
+
+# make sure dir is exists, change to for loop?
+for app in "${APPS[@]}"; do
+	mkdir -p "$CONFIG_DIR/$APP"
+done
+
+matugen image "$SELECTED_WALLPAPER" --quiet --source-color-index 0
+
+notify-send "Theme" "Sync successful!" -i "$SELECTED_WALLPAPER" -t 1500
+
+echo "Colors updated for $SELECTED_WALLPAPER"

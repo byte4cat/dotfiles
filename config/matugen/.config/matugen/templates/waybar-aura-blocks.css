@@ -1,0 +1,117 @@
+/* Waybar Matugen Template */
+* {
+    border: none;
+    border-radius: 0;
+    min-height: 0;
+    font-family: JetBrainsMono Nerd Font;
+    font-size: 13px;
+}
+
+window#waybar {
+    background-color: {{colors.background.default.hex}};
+    transition-property: background-color;
+    transition-duration: 0.5s;
+}
+
+window#waybar.hidden {
+    opacity: 0.5;
+}
+
+#workspaces {
+    background-color: transparent;
+}
+
+#workspaces button {
+    all: initial;
+    min-width: 0;
+    box-shadow: inset 0 -3px transparent;
+    padding: 6px 18px;
+    margin: 6px 3px;
+    border-radius: 4px;
+    background-color: {{colors.surface_container.default.hex}};
+    color: {{colors.on_surface.default.hex}};
+}
+
+#workspaces button.active {
+    color: {{colors.surface_container.default.hex}};
+    background-color: {{colors.on_surface.default.hex}};
+}
+
+#workspaces button:hover {
+    box-shadow: inherit;
+    text-shadow: inherit;
+    color: {{colors.surface_container.default.hex}};
+    background-color: {{colors.on_surface.default.hex}};
+}
+
+#workspaces button.urgent {
+    background-color: {{colors.error.default.hex}};
+}
+
+#memory,
+#custom-power,
+#battery,
+#backlight,
+#wireplumber,
+#network,
+#clock,
+#clock.simpleclock,
+#tray {
+    border-radius: 4px;
+    margin: 6px 3px;
+    padding: 6px 12px;
+    background-color: {{colors.surface_container.default.hex}};
+    color: {{colors.on_surface.default.hex}};
+}
+
+#custom-power {
+    margin-right: 6px;
+    background-color: {{colors.secondary_container.default.hex}};
+}
+
+#memory {
+    background-color: {{colors.tertiary.default.hex}};
+    color: {{colors.on_tertiary.default.hex}};
+}
+
+#cpu {
+    background-color: {{colors.primary_container.default.hex}};
+    color: {{colors.on_primary_container.default.hex}};
+}
+
+#battery {
+    background-color: {{colors.error_container.default.hex}};
+    color: {{colors.on_error_container.default.hex}};
+}
+
+#battery.charging {
+    background-color: {{colors.primary.default.hex}};
+    color: {{colors.on_primary.default.hex}};
+}
+
+#wireplumber {
+    background-color: {{colors.secondary.default.hex}};
+    color: {{colors.on_secondary.default.hex}};
+}
+
+#network {
+    background-color: {{colors.tertiary_container.default.hex}};
+    padding-right: 17px;
+}
+
+#clock {
+    background-color: {{colors.primary.default.hex}};
+    color: {{colors.on_primary.default.hex}};
+}
+
+tooltip {
+    border-radius: 8px;
+    padding: 15px;
+    background-color: {{colors.surface_container_low.default.hex}};
+}
+
+tooltip label {
+    padding: 5px;
+    background-color: {{colors.surface_container_low.default.hex}};
+    color: {{colors.on_surface.default.hex}};
+}

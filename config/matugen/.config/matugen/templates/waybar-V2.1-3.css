@@ -1,0 +1,50 @@
+/* Matugen generated styles for Waybar */
+@define-color base {{colors.background.default.hex}};
+@define-color highlightHigh {{colors.outline_variant.default.hex}};
+
+* {
+  font-family: "JetBrainsMono Nerd Font";
+  font-size: 13px;
+  font-weight: 600;
+  border: none;
+}
+
+window#waybar {
+  background-color: transparent;
+}
+
+#waybar > box {
+  background-color: @base;
+  border: 1px solid @highlightHigh;
+  border-radius: 8px;
+  margin: 4px 8px;
+  /* 增加左右內距，防止模組頂到邊緣 */
+  padding: 0 15px; 
+}
+
+/* 讓模組自身變寬 */
+.modules-left > widget,
+.modules-center > widget,
+.modules-right > widget {
+  /* 增加左右邊距，把每個模組當成獨立的區塊 */
+  margin: 0 12px; 
+  /* 強制所有模組最小寬度，防止文字變動導致擠壓 */
+  min-width: 40px;
+}
+
+/* 讓模組內的內容有呼吸空間 */
+#custom-omarchy, #clock, #memory, #cpu, #pulseaudio, #network, #battery {
+  padding: 0 8px;
+}
+
+/* Workspaces 保持彈性 */
+#workspaces {
+  margin: 0 15px;
+}
+
+/* 顏色區 (維持你原本的顏色變數) */
+#custom-update, #battery, #pulseaudio { color: {{colors.error.default.hex}}; }
+#memory { color: {{colors.tertiary_container.default.hex}}; }
+#cpu { color: {{colors.primary.default.hex}}; }
+#network, #bluetooth, #mpris { color: {{colors.secondary_container.default.hex}}; }
+#clock { color: {{colors.primary.default.hex}}; }

@@ -32,3 +32,23 @@ reload_all_panes() {
 }
 
 alias rall=reload_all_panes
+
+# Wayland / Sway / Hyprland / X11 / TTY
+typeset -U path PATH
+export PATH="/home/neil/.local/bin/common:/home/neil/.local/private/bin:/usr/local/bin:/usr/bin:$PATH"
+if [[ "$XDG_SESSION_TYPE" == "wayland" ]]; then
+    alias sayenv="echo 'Running on Wayland ($XDG_CURRENT_DESKTOP)'"
+    export PATH="/home/neil/.local/bin/wayland:$PATH"
+    if [[ "${(L)XDG_CURRENT_DESKTOP}" == *"hyprland"* ]]; then
+        export PATH="/home/neil/.local/bin/hyprland:$PATH"
+    elif [[ "${(L)XDG_CURRENT_DESKTOP}" == *"sway"* ]]; then
+        export PATH="/home/neil/.local/bin/sway:$PATH"
+    fi
+
+elif [[ "$XDG_SESSION_TYPE" == "x11" ]]; then
+    alias sayenv="echo 'Running on X11'"
+    export PATH="/home/neil/.local/bin/x11:$PATH"
+    
+else
+    alias sayenv="echo 'Running on TTY/Console'"
+fi

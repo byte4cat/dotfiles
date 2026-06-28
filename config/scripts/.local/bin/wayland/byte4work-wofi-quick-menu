@@ -2,7 +2,10 @@
 
 set -e
 
-SCRIPTS_DIR="$HOME/.local/bin/wayland"
+SCRIPTS_COMMON_DIR="$HOME/.local/bin/common"
+SCRIPTS_WAYLAND_DIR="$HOME/.local/bin/wayland"
+SCRIPTS_HYPRLAND_DIR="$HOME/.local/bin/hyprland"
+SCRIPTS_SWAY_DIR="$HOME/.local/bin/sway"
 LOG_PATH="$SCRIPTS_DIR/logs/wofi_quick_menu.log"
 WOFI_CMD="wofi --show dmenu --width 800 --height 400"
 
@@ -152,18 +155,18 @@ main() {
 		;;
 	"Toggle Vertical Monitor") toggle_monitor ;;
 	"Restart PipeWire")
-		"$SCRIPTS_DIR/byte4work-restart-pipewire"
+		"$SCRIPTS_COMMON_DIR/byte4work-restart-pipewire"
 		notify-send "PipeWire Restarted"
 		;;
 	"Restart NetworkManager")
-		"$SCRIPTS_DIR/byte4work-restart-network-manager"
+		"$SCRIPTS_COMMON_DIR/byte4work-restart-network-manager"
 		notify-send "NetworkManager Restarted"
 		;;
 	"Restart Wifi wlan0")
-		"$SCRIPTS_DIR/byte4work-restart-wifi-wlan0"
+		"$SCRIPTS_COMMON_DIR/byte4work-restart-wifi-wlan0"
 		notify-send "Wifi wlan0 Restarted"
 		;;
-	"Toggle Sleep") "$SCRIPTS_DIR/byte4work-hypridle-toggle" ;;
+	"Toggle Sleep") "$SCRIPTS_HYPRLAND_DIR/byte4work-hypridle-toggle" ;;
 	"Toggle VPN")
 		local vpn_options=$(format_vpn_options)
 		local selected_line=$(echo -e "$vpn_options" | $WOFI_CMD --prompt "Select VPN to toggle…")

@@ -2,48 +2,21 @@
 ---- Look & Feel ----
 ---------------------
 
--- ==========================================
--- 顏色風格選單
--- ==========================================
-
--- [Original] 北歐青 (Nordic Aqua) - 沉穩、專業
--- local activeBorderColor = { colors = { "0x33ccffee", "0x00ff99ee" }, angle = 45 }
--- local inactiveBorderColor = "0x595959aa"
-
--- [Cyberpunk] 霓虹粉藍 (Vaporwave) - 高對比
--- local activeBorderColor = { colors = { "0xff00ffee", "0x00ffffee" }, angle = 45 }
--- local inactiveBorderColor = "0x444444aa"
-
--- [Lava] 地獄烈焰 (Magma) - 侵略性
--- local activeBorderColor = { colors = { "0xff4500ee", "0x800080ee" }, angle = 45 }
--- local inactiveBorderColor = "0x333333aa"
-
--- [Electric] 電子脈衝 (Pulse) - 極致亮眼
--- local activeBorderColor = { colors = { "0xffff00ee", "0x8a2be2ee" }, angle = 45 }
--- local inactiveBorderColor = "0x2a2a2aaa"
-
--- [Forest] 深邃翡翠 (Emerald) - 高雅護眼
--- local activeBorderColor = { colors = { "0x00ff9f99", "0x006633ee" }, angle = 45 }
--- local inactiveBorderColor = "0x202020aa"
-
--- [NeonGreen] 極致亮綠
--- local activeBorderColor = { colors = { "rgba(39ff14ee)", "rgba(008f11ee)" }, angle = 45 }
--- local inactiveBorderColor = "rgba(404040aa)" -- 故意設得深一點，讓活躍的更跳出來
-
--- [SkyBlue] 天空藍
-local activeBorderColor = { colors = { "rgba(33ccffee)", "rgba(00ff99ee)" }, angle = 45 }
-local inactiveBorderColor = "rgba(595959aa)"
-
-local shadowColor = "rgba(1a1a1aee)"
+-- 載入 Matugen 生成的 Lua 色彩模組
+-- 確保路徑在 package.path 中，或者直接使用絕對路徑載入
+package.path = package.path .. ";" .. os.getenv("HOME") .. "/.local/share/hypr/land/colors.lua"
+local c = require("colors")
 
 hl.config({
 	general = {
 		gaps_in = 5,
 		gaps_out = 5,
 		border_size = 2,
+
+		-- 直接讀取 Lua 表格中的色彩
 		col = {
-			active_border = activeBorderColor,
-			inactive_border = inactiveBorderColor,
+			active_border = c.primary,
+			inactive_border = c.outline_variant,
 		},
 		resize_on_border = false,
 		allow_tearing = false,
@@ -52,31 +25,53 @@ hl.config({
 
 	decoration = {
 		rounding = 5,
+		rounding_power = 2,
 		shadow = {
-			enabled = true,
+			enabled = false,
 			range = 2,
 			render_power = 3,
-			color = shadowColor,
+			color = c.shadow,
 		},
 		blur = {
-			enabled = false,
-			size = 3,
-			passes = 1,
+			enabled = true,
+			size = 15,
+			passes = 3,
+			ignore_opacity = true,
+			noise = 0.08,
+			contrast = 1.5,
+			xray = true,
+			new_optimizations = true,
 		},
 	},
 
 	group = {
+		col = {
+			border_active = c.primary,
+			border_inactive = c.outline_variant,
+		},
 		auto_group = true,
+
 		groupbar = {
 			enabled = true,
-			height = 20,
 			font_size = 12,
 			font_family = "comic code",
-			render_titles = true,
+			font_weight_active = "ultraheavy",
+			font_weight_inactive = "normal",
+			indicator_height = 0,
+			indicator_gap = 5,
+			height = 20,
+			gaps_in = 5,
+			gaps_out = 5,
+
+			text_color = c.on_surface,
+			text_color_inactive = c.on_surface_variant,
 			col = {
-				active = "0xff39ff14",
-				inactive = "0xff204020",
+				active = c.primary_container,
+				inactive = c.surface_variant,
 			},
+			gradients = true,
+			gradient_rounding = 0,
+			gradient_round_only_edges = false,
 		},
 	},
 
@@ -102,14 +97,6 @@ hl.config({
 	},
 })
 
+-- Layer rules
 hl.layer_rule({ name = "blur", match = "namespace:lockscreen" })
 hl.layer_rule({ name = "ignorealpha 0.7", match = "namespace:lockscreen" })
-
--- 動態自定義貝茲曲線與動畫
-hl.curve("myBezier", { type = "bezier", points = { { 0.10, 0.9 }, { 0.1, 1.05 } } })
-
-hl.animation({ leaf = "windows", enabled = true, speed = 7, bezier = "myBezier", style = "slide" })
-hl.animation({ leaf = "windowsOut", enabled = true, speed = 7, bezier = "myBezier", style = "slide" })
-hl.animation({ leaf = "border", enabled = true, speed = 10, bezier = "default" })
-hl.animation({ leaf = "fade", enabled = true, speed = 7, bezier = "default" })
-hl.animation({ leaf = "workspaces", enabled = true, speed = 6, bezier = "default" })

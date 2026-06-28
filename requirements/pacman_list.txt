@@ -49,10 +49,10 @@ evtest
 eza
 fail2ban
 fastfetch
-fcitx5-chewing
 fcitx5-chinese-addons
 fcitx5-configtool
 fcitx5-gtk
+fcitx5-rime
 fdupes
 ffmpegthumbnailer
 file-roller
@@ -183,6 +183,7 @@ qt6-wayland
 radeontop
 reflector
 remmina
+rime-double-pinyin
 rofi
 rofimoji
 rustup
@@ -230,6 +231,7 @@ turbostat
 ueberzugpp
 ufw
 usbip
+uv
 uwsm
 vesktop-bin
 vim

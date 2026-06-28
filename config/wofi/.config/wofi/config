@@ -17,3 +17,8 @@ no_actions=true
 orientation=vertical
 # 讓它在居中時更像一個彈出視窗
 hide_search=false
+
+key_up=Ctrl-k
+key_down=Ctrl-j
+key_left=Ctrl-h
+key_right=Ctrl-l

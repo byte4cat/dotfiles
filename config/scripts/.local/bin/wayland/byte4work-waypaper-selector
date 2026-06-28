@@ -3,12 +3,12 @@
 STATE_FILE="$HOME/.local/state/waypaper/default.toml"
 mkdir -p "$(dirname "$STATE_FILE")"
 FOLDERS=(
-    ~/.local/share/wallpapers
+	~/.local/share/wallpapers
 )
 
 FOLDER_ARGS=()
 for f in "${FOLDERS[@]}"; do
-    FOLDER_ARGS+=("$f")
+	FOLDER_ARGS+=("$f")
 done
 
 waypaper --state-file "$STATE_FILE" --folder "${FOLDER_ARGS[@]}"
