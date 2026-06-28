@@ -26,7 +26,8 @@ post_hook = 'pkill -SIGUSR2 waybar'
 
 [templates.hyprland]
 input_path = '~/.config/matugen/templates/hyprland-colors.lua'
-output_path = '~/.local/share/hypr/land/colors.lua'
+output_path = '~/.config/hypr/modules/colors.lua'
+post_hook = 'hyprctl reload'
 
 [templates.yazi]
 input_path = '~/.config/matugen/templates/yazi-theme.toml'

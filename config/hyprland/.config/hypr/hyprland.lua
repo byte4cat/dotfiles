@@ -1,4 +1,5 @@
-local config_path = os.getenv("HOME") .. "/.local/share/hypr/land/"
+---@diagnostic disable: undefined-global
+local config_path = os.getenv("HOME") .. "/.config/hypr/modules/"
 local private_config = os.getenv("HOME") .. "/.local/private/hypr/hyprland.lua"
 
 local function load_if_exists(path)
@@ -17,9 +18,9 @@ _G.myEnv = load_if_exists(config_path .. "env.lua") or {}
 
 -- 順序載入模組
 local modules = {
-	"colors.lua",
 	"monitor.lua",
 	"autostart.lua",
+	"colors.lua",
 	"looknfeel.lua",
 	"cursor.lua",
 	"input.lua",

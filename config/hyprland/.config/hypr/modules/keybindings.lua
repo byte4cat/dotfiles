@@ -1,3 +1,4 @@
+---@diagnostic disable: undefined-global
 ---------------------
 ---- KEYBINDINGS ----
 ---------------------
@@ -183,12 +184,12 @@ hl.bind(mainMod .. " + mouse_down", hl.dsp.exec_cmd("hyprctl keyword cursor:zoom
 -- ===========
 local screenshot_dir = os.getenv("HOME") .. "/Pictures/Screenshots"
 
-local cmd_full = "grim - | tee "
-	.. screenshot_dir
-	.. "/$(date +'%Y%m%d-%H%M%S').png | wl-copy && notify-send 'Screenshot saved & copied'"
+local notify_cmd = "notify-send 'Screenshot' \"saved & copied\""
+local cmd_full = "grim - | tee " .. screenshot_dir .. "/$(date +'%Y%m%d-%H%M%S').png | wl-copy && " .. notify_cmd
 local cmd_slurp = 'grim -g "$(slurp)" - | tee '
 	.. screenshot_dir
-	.. "/$(date +'%Y%m%d-%H%M%S').png | wl-copy && notify-send 'Screenshot saved & copied'"
+	.. "/$(date +'%Y%m%d-%H%M%S').png | wl-copy && "
+	.. notify_cmd
 
 hl.bind(mainMod .. " + CONTROL + 1", sh_exec(cmd_full))
 hl.bind(mainMod .. " + CONTROL + 2", sh_exec(cmd_slurp))
