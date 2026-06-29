@@ -41,14 +41,14 @@ sudo systemctl enable --now NetworkManager bluetooth
 # Desktop & Hyprland Infrastructure
 info "=== Desktop & Hyprland Helpers ==="
 sudo pacman -S --noconfirm --needed \
-	adw-gtk-theme nwg-look dunst waybar waypaper yazi libnotify \
+	adw-gtk-theme nwg-look dunst waybar yazi libnotify \
 	xdg-desktop-portal-hyprland grim slurp satty wl-clipboard \
 	brightnessctl playerctl \
 	ttf-jetbrains-mono-nerd ttf-liberation noto-fonts-cjk noto-fonts-emoji noto-fonts-extra
 
 # Developer Tooling (Rust / Node / C / Go)
 info "=== Developer Tooling ==="
-sudo pacman -S --noconfirm --needed zsh rustup tmux gdb lld vlc go
+sudo pacman -S --noconfirm --needed zsh rustup tmux gdb lld vlc go starship
 rustup default stable
 
 # ZSH Shell setup
@@ -78,6 +78,16 @@ sudo pacman -S --noconfirm --needed ghostty awww firefox
 if [ ! -d "$HOME/.tmux/plugins/tpm" ]; then
 	git clone https://github.com/tmux-plugins/tpm "$HOME/.tmux/plugins/tpm"
 fi
+
+# NOTE: Commented out due to recent AUR security alerts / supply chain risks
+# info "=== AUR Custom Targets (yay) ==="
+# yay -S --noconfirm --needed \
+#      fcitx5-mcbopomofo-git \
+#      swayosd-git \
+#      librewolf-bin \
+#	   fzf-tab \
+#  	   hyprshade \
+#  	   waypaper
 
 success "========================================="
 success "🎉 System deployment completed successfully!"
