@@ -1,7 +1,6 @@
 import Quickshell
 import Quickshell.Wayland
 import Quickshell.Io
-import Quickshell.Hyprland
 import QtQuick
 import QtQuick.Layouts
 import "." 
@@ -46,6 +45,8 @@ ShellRoot {
     property int volumeLevel: 0
     property string activeWindow: "Window"
     property string currentLayout: "Tile"
+    property int focusedWorkspace: 1
+    property var occupiedWorkspaces: []
 
     // CPU tracking
     property var lastCpuIdle: 0
@@ -143,10 +144,10 @@ ShellRoot {
         Component.onCompleted: running = true
     }
 
-    // Active window title
+    // Active window title (sway)
     Process {
         id: windowProc
-        command: ["sh", "-c", "hyprctl activewindow -j | jq -r '.title // empty'"]
+        command: ["sh", "-c", "swaymsg -t get_tree | jq -r '.. | select(.focused? == true) | .name // empty' | head -1"]
         stdout: SplitParser {
             onRead: data => {
                 if (data && data.trim()) {
@@ -157,14 +158,60 @@ ShellRoot {
         Component.onCompleted: running = true
     }
 
-    // Current layout (Hyprland: dwindle/master/floating)
+    // Current layout (sway: splith, splitv, tabbed, stacking)
     Process {
         id: layoutProc
-        command: ["sh", "-c", "hyprctl activewindow -j | jq -r 'if .floating then \"Floating\" elif .fullscreen == 1 then \"Fullscreen\" else \"Tiled\" end'"]
+        command: ["sh", "-c", "swaymsg -t get_tree | jq -r '.. | select(.focused? == true) | .layout // empty' | head -1"]
         stdout: SplitParser {
             onRead: data => {
                 if (data && data.trim()) {
-                    currentLayout = data.trim()
+                    var layout = data.trim()
+                    // Convert sway layout names to friendly names
+                    if (layout === "splith") {
+                        currentLayout = "Horizontal"
+                    } else if (layout === "splitv") {
+                        currentLayout = "Vertical"
+                    } else if (layout === "tabbed") {
+                        currentLayout = "Tabbed"
+                    } else if (layout === "stacking") {
+                        currentLayout = "Stacking"
+                    } else if (layout === "output" || layout === "none") {
+                        currentLayout = "Tiled"
+                    } else {
+                        currentLayout = layout.charAt(0).toUpperCase() + layout.slice(1)
+                    }
+                }
+            }
+        }
+        Component.onCompleted: running = true
+    }
+
+    // Focused workspace (sway)
+    Process {
+        id: workspaceProc
+        command: ["sh", "-c", "swaymsg -t get_workspaces | jq -r '.[] | select(.focused == true) | .num'"]
+        stdout: SplitParser {
+            onRead: data => {
+                if (data && data.trim()) {
+                    var num = parseInt(data.trim())
+                    if (!isNaN(num)) {
+                        focusedWorkspace = num
+                    }
+                }
+            }
+        }
+        Component.onCompleted: running = true
+    }
+
+    // Occupied workspaces (sway)
+    Process {
+        id: occupiedProc
+        command: ["sh", "-c", "swaymsg -t get_workspaces | jq -r '.[].num'"]
+        stdout: SplitParser {
+            onRead: data => {
+                if (data && data.trim()) {
+                    var nums = data.trim().split('\n').map(n => parseInt(n)).filter(n => !isNaN(n))
+                    occupiedWorkspaces = nums
                 }
             }
         }
@@ -184,16 +231,7 @@ ShellRoot {
         }
     }
 
-    // Event-based updates for window/layout (instant)
-    Connections {
-        target: Hyprland
-        function onRawEvent(event) {
-            windowProc.running = true
-            layoutProc.running = true
-        }
-    }
-
-    // Backup timer for window/layout (catches edge cases)
+    // Fast timer for window/layout/workspace (sway doesn't have event hooks in quickshell)
     Timer {
         interval: 200
         running: true
@@ -201,12 +239,13 @@ ShellRoot {
         onTriggered: {
             windowProc.running = true
             layoutProc.running = true
+            workspaceProc.running = true
+            occupiedProc.running = true
         }
     }
 
     Variants {
-        // model: Quickshell.screens
-		model: Quickshell.screens.filter(s => s.name === "DP-1")
+        model: Quickshell.screens
 
         PanelWindow {
             property var modelData
@@ -238,19 +277,17 @@ ShellRoot {
 
                     Item { width: 8 }
 
-					Rectangle {
-						Layout.preferredWidth: 30
-						Layout.preferredHeight: 24
-						color: "transparent"
+                    Rectangle {
+                        Layout.preferredWidth: 24
+                        Layout.preferredHeight: 24
+                        color: "transparent"
 
-						Text {
-							text: ""
-							color: root.colCyan 
-							font.pixelSize: 16
-							font.family: "JetBrainsMono Nerd Font"
-							anchors.centerIn: parent
-						}
-					}
+                        Image {
+                            anchors.fill: parent
+                            source: "file:///home/tony/.config/quickshell/icons/tonybtw.png"
+                            fillMode: Image.PreserveAspectFit
+                        }
+                    }
 
                     Item { width: 8 }
 
@@ -262,9 +299,8 @@ ShellRoot {
                             Layout.preferredHeight: parent.height
                             color: "transparent"
 
-                            property var workspace: Hyprland.workspaces.values.find(ws => ws.id === index + 1) ?? null
-                            property bool isActive: Hyprland.focusedWorkspace?.id === (index + 1)
-                            property bool hasWindows: workspace !== null
+                            property bool isActive: focusedWorkspace === (index + 1)
+                            property bool hasWindows: occupiedWorkspaces.indexOf(index + 1) !== -1
 
                             Text {
                                 text: index + 1
@@ -285,7 +321,11 @@ ShellRoot {
 
                             MouseArea {
                                 anchors.fill: parent
-                                onClicked: Hyprland.dispatch("workspace " + (index + 1))
+                                onClicked: {
+                                    var proc = Qt.createQmlObject('import Quickshell.Io; Process { }', parent)
+                                    proc.command = ["swaymsg", "workspace", String(index + 1)]
+                                    proc.running = true
+                                }
                             }
                         }
                     }
