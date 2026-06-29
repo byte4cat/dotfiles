@@ -10,9 +10,10 @@ return {
 		},
 		event = { "BufReadPre", "BufNewFile" },
 		config = function()
+			local mason = require("mason")
+
 			vim.env.PATH = vim.fn.stdpath("data") .. "/mason/bin:" .. vim.env.PATH
 
-			local mason = require("mason")
 			local mason_lspconfig = require("mason-lspconfig")
 			local mason_tool_installer = require("mason-tool-installer")
 			local cmp_lsp = require("cmp_nvim_lsp")
@@ -45,6 +46,7 @@ return {
 				"yamlls",
 				"zls",
 				-- "volar",
+				"qmlls",
 			}
 
 			-- Formatters & Linters

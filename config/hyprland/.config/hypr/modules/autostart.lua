@@ -23,9 +23,10 @@ hl.on("hyprland.start", function()
 	exec("awww-daemon")
 	exec("/usr/lib/polkit-kde-authentication-agent-1")
 	exec("gnome-keyring-daemon --start --components=secrets,pkcs11,ssh")
+	exec("tomat daemon start")
 
 	-- UI 相關應用
-	exec("byte4work-launch-waybar")
+	-- exec("byte4work-launch-waybar")
 	exec("swaync")
 	exec("fcitx5 -d")
 	exec("elephant")
@@ -46,6 +47,7 @@ hl.on("hyprland.start", function()
 
 	-- 特定 Workspace 預載應用
 	exec("sleep 3")
+	exec("quickshell --config $HOME/.config/quickshell/hyprland/")
 	-- 終端機與 tmux
 	exec(
 		"[workspace special:scratchpadterm] "

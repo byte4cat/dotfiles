@@ -2,13 +2,11 @@
 # 'content' 比較柔和，'vibrant' 比較鮮豔
 color_mode = "content"
 
-# NOTE: DONE
 [templates.gtk3]
 input_path = '~/.config/matugen/templates/gtk-colors.css'
 output_path = '~/.config/gtk-3.0/colors.css'
 post_hook = 'gsettings set org.gnome.desktop.interface gtk-theme ""; gsettings set org.gnome.desktop.interface gtk-theme adw-gtk3-dark'
 
-# NOTE: DONE
 [templates.gtk4]
 input_path = '~/.config/matugen/templates/gtk-colors.css'
 output_path = '~/.config/gtk-4.0/colors.css'
@@ -18,7 +16,6 @@ post_hook = '~/.config/matugen/post-hook-scripts/gtk-themes-reload'
 # input_path = '~/.config/matugen/templates/qt.conf'
 # output_path = '/tmp/qt/colors.conf'
 
-# NOTE: DONE
 [templates.waybar]
 input_path = '~/.config/matugen/templates/waybar-V7.1.css'
 output_path = '~/.config/waybar/style.css'
@@ -28,6 +25,10 @@ post_hook = 'pkill -SIGUSR2 waybar'
 input_path = '~/.config/matugen/templates/hyprland-colors.lua'
 output_path = '~/.config/hypr/modules/colors.lua'
 post_hook = 'hyprctl reload'
+
+[templates.quickshell]
+input_path = '~/.config/matugen/templates/qs-color.json'
+output_path = '~/.config/quickshell/generated/color.json'
 
 [templates.yazi]
 input_path = '~/.config/matugen/templates/yazi-theme.toml'
