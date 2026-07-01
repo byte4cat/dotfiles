@@ -10,8 +10,8 @@ export GOPATH="$HOME/go"
 export PATH="$PATH:$GOPATH/bin"
 # Rust
 export PATH="$HOME/.cargo/bin:$PATH"
-# Node (NVM) lazy load
-export NVM_DIR="$HOME/.nvm"
+# Node
+eval "$(fnm env --use-on-cd --shell zsh)"
 # Bun & Flutter
 export BUN_INSTALL="$HOME/.bun"
 export PATH="$BUN_INSTALL/bin:$HOME/flutter/bin:$HOME/.pub-cache/bin:$PATH"
@@ -112,19 +112,6 @@ gacp() {
     git add -A && git commit -m "${1?'Missing commit message'}" && git push
 }
 
-
-_load_nvm() {
-    [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-    [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
-}
-nvm() {
-    unset -f nvm node npm npx
-    _load_nvm
-    nvm "$@"
-}
-node() { unset -f nvm node npm npx; _load_nvm; node "$@"; }
-npm() { unset -f nvm node npm npx; _load_nvm; npm "$@"; }
-npx() { unset -f nvm node npm npx; _load_nvm; npx "$@"; }
 
 alias ls='eza --icons --group-directories-first'
 alias ll='eza -la --icons --git --group-directories-first'

@@ -46,6 +46,6 @@ hl.window_rule({
 		class = "^(com\\.mitchellh\\.ghostty|Alacritty|kitty|foot)$",
 		fullscreen = "1",
 	},
-	opacity = "0.90 override 0.90 override",
+	opacity = "0.80 override 0.80 override 0.80 override",
 	no_blur = false,
 })
