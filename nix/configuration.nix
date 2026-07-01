@@ -67,7 +67,7 @@
 
   # Enable the KDE Plasma Desktop Environment.
   services.displayManager.sddm.enable = true;
-  services.desktopManager.plasma6.enable = true;
+  # services.desktopManager.plasma6.enable = true;
 
   # Configure keymap in X11
   services.xserver.xkb = {
@@ -94,6 +94,26 @@
     #media-session.enable = true;
   };
 
+  fonts.packages = with pkgs; [
+    # Nerd Fonts
+    (nerdfonts.override { fonts = [ "JetBrainsMono" "Meslo" ]; })
+
+    # 中文字體
+    noto-fonts-cjk-sans
+    noto-fonts-cjk-serif
+    source-han-sans
+    source-han-serif
+  ];
+
+  fonts.fontconfig = {
+    enable = true;
+    defaultFonts = {
+      serif = [ "Noto Serif CJK SC" "Noto Serif" ];
+      sansSerif = [ "Noto Sans CJK SC" "Noto Sans" ];
+      monospace = [ "JetBrainsMono Nerd Font" ];
+    };
+  };
+
   # Enable touchpad support (enabled default in most desktopManager).
   # services.xserver.libinput.enable = true;
 
@@ -101,7 +121,7 @@
   users.users."neil" = {
     isNormalUser = true;
     description = "neil";
-    extraGroups = [ "networkmanager" "wheel" "video", "render" ];
+    extraGroups = [ "networkmanager" "wheel" "video" "render" ];
     packages = with pkgs; [
       kdePackages.kate
     ];
@@ -134,12 +154,13 @@
     # desktop tool
     adw-gtk3 nwg-look dunst waybar yazi libnotify
     grim slurp satty wl-clipboard brightnessctl playerctl
+	quickshell matugen
 
     # media
     vlc ffmpeg libva-utils libvdpau
 
     # apps
-    ghostty
+    ghostty kitty
 
   ];
 
