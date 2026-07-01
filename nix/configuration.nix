@@ -101,7 +101,7 @@
   users.users."neil" = {
     isNormalUser = true;
     description = "neil";
-    extraGroups = [ "networkmanager" "wheel" ];
+    extraGroups = [ "networkmanager" "wheel" "video", "render" ];
     packages = with pkgs; [
       kdePackages.kate
     ];
@@ -116,6 +116,7 @@
   xdg.portal = {
     enable = true;
     extraPortals = [ pkgs.xdg-desktop-portal-hyprland ];
+	config.common.default = "hyprland";
   };
 
   programs.zsh.enable = true;
@@ -125,7 +126,7 @@
   # $ nix search wget
   environment.systemPackages = with pkgs; [
     # basic
-    git gnumake ccache p7zip unzip wget curl jq ripgrep fd bat eza tree btop htop ncdu
+    git stow gnumake ccache p7zip unzip wget curl jq ripgrep fd bat eza tree btop htop ncdu
 
     # devtool
     gdb lld rustup go starship fnm neovim
@@ -145,7 +146,7 @@
   environment.sessionVariables = {
     NIXOS_OZONE_WL = "1";
     MOZ_ENABLE_WAYLAND = "1";
-    GDK_BACKEND = "wayland";
+    # GDK_BACKEND = "wayland";
   };
 
   # Some programs need SUID wrappers, can be configured further or are
