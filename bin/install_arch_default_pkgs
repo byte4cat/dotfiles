@@ -59,7 +59,7 @@ sudo pacman -S --noconfirm --needed \
 	fastfetch matugen rofi-wayland swaync thunar thunar-archive-plugin file-roller \
 	qt5-wayland qt6-wayland polkit-kde-agent adw-gtk-theme nwg-look dunst waybar yazi libnotify \
 	quickshell cliphist xdg-desktop-portal-hyprland grim slurp satty wl-clipboard \
-	brightnessctl playerctl swayosd awww
+	brightnessctl playerctl swayosd awww stow
 pgrep -x awww-daemon >/dev/null || nohup awww-daemon >/dev/null 2>&1 &
 
 info "=== AUR Custom Targets (yay) ==="
