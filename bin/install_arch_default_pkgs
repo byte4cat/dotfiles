@@ -70,7 +70,7 @@ yay -S --noconfirm --needed \
 	walker-bin \
 	fcitx5-mcbopomofo-git \
 	another-redis-desktop-manager-bin \
-	bruno \
+	bruno-bin \
 	postman-bin \
 	freelens-bin \
 	localsend-bin \
@@ -113,6 +113,11 @@ sudo pacman -S --noconfirm --needed zsh-autosuggestions zsh-history-substring-se
 
 # Setup Tmux Plugin Manager
 [ ! -d "$HOME/.tmux/plugins/tpm" ] && git clone https://github.com/tmux-plugins/tpm "$HOME/.tmux/plugins/tpm"
+
+# Generate matugen colors
+DEFAULT_WALLPAPER="$HOME/dotfiles/config/wallpapers/.local/share/wallpapers/wp12195667-arch-linux-4k-wallpapers.jpg"
+matugen image $DEFAULT_WALLPAPER --quiet
+awww img $DEFAULT_WALLPAPER
 
 # Install main applications
 sudo pacman -S --noconfirm --needed ghostty awww firefox
