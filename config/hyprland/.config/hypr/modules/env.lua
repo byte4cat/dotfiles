@@ -32,7 +32,17 @@ hl.env("HYPRSHOT_DIR", home .. "/Pictures/Screenshots")
 hl.env("SCREENSHOT_DIR", home .. "/Pictures/Screenshots")
 
 hl.env("TERMINAL", p.terminal)
-hl.env("PATH", home .. "/.local/bin/wayland:" .. home .. "/.local/private/bin:/usr/local/bin:/usr/bin")
+hl.env(
+	"PATH",
+	home
+		.. "/.local/bin/wayland:"
+		.. home
+		.. "/.local/bin/common:"
+		.. home
+		.. "/.local/bin/hyprland:"
+		.. home
+		.. "/.local/private/bin:/usr/local/bin:/usr/bin"
+)
 
 hl.env("GDK_BACKEND", "wayland")
 hl.env("QT_QPA_PLATFORM", "wayland")

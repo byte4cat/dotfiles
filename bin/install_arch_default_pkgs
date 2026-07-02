@@ -1,95 +1,117 @@
 #!/usr/bin/env bash
 
 # ==============================================================================
-# Arch Linux System Core Component Installer
+# Arch Linux System Deployment Script
 # ==============================================================================
 set -euo pipefail
 
+# Load environment and common library functions
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 DOTFILES_DIR="$(dirname "$SCRIPT_DIR")"
 source "$DOTFILES_DIR/lib/common"
 
-# System Upgrade & Base Layer
-info "=== System Base & Build Layer ==="
-if confirm "Would you like to perform a full system upgrade now?"; then
+# System Base & Build Layer
+info "=== [1/7] System Base & Build Layer ==="
+if confirm "Perform a full system upgrade?"; then
 	sudo pacman -Syu --noconfirm
 fi
-sudo pacman -S --noconfirm --needed git base-devel ccache linux-headers p7zip unzip tar
+sudo pacman -S --noconfirm --needed git base-devel ccache linux-headers p7zip unrar unzip tar
 
 # AUR Helper (yay)
 if ! command -v yay &>/dev/null; then
-	info "=== Installing yay ==="
+	info "Installing yay..."
 	_tmp_dir=$(mktemp -d /tmp/yay-build-XXXXXX)
-	cd_or_error "$_tmp_dir"
-	git clone https://aur.archlinux.org/yay.git .
-	makepkg -si --noconfirm
-	cd - >/dev/null && rm -rf "$_tmp_dir"
-else
-	success "yay is already installed."
+	git clone https://aur.archlinux.org/yay.git "$_tmp_dir"
+	(cd "$_tmp_dir" && makepkg -si --noconfirm)
+	rm -rf "$_tmp_dir"
 fi
 
-# System Ecosystem, Audio, & Networking
-info "=== System Ecosystem & Networking ==="
+# Developer Tooling (Compilers & Core Dependencies)
+info "=== [2/7] Developer Tooling ==="
 sudo pacman -S --noconfirm --needed \
-	networkmanager network-manager-applet bluez bluez-utils \
-	pipewire wireplumber pipewire-pulse pipewire-alsa \
+	cmake meson ninja gcc clang make pkg-config libxkbcommon \
+	libinput libxcb xcb-util xcb-util-keysyms xcb-util-wm xcb-util-renderutil \
+	zsh rustup tmux gdb lld vlc go starship fnm code neovim docker docker-compose docker-buildx
+rustup default stable
+sudo systemctl enable --now docker
+# Add user to docker group if not already present
+if ! getent group docker | grep -q "\b$USER\b"; then
+	sudo usermod -aG docker "$USER"
+	success "Added $USER to docker group (requires re-login)."
+fi
+
+# System Ecosystem, Audio & Networking
+info "=== [3/7] Ecosystem & Networking ==="
+sudo pacman -S --noconfirm --needed \
+	networkmanager network-manager-applet bluez bluez-utils fail2ban \
+	pipewire wireplumber pipewire-pulse pipewire-alsa pipewire-jack gst-plugin-pipewire \
 	openssh curl jq ripgrep fd bat eza tree btop htop ncdu
 
-sudo systemctl enable --now NetworkManager bluetooth
-# Note: Pipewire is usually handled by user-space, no systemctl needed for session
+sudo systemctl enable --now NetworkManager bluetooth fail2ban
 
-# Desktop & Hyprland Infrastructure
-info "=== Desktop & Hyprland Helpers ==="
+# Desktop Environment (Hyprland Infrastructure)
+info "=== [4/7] Desktop Environment ==="
 sudo pacman -S --noconfirm --needed \
-	adw-gtk-theme nwg-look dunst waybar yazi libnotify \
-	xdg-desktop-portal-hyprland grim slurp satty wl-clipboard \
-	brightnessctl playerctl \
-	ttf-jetbrains-mono-nerd ttf-liberation noto-fonts-cjk noto-fonts-emoji noto-fonts-extra
+	fastfetch matugen rofi-wayland swaync walker thunar thunar-archive-plugin file-roller \
+	qt5-wayland qt6-wayland polkit-kde-agent adw-gtk-theme nwg-look dunst waybar yazi libnotify \
+	quickshell cliphist xdg-desktop-portal-hyprland grim slurp satty wl-clipboard \
+	brightnessctl playerctl swayosd
 
-# Developer Tooling (Rust / Node / C / Go)
-info "=== Developer Tooling ==="
-sudo pacman -S --noconfirm --needed zsh rustup tmux gdb lld vlc go starship
-rustup default stable
+info "=== AUR Custom Targets (yay) ==="
+yay -S --noconfirm --needed \
+	librewolf-bin \
+	fzf-tab \
+	hyprshade \
+	waypaper
 
-# ZSH Shell setup
-if [ "${SHELL:-}" != "/bin/zsh" ]; then
-	chsh -s /bin/zsh
+info "=== Installing Purchased Fonts ==="
+# Define the source of your purchased fonts
+PURCHASED_FONTS_DIR="$DOTFILES_DIR/private/fonts"
+
+if [ -d "$PURCHASED_FONTS_DIR" ]; then
+	# Create the user font directory
+	mkdir -p "$HOME/.local/share/fonts"
+
+	# Copy all font files (ttf, otf) to the local font folder
+	cp "$PURCHASED_FONTS_DIR"/*.{ttf,otf} "$HOME/.local/share/fonts/" 2>/dev/null || true
+
+	# Refresh the font cache so the system detects the new files
+	fc-cache -fv
+	success "Purchased fonts installed successfully."
+else
+	warn "Purchased fonts directory not found, skipping..."
 fi
+
+# Multimedia, Fonts & Input Methods
+info "=== [5/7] Multimedia, Fonts & Input ==="
+sudo pacman -S --noconfirm --needed \
+	ffmpeg mpv vlc-plugin-ffmpeg vlc-plugin-live555 vlc-plugins-all vlc-plugins-extra libva-utils libvdpau \
+	fcitx5-mcbopomofo fcitx5-chinese-addons fcitx5-configtool fcitx5-gtk rime-double-pinyin \
+	ttf-jetbrains-mono-nerd ttf-liberation noto-fonts-cjk noto-fonts-emoji noto-fonts-extra \
+	otf-font-awesome ttf-font-awesome
+
+# Shell Configuration & Finalization
+info "=== [6/7] Finalizing Environment ==="
+# Set ZSH as default shell
+[ "${SHELL:-}" != "/bin/zsh" ] && chsh -s /bin/zsh
 sudo pacman -S --noconfirm --needed zsh-autosuggestions zsh-history-substring-search zsh-syntax-highlighting
 
-# NVM Environment
-export NVM_DIR="$HOME/.nvm"
-if [ ! -d "$NVM_DIR" ]; then
-	curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh | bash
-fi
-[ -s "$NVM_DIR/nvm.sh" ] && source "$NVM_DIR/nvm.sh" && nvm install --lts
-
-# Multimedia & Input
-info "=== Multimedia & Input ==="
-sudo pacman -S --noconfirm --needed \
-	vlc-plugin-ffmpeg vlc-plugin-live555 vlc-plugins-all vlc-plugins-extra libva-utils libvdpau \
-	fcitx5-chewing fcitx5-chinese-addons fcitx5-configtool fcitx5-gtk rime-double-pinyin
-
-# Applications
-info "=== Applications ==="
-sudo pacman -S --noconfirm --needed ghostty awww firefox
+# Setup Node.js via FNM
+fnm install --lts
 
 # Setup Tmux Plugin Manager
-if [ ! -d "$HOME/.tmux/plugins/tpm" ]; then
-	git clone https://github.com/tmux-plugins/tpm "$HOME/.tmux/plugins/tpm"
-fi
+[ ! -d "$HOME/.tmux/plugins/tpm" ] && git clone https://github.com/tmux-plugins/tpm "$HOME/.tmux/plugins/tpm"
 
-# NOTE: Commented out due to recent AUR security alerts / supply chain risks
-# info "=== AUR Custom Targets (yay) ==="
-# yay -S --noconfirm --needed \
-#      fcitx5-mcbopomofo-git \
-#      swayosd-git \
-#      librewolf-bin \
-#	   fzf-tab \
-#  	   hyprshade \
-#  	   waypaper
+# Install main applications
+sudo pacman -S --noconfirm --needed ghostty awww firefox
+
+# Environment Health Check
+info "=== [7/7] Environment Check ==="
+for service in NetworkManager bluetooth fail2ban; do
+	systemctl is-active --quiet "$service" && success "$service is running." || warn "$service is NOT running!"
+done
 
 success "========================================="
 success "🎉 System deployment completed successfully!"
-success "Please log out and log back in to finalize environment settings."
+success "Please log out and log back in to apply all changes."
 success "========================================="

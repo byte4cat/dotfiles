@@ -90,6 +90,20 @@ stow_dotfiles() {
 		"librewolf"
 	)
 
+	# Directories that system might auto-create, so we force-delete them
+	# before stowing to avoid "already exists" errors.
+	local force_dirs=(
+		"$HOME/.config/gtk-3.0"
+		"$HOME/.config/gtk-4.0"
+	)
+
+	for dir in "${force_dirs[@]}"; do
+		if [ -d "$dir" ] && [ ! -L "$dir" ]; then
+			info "  > Removing pre-existing directory to allow stow: $dir"
+			rm -rf "$dir"
+		fi
+	done
+
 	info "Stowing dotfiles from: $DOTFILES_DIR"
 	[ -d "config" ] || error "'stow' directory not found."
 	info "Stowing config packages..."

@@ -49,6 +49,7 @@ evtest
 eza
 fail2ban
 fastfetch
+fcitx5-chewing
 fcitx5-chinese-addons
 fcitx5-configtool
 fcitx5-gtk
@@ -58,6 +59,7 @@ ffmpegthumbnailer
 file-roller
 firefox
 flatpak
+fnm
 foot
 gamescope
 ghex
@@ -133,7 +135,6 @@ mingw-w64-gcc
 mold
 mosh
 nano
-nautilus
 ncdu
 neovim
 networkmanager
@@ -180,6 +181,7 @@ qt5-webchannel
 qt5-webengine
 qt6-virtualkeyboard
 qt6-wayland
+quickshell
 radeontop
 reflector
 remmina
@@ -230,6 +232,7 @@ tumbler
 turbostat
 ueberzugpp
 ufw
+unixodbc
 usbip
 uv
 uwsm
@@ -254,6 +257,7 @@ wget
 wireless_tools
 wireplumber
 wlogout
+wlroots0.19
 wofi
 wpa_supplicant
 wqy-zenhei

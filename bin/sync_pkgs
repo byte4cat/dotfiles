@@ -1,42 +1,32 @@
 #!/bin/bash
-
-# Exit immediately if a command exits with a non-zero status,
-# treat unset variables as an error, and catch errors in pipelines.
 set -euo pipefail
 
-# Get the script's actual path using BASH_SOURCE
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REQUIREMENTS_DIR="$(dirname "$SCRIPT_DIR")/requirements"
 
-# Ensure the requirements directory exists
 mkdir -p "$REQUIREMENTS_DIR"
 
 echo "Analyzing system packages..."
 
-# Temporary files for fast set operations
-TMP_EXPLICIT=$(mktemp)
-TMP_REPOS=$(mktemp)
+# 1. 取得所有明確安裝（Explicitly installed）的包
+# -Qeq 只列出明確安裝的非依賴包
+# 這裡我們加上 grep -v 用來過濾掉你不想自動保存的開發調試包
+yay -Qeq | grep -vE '\-(debug|git|svn|hg|bzr)$' | sort >/tmp/explicit_pkgs.txt
 
-# Clean up temporary files on script exit
-trap 'rm -f "$TMP_EXPLICIT" "$TMP_REPOS"' EXIT
+# 2. 取得官方倉庫中的所有包
+pacman -Slq | sort -u >/tmp/repo_pkgs.txt
 
-# Get sorted list of all explicitly installed packages
-yay -Qeq | sort >"$TMP_EXPLICIT"
+# 3. 生成官方包列表 (交集)
+comm -12 /tmp/explicit_pkgs.txt /tmp/repo_pkgs.txt >"$REQUIREMENTS_DIR/pacman_list.txt"
 
-# Dynamically get all unique package names available in active synced repositories
-# (Automatically covers core, extra, multilib, and ALL CachyOS architecture repos)
-pacman -Slq | sort -u >"$TMP_REPOS"
+# 4. 生成 AUR 包列表 (差異集)
+# 使用 comm -23，從明確安裝列表中排除掉官方倉庫已有的包，剩下的就是 AUR/Foreign
+comm -23 /tmp/explicit_pkgs.txt /tmp/repo_pkgs.txt | grep -vE '\-(debug|git|svn|hg|bzr)$' >"$REQUIREMENTS_DIR/aur_list.txt"
 
-echo "Generating pacman_list.txt (Official/Synced Repos)..."
-# comm -12 outputs lines common to both files (Intersection)
-comm -12 "$TMP_EXPLICIT" "$TMP_REPOS" >"$REQUIREMENTS_DIR/pacman_list.txt"
-
-echo "Generating aur_list.txt (AUR/Foreign)..."
-# Filter out *-debug packages right from the start
-yay -Qmq | grep -v '\-debug$' | sort >"$REQUIREMENTS_DIR/aur_list.txt"
+# 清理
+rm /tmp/explicit_pkgs.txt /tmp/repo_pkgs.txt
 
 echo "----------------------------------------"
-echo "Update complete!"
-echo "- Official Repos: $REQUIREMENTS_DIR/pacman_list.txt"
-echo "- AUR Packages:   $REQUIREMENTS_DIR/aur_list.txt"
-echo "Please review the generated files and manually remove any unwanted packages."
+echo "Success! Packages categorized:"
+echo "- Official Repos: $(wc -l <"$REQUIREMENTS_DIR/pacman_list.txt") packages"
+echo "- AUR Packages:   $(wc -l <"$REQUIREMENTS_DIR/aur_list.txt") packages"
