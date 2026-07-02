@@ -254,6 +254,7 @@ ShellRoot {
 
                     Item { width: 8 }
 
+
                     Repeater {
                         model: 9
 
@@ -262,24 +263,25 @@ ShellRoot {
                             Layout.preferredHeight: parent.height
                             color: "transparent"
 
-							property var workspace: null
 
-							Connections {
-								target: Hyprland
-								function onWorkspaceAdded(id) { updateWorkspace() }
-								function onWorkspaceRemoved(id) { updateWorkspace() }
-								function onWorkspaceMoved(id) { updateWorkspace() }
+							function getWorkspace(id) {
+								for (let i = 0; i < Hyprland.workspaces.count; i++) {
+									let ws = Hyprland.workspaces.get(i);
+									if (ws.id === id) return ws;
+								}
+								return null;
 							}
 
-							Component.onCompleted: updateWorkspace()
-
-							function updateWorkspace() {
-								var ws = Hyprland.workspaces.get(index + 1)
-								workspace = ws
+							property var ws: {
+								for (let i = 0; i < Hyprland.workspaces.count; i++) {
+									let w = Hyprland.workspaces.get(i);
+									if (w.id === index + 1) return w;
+								}
+								return null;
 							}
 
-                            property bool isActive: Hyprland.focusedWorkspace?.id === (index + 1)
-                            property bool hasWindows: workspace !== null
+							property bool isActive: Hyprland.focusedWorkspace?.id === (index + 1)
+							property bool hasWindows: ws !== null && ws.windows > 0
 
                             Text {
                                 text: index + 1
