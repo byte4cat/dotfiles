@@ -262,7 +262,22 @@ ShellRoot {
                             Layout.preferredHeight: parent.height
                             color: "transparent"
 
-                            property var workspace: Hyprland.workspaces.values.find(ws => ws.id === index + 1) ?? null
+							property var workspace: null
+
+							Connections {
+								target: Hyprland
+								function onWorkspaceAdded(id) { updateWorkspace() }
+								function onWorkspaceRemoved(id) { updateWorkspace() }
+								function onWorkspaceMoved(id) { updateWorkspace() }
+							}
+
+							Component.onCompleted: updateWorkspace()
+
+							function updateWorkspace() {
+								var ws = Hyprland.workspaces.get(index + 1)
+								workspace = ws
+							}
+
                             property bool isActive: Hyprland.focusedWorkspace?.id === (index + 1)
                             property bool hasWindows: workspace !== null
 
