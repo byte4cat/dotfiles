@@ -52,7 +52,7 @@ sudo systemctl enable --now NetworkManager bluetooth fail2ban
 # Desktop Environment (Hyprland Infrastructure)
 info "=== [4/7] Desktop Environment ==="
 sudo pacman -S --noconfirm --needed \
-	fastfetch matugen rofi-wayland swaync walker thunar thunar-archive-plugin file-roller \
+	fastfetch matugen rofi-wayland swaync thunar thunar-archive-plugin file-roller \
 	qt5-wayland qt6-wayland polkit-kde-agent adw-gtk-theme nwg-look dunst waybar yazi libnotify \
 	quickshell cliphist xdg-desktop-portal-hyprland grim slurp satty wl-clipboard \
 	brightnessctl playerctl swayosd
@@ -62,7 +62,9 @@ yay -S --noconfirm --needed \
 	librewolf-bin \
 	fzf-tab \
 	hyprshade \
-	waypaper
+	waypaper \
+	walker \
+	fcitx5-mcbopomofo-git
 
 info "=== Installing Purchased Fonts ==="
 # Define the source of your purchased fonts
@@ -86,7 +88,7 @@ fi
 info "=== [5/7] Multimedia, Fonts & Input ==="
 sudo pacman -S --noconfirm --needed \
 	ffmpeg mpv vlc-plugin-ffmpeg vlc-plugin-live555 vlc-plugins-all vlc-plugins-extra libva-utils libvdpau \
-	fcitx5-mcbopomofo fcitx5-chinese-addons fcitx5-configtool fcitx5-gtk rime-double-pinyin \
+	fcitx5-chinese-addons fcitx5-configtool fcitx5-gtk rime-double-pinyin \
 	ttf-jetbrains-mono-nerd ttf-liberation noto-fonts-cjk noto-fonts-emoji noto-fonts-extra \
 	otf-font-awesome ttf-font-awesome
 
