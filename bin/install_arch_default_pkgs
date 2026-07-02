@@ -74,11 +74,11 @@ yay -S --noconfirm --needed \
 	networkmanager-fortisslvpn \
 	spotify \
 	another-redis-desktop-manager-bin \
-	wombat-bin \
 	bruno-bin \
 	postman-bin \
 	freelens-bin \
 	localsend-bin
+# wombat-bin # required webkit2gtk
 
 info "=== Installing Purchased Fonts ==="
 # Define the source of your purchased fonts
