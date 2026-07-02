@@ -32,7 +32,11 @@ sudo pacman -S --noconfirm --needed \
 	cmake meson ninja gcc clang make pkg-config libxkbcommon \
 	libinput libxcb xcb-util xcb-util-keysyms xcb-util-wm xcb-util-renderutil \
 	zsh rustup tmux gdb lld vlc go starship fnm code neovim docker docker-compose docker-buildx
+# Setup Node.js via FNM
+fnm install --lts
+# Setup Rust
 rustup default stable
+# Setup docker
 sudo systemctl enable --now docker
 # Add user to docker group if not already present
 if ! getent group docker | grep -q "\b$USER\b"; then
@@ -63,8 +67,17 @@ yay -S --noconfirm --needed \
 	fzf-tab \
 	hyprshade \
 	waypaper \
-	walker \
-	fcitx5-mcbopomofo-git
+	walker-bin \
+	fcitx5-mcbopomofo-git \
+	another-redis-desktop-manager-bin \
+	bruno \
+	postman-bin \
+	freelens-bin \
+	localsend-bin \
+	mongodb-compass-bin \
+	networkmanager-fortisslvpn \
+	spotify \
+	wombat-bin
 
 info "=== Installing Purchased Fonts ==="
 # Define the source of your purchased fonts
@@ -97,9 +110,6 @@ info "=== [6/7] Finalizing Environment ==="
 # Set ZSH as default shell
 [ "${SHELL:-}" != "/bin/zsh" ] && chsh -s /bin/zsh
 sudo pacman -S --noconfirm --needed zsh-autosuggestions zsh-history-substring-search zsh-syntax-highlighting
-
-# Setup Node.js via FNM
-fnm install --lts
 
 # Setup Tmux Plugin Manager
 [ ! -d "$HOME/.tmux/plugins/tpm" ] && git clone https://github.com/tmux-plugins/tpm "$HOME/.tmux/plugins/tpm"
