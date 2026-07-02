@@ -33,8 +33,10 @@ sudo pacman -S --noconfirm --needed \
 	libinput libxcb xcb-util xcb-util-keysyms xcb-util-wm xcb-util-renderutil \
 	zsh rustup tmux gdb lld vlc go starship fnm code neovim docker docker-compose docker-buildx
 # Setup Node.js via FNM
+eval "$(fnm env --use-on-cd)"
 fnm install --lts
 # Setup Rust
+source "$HOME/.cargo/env"
 rustup default stable
 # Setup docker
 sudo systemctl enable --now docker
@@ -59,8 +61,7 @@ sudo pacman -S --noconfirm --needed \
 	fastfetch matugen rofi-wayland swaync thunar thunar-archive-plugin file-roller \
 	qt5-wayland qt6-wayland polkit-kde-agent adw-gtk-theme nwg-look dunst waybar yazi libnotify \
 	quickshell cliphist xdg-desktop-portal-hyprland grim slurp satty wl-clipboard \
-	brightnessctl playerctl swayosd awww stow zoxide
-pgrep -x awww-daemon >/dev/null || nohup awww-daemon >/dev/null 2>&1 &
+	brightnessctl playerctl swayosd awww stow zoxide gnome-disk-utility
 
 info "=== AUR Custom Targets (yay) ==="
 yay -S --noconfirm --needed \
@@ -78,7 +79,17 @@ yay -S --noconfirm --needed \
 	postman-bin \
 	freelens-bin \
 	localsend-bin
-# wombat-bin # required webkit2gtk
+# wombat-bin # required webkit2gtk, outdated (project archive) since 2021.
+
+# Waypaper default state file
+# If this file doesn't exist, the hotkey script (Super+W) won't work.
+WAYPAPER_DIR="$HOME/.local/state/waypaper"
+WAYPAPER_STATE_FILE="$WAYPAPER_DIR/default.toml"
+if [ ! -f "$WAYPAPER_STATE_FILE" ]; then
+	mkdir -p "$WAYPAPER_DIR"
+	touch "$WAYPAPER_STATE_FILE"
+	echo "Created empty Waypaper default state file: $WAYPAPER_STATE_FILE"
+fi
 
 info "=== Installing Purchased Fonts ==="
 # Define the source of your purchased fonts
@@ -109,7 +120,7 @@ sudo pacman -S --noconfirm --needed \
 # Shell Configuration & Finalization
 info "=== [6/7] Finalizing Environment ==="
 # Set ZSH as default shell
-[ "${SHELL:-}" != "/bin/zsh" ] && chsh -s /bin/zsh
+[ "${SHELL:-}" != "/bin/zsh" ] && sudo chsh -s /bin/zsh "$USER" || true
 sudo pacman -S --noconfirm --needed zsh-autosuggestions zsh-history-substring-search zsh-syntax-highlighting
 
 # Setup Tmux Plugin Manager
@@ -117,8 +128,14 @@ sudo pacman -S --noconfirm --needed zsh-autosuggestions zsh-history-substring-se
 
 # Generate matugen colors
 DEFAULT_WALLPAPER="$HOME/dotfiles/config/wallpapers/.local/share/wallpapers/wp12195667-arch-linux-4k-wallpapers.jpg"
-matugen image $DEFAULT_WALLPAPER --quiet
-awww img $DEFAULT_WALLPAPER
+if [ -f "$DEFAULT_WALLPAPER" ]; then
+	matugen image "$DEFAULT_WALLPAPER" --quiet
+	# Launch awww-daemon if it's not running
+	pgrep -x awww-daemon >/dev/null || nohup awww-daemon >/dev/null 2>&1 &
+	awww img "$DEFAULT_WALLPAPER"
+else
+	warn "Wallpaper not found at $DEFAULT_WALLPAPER, skipping matugen initialization."
+fi
 
 # Install main applications
 sudo pacman -S --noconfirm --needed ghostty awww firefox
