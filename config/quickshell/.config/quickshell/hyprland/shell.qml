@@ -302,7 +302,9 @@ ShellRoot {
 
                             MouseArea {
                                 anchors.fill: parent
-                                onClicked: Hyprland.dispatch("workspace " + (index + 1))
+								onClicked: {
+									Hyprland.dispatch("hl.dsp.focus({ workspace = " + (index + 1) + " })");
+								}
                             }
                         }
                     }
