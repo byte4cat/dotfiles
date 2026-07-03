@@ -36,7 +36,7 @@ hl.config({
 			ignore_opacity = true,
 			noise = 0.08,
 			contrast = 1.5,
-			xray = true,
+			xray = false,
 			new_optimizations = true,
 		},
 	},

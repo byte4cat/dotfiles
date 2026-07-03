@@ -193,9 +193,37 @@ hl.bind(mainMod .. " + CONTROL + SHIFT + 3", sh_exec(satty_slurp))
 -- =====
 -- ZOOM
 -- =====
-hl.bind(mainMod .. " + equal", hl.dsp.exec_cmd("hyprctl keyword cursor:zoom_factor 1.5"), { repeating = true })
-hl.bind(mainMod .. " + minus", hl.dsp.exec_cmd("hyprctl keyword cursor:zoom_factor 1.0"), { repeating = true })
-hl.bind(mainMod .. " + SHIFT + 0", hl.dsp.exec_cmd("hyprctl keyword cursor:zoom_factor 1"))
+
+local function adjust_zoom(factor)
+	hl.config({ cursor = { zoom_factor = factor } })
+end
+
+local current_zoom = 1.0
+local function apply_zoom(multiplier)
+	current_zoom = math.max(1.0, math.min(5.0, current_zoom * multiplier))
+	adjust_zoom(current_zoom)
+end
+
+hl.bind(mainMod .. " + equal", function()
+	apply_zoom(1.1)
+end, { repeating = true })
+
+hl.bind(mainMod .. " + minus", function()
+	apply_zoom(0.9)
+end, { repeating = true })
+
+-- Reset
+hl.bind(mainMod .. " + SHIFT + 0", function()
+	current_zoom = 1.0
+	adjust_zoom(1.0)
+end)
+
+hl.bind(mainMod .. " + mouse_up", function()
+	apply_zoom(0.9)
+end)
+hl.bind(mainMod .. " + mouse_down", function()
+	apply_zoom(1.1)
+end)
 
 -- =====================
 -- MULTIMEDIA & SWAYOSD
