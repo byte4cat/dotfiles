@@ -15,7 +15,7 @@ info "=== [1/7] System Base & Build Layer ==="
 if confirm "Perform a full system upgrade?"; then
 	sudo pacman -Syu --noconfirm
 fi
-sudo pacman -S --noconfirm --needed git base-devel ccache linux-headers p7zip unrar unzip tar
+sudo pacman -S --noconfirm --needed git base-devel ccache linux-headers p7zip unrar unzip tar stow
 
 # AUR Helper (yay)
 if ! command -v yay &>/dev/null; then
@@ -47,12 +47,6 @@ if ! getent group docker | grep -q "\b$USER\b"; then
 	sudo usermod -aG docker "$USER"
 	success "Added $USER to docker group (requires re-login)."
 fi
-# Neovim background install
-info "Setting up neovim plugins and LSP servers"
-export PATH="$HOME/.fnm:$PATH"
-export PATH="$HOME/.cargo/bin:$PATH"
-nohup bash -c 'nvim --headless "+Lazy! sync" "+MasonInstallAll" +qa' >"$HOME/.local/state/nvim_install.log" 2>&1 &
-success "Neovim installation started in the background. Check logs at ~/.local/state/nvim_install.log"
 
 # System Ecosystem, Audio & Networking
 info "=== [3/7] Ecosystem & Networking ==="
@@ -69,7 +63,7 @@ sudo pacman -S --noconfirm --needed \
 	fastfetch matugen rofi-wayland swaync thunar thunar-archive-plugin file-roller \
 	qt5-wayland qt6-wayland polkit-kde-agent adw-gtk-theme nwg-look dunst waybar yazi libnotify \
 	quickshell cliphist xdg-desktop-portal-hyprland grim slurp satty wl-clipboard \
-	brightnessctl playerctl swayosd awww stow zoxide gnome-disk-utility
+	brightnessctl playerctl swayosd awww zoxide gnome-disk-utility
 
 info "=== AUR Custom Targets (yay) ==="
 yay -S --noconfirm --needed \
@@ -134,6 +128,23 @@ sudo pacman -S --noconfirm --needed zsh-autosuggestions zsh-history-substring-se
 # Setup Tmux Plugin Manager
 [ ! -d "$HOME/.tmux/plugins/tpm" ] && git clone https://github.com/tmux-plugins/tpm "$HOME/.tmux/plugins/tpm"
 
+if [ -f "$SCRIPT_DIR/sync_dotfiles" ]; then
+	chmod +x "$SCRIPT_DIR/sync_dotfiles"
+	rm -f "$HOME/.config/hypr/hyprland.lua"
+	bash "$SCRIPT_DIR/sync_dotfiles"
+else
+	warn "Stow script not found, please run it manually."
+fi
+
+# check if dotfile sync, so that neovim setting is right there
+# Neovim background install
+info "Setting up neovim plugins and LSP servers"
+export PATH="$HOME/.fnm:$PATH"
+export PATH="$HOME/.cargo/bin:$PATH"
+mkdir -p "$HOME/.local/state"
+nohup bash -c 'nvim --headless "+Lazy! sync" "+MasonUpdate" "+MasonInstallAll" +qa' >"$HOME/.local/state/nvim_install.log" 2>&1 &
+success "Neovim installation started in the background. Check logs at ~/.local/state/nvim_install.log"
+
 # Generate matugen colors
 DEFAULT_WALLPAPER="$HOME/dotfiles/config/wallpapers/.local/share/wallpapers/wp12195667-arch-linux-4k-wallpapers.jpg"
 if [ -f "$DEFAULT_WALLPAPER" ]; then
@@ -156,5 +167,7 @@ done
 
 success "========================================="
 success "🎉 System deployment completed successfully!"
+echo "Note: Neovim plugins are being installed in the background."
+echo "You can monitor progress with: tail -f ~/.local/state/nvim_install.log"
 success "Please log out and log back in to apply all changes."
 success "========================================="
