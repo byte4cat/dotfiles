@@ -11,6 +11,7 @@ return {
 		event = { "BufReadPre", "BufNewFile" },
 		config = function()
 			local mason = require("mason")
+			mason.setup()
 
 			vim.env.PATH = vim.fn.stdpath("data") .. "/mason/bin:" .. vim.env.PATH
 
@@ -261,8 +262,6 @@ return {
 					})
 				end,
 			})
-
-			mason.setup()
 
 			mason_lspconfig.setup({
 				ensure_installed = servers,

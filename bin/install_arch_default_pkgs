@@ -33,18 +33,26 @@ sudo pacman -S --noconfirm --needed \
 	libinput libxcb xcb-util xcb-util-keysyms xcb-util-wm xcb-util-renderutil \
 	zsh rustup tmux gdb lld vlc go starship fnm code neovim docker docker-compose docker-buildx
 # Setup Node.js via FNM
+info "Setting up nodejs tool chain"
 eval "$(fnm env --use-on-cd)"
 fnm install --lts
 # Setup Rust
-source "$HOME/.cargo/env"
+info "Setting up rustup tool chain"
 rustup default stable
 # Setup docker
+info "Setting up docker environment"
 sudo systemctl enable --now docker
 # Add user to docker group if not already present
 if ! getent group docker | grep -q "\b$USER\b"; then
 	sudo usermod -aG docker "$USER"
 	success "Added $USER to docker group (requires re-login)."
 fi
+# Neovim background install
+info "Setting up neovim plugins and LSP servers"
+export PATH="$HOME/.fnm:$PATH"
+export PATH="$HOME/.cargo/bin:$PATH"
+nohup bash -c 'nvim --headless "+Lazy! sync" "+MasonInstallAll" +qa' >"$HOME/.local/state/nvim_install.log" 2>&1 &
+success "Neovim installation started in the background. Check logs at ~/.local/state/nvim_install.log"
 
 # System Ecosystem, Audio & Networking
 info "=== [3/7] Ecosystem & Networking ==="

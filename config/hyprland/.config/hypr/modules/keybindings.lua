@@ -6,7 +6,6 @@
 local mainMod = (myEnv and myEnv.mainMod) or "SUPER"
 local secMod = (myEnv and myEnv.secMod) or "ALT"
 
--- 輔助函數：簡化 shell 呼叫（比單純 exec_cmd 更穩定處理複雜 pipe 組合）
 local function sh_exec(cmd)
 	return hl.dsp.exec_cmd("sh -c '" .. cmd .. "'")
 end
@@ -218,6 +217,7 @@ hl.bind(mainMod .. " + SHIFT + 0", function()
 	adjust_zoom(1.0)
 end)
 
+-- 滑鼠滾輪綁定
 hl.bind(mainMod .. " + mouse_up", function()
 	apply_zoom(0.9)
 end)
