@@ -36,7 +36,7 @@ hl.window_rule({
 	name = "terminal-transparent",
 	match = { class = "^(com\\.mitchellh\\.ghostty|Alacritty|kitty|foot)$" },
 	opacity = "0.80 override 0.80 override 0.80 override",
-	no_blur = false,
+	no_blur = true,
 })
 
 -- 終端機全螢幕時：稍微調低透明度以專注 (0.90)
@@ -47,5 +47,5 @@ hl.window_rule({
 		fullscreen = "1",
 	},
 	opacity = "0.80 override 0.80 override 0.80 override",
-	no_blur = false,
+	no_blur = true,
 })

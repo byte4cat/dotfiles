@@ -71,12 +71,24 @@ hl.window_rule({
 	size = { "(monitor_w * 0.5)", "(monitor_h * 0.5)" },
 })
 
+-- 2k resolution
+-- hl.window_rule({
+-- 	name = "babycam-window",
+-- 	match = { initial_title = "BabyCam" },
+-- 	monitor = myEnv.primaryMonitor,
+-- 	size = { 320, 180 },
+-- 	move = { "(monitor_w * 0.87)", "(monitor_h * 0.865)" },
+-- 	float = true,
+-- 	pin = true,
+-- })
+
+-- FHD resolution
 hl.window_rule({
 	name = "babycam-window",
 	match = { initial_title = "BabyCam" },
 	monitor = myEnv.primaryMonitor,
 	size = { 320, 180 },
-	move = { "(monitor_w * 0.87)", "(monitor_h * 0.865)" },
+	move = { "(monitor_w * 0.83)", "(monitor_h * 0.83)" },
 	float = true,
 	pin = true,
 })
