@@ -105,8 +105,8 @@ stow_dotfiles() {
 	done
 
 	local sources=(
-		"config"
-		"private/config"
+		"modules"
+		"private/modules"
 	)
 
 	info "Stowing dotfiles from: $DOTFILES_DIR"
