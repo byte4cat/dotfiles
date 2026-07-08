@@ -104,34 +104,38 @@ stow_dotfiles() {
 		fi
 	done
 
+	local sources=(
+		"config"
+		"private/config"
+	)
+
 	info "Stowing dotfiles from: $DOTFILES_DIR"
-	[ -d "config" ] || error "'stow' directory not found."
-	info "Stowing config packages..."
 
-	for pkg in config/*; do
-		[ -d "$pkg" ] || continue
-		pkg_name=$(basename "$pkg")
-
-		if [[ " ${skip_pkgs[*]} " =~ " ${pkg_name} " ]]; then
-			info "  > Skipping stowing for: $pkg_name (Handled by custom script)"
+	for source in "${sources[@]}"; do
+		if [ ! -d "$source" ]; then
+			if [[ "$source" == *"private"* ]]; then
+				warn "  ! Skipping $source (directory not found, skipping private configs)"
+			else
+				error "Source directory '$source' not found!"
+			fi
 			continue
 		fi
 
-		info "  > Stowing config: $pkg_name"
-		stow -d config -t "$HOME" --restow --no-folding "$pkg_name"
-	done
+		info "Stowing packages from: $source"
 
-	if [ -d "private" ]; then
-		info "Stowing private packages..."
+		for pkg in "$source"/*; do
+			[ -d "$pkg" ] || continue
+			local pkg_name=$(basename "$pkg")
 
-		for p_pkg in private/*; do
-			[ -d "$p_pkg" ] || continue
-			p_pkg_name=$(basename "$p_pkg")
+			if [[ " ${skip_pkgs[*]} " =~ " ${pkg_name} " ]]; then
+				info "  > Skipping: $pkg_name"
+				continue
+			fi
 
-			info "  > Stowing private: $p_pkg_name"
-			stow -d private -t "$HOME" --restow --no-folding "$p_pkg_name"
+			info "  > Stowing: $pkg_name"
+			stow -d "$source" -t "$HOME" --restow --no-folding "$pkg_name"
 		done
-	fi
+	done
 
 	success "✅ All dotfiles stowed successfully."
 }
