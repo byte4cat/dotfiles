@@ -47,5 +47,5 @@ hl.window_rule({
 		fullscreen = "1",
 	},
 	opacity = "0.80 override 0.80 override 0.80 override",
-	no_blur = true,
+	no_blur = false,
 })

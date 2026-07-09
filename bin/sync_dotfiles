@@ -18,7 +18,7 @@ cd_or_error "$DOTFILES_DIR"
 
 link_librewolf_css() {
 	local lw_config_dir="$HOME/.config/librewolf/librewolf"
-	local dotfiles_chrome_src="$DOTFILES_DIR/config/librewolf/chrome"
+	local dotfiles_chrome_src="$DOTFILES_DIR/modules/librewolf/chrome"
 
 	if [ -d "$lw_config_dir" ] && [ -d "$dotfiles_chrome_src" ]; then
 		info "🔗 Linking LibreWolf chrome to random profile(s)..."
@@ -46,7 +46,7 @@ link_librewolf_css() {
 
 link_firefox_css() {
 	local config_dir="$HOME/.mozilla/firefox"
-	local dotfiles_chrome_src="$DOTFILES_DIR/config/firefox/chrome"
+	local dotfiles_chrome_src="$DOTFILES_DIR/modules/firefox/chrome"
 
 	if [ -d "$config_dir" ] && [ -d "$dotfiles_chrome_src" ]; then
 		info "🔗 Linking Firefox chrome to random profile(s)..."

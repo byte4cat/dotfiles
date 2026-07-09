@@ -146,7 +146,7 @@ nohup bash -c 'nvim --headless "+Lazy! sync" "+MasonUpdate" "+MasonInstallAll" +
 success "Neovim installation started in the background. Check logs at ~/.local/state/nvim_install.log"
 
 # Generate matugen colors
-DEFAULT_WALLPAPER="$HOME/dotfiles/config/wallpapers/.local/share/wallpapers/wp12195667-arch-linux-4k-wallpapers.jpg"
+DEFAULT_WALLPAPER="$HOME/dotfiles/modules/wallpapers/.local/share/wallpapers/wp12195667-arch-linux-4k-wallpapers.jpg"
 if [ -f "$DEFAULT_WALLPAPER" ]; then
 	matugen image "$DEFAULT_WALLPAPER" --quiet
 	# Launch awww-daemon if it's not running

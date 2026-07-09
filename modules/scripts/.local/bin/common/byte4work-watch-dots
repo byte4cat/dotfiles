@@ -1,7 +1,7 @@
 #! /bin/zsh
 
 # watchdog, dotfiles sync
-WATCH_DIR="$DOTFILES_DIR/config"
+WATCH_DIR="$DOTFILES_DIR/modules"
 
 echo "👀 Watching $WATCH_DIR for changes..."
 
