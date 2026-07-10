@@ -29,7 +29,13 @@ return {
 			nerd_font_variant = "mono",
 		},
 
-		signature = { enabled = true },
+		signature = {
+			enabled = true,
+			window = {
+				border = "rounded",
+				winblend = 0,
+			},
+		},
 
 		snippets = {
 			preset = "luasnip",
