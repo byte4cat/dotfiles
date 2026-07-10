@@ -82,11 +82,18 @@ vim.keymap.set("n", "<leader>R", function()
 end, { noremap = true, silent = true, desc = "LSP Restart" })
 
 -- Nvim tree
+-- vim.api.nvim_set_keymap(
+-- 	"n",
+-- 	"<leader>e",
+-- 	":NvimTreeToggle<CR>",
+-- 	{ noremap = true, silent = true, desc = "Toggle NvimTree" }
+-- )
+-- Let's try mini.file
 vim.api.nvim_set_keymap(
 	"n",
 	"<leader>e",
-	":NvimTreeToggle<CR>",
-	{ noremap = true, silent = true, desc = "Toggle NvimTree" }
+	":lua MiniFiles.open()<CR>",
+	{ noremap = true, silent = true, desc = "Toggle Mini file" }
 )
 
 -- Fold
