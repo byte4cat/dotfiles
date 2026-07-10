@@ -1,22 +1,33 @@
 #!/bin/bash
 
 STATE_FILE="$HOME/.local/state/waypaper/default.toml"
+
 mkdir -p "$(dirname "$STATE_FILE")"
+
 FOLDERS=(
 	"$HOME/.local/share/wallpapers"
 )
 
-FOLDER_ARGS=()
-for f in "${FOLDERS[@]}"; do
-	FOLDER_ARGS+=("$f")
-done
-
-if [ ! -f "$STATE_FILE" ]; then
-	echo "Error: $STATE_FILE not exists"
-	exit 1
+if [ -f "$STATE_FILE" ]; then
+	PREV_WALLPAPER=$(grep 'wallpaper =' "$STATE_FILE" | head -n 1 | sed 's/.*= //;s/"//g')
+else
+	touch "$STATE_FILE"
+	PREV_WALLPAPER=""
 fi
 
-waypaper --state-file "$STATE_FILE" --folder "${FOLDER_ARGS[@]}"
+waypaper --state-file "$STATE_FILE" --folder "${FOLDERS[@]}"
+
+if [ ! -s "$STATE_FILE" ]; then
+	notify-send "Theme" "State file empty, exiting."
+	exit 0
+fi
+
+CURRENT_WALLPAPER=$(grep 'wallpaper =' "$STATE_FILE" | head -n 1 | sed 's/.*= //;s/"//g')
+
+if [ "$PREV_WALLPAPER" == "$CURRENT_WALLPAPER" ]; then
+	notify-send "Theme" "No wallpaper change detected."
+	exit 0
+fi
 
 RAW_PATH=$(grep 'wallpaper =' "$STATE_FILE" | head -n 1 | sed 's/.*= //;s/"//g')
 SELECTED_WALLPAPER="${RAW_PATH/#\~/$HOME}"
@@ -29,21 +40,10 @@ if [ -z "$SELECTED_WALLPAPER" ]; then
 	exit 1
 fi
 
-CONFIG_DIR="/tmp"
-APPS=(
-	"waybar"
-	"wofi"
-	"kitty"
-	"ghostty"
-	"starship"
-	"gtk"
-	"neovim"
-)
-
-# make sure dir is exists, change to for loop?
-for app in "${APPS[@]}"; do
-	mkdir -p "$CONFIG_DIR/$APP"
-done
+if [ ! -f "$SELECTED_WALLPAPER" ]; then
+	notify-send "Theme" "Wallpaper file not found!" -t 2000
+	exit 1
+fi
 
 matugen image "$SELECTED_WALLPAPER" --quiet --source-color-index 0
 
