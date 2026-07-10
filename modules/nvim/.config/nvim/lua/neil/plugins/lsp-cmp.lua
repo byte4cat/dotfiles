@@ -1,99 +1,101 @@
 return {
-	"hrsh7th/nvim-cmp",
-	event = "InsertEnter",
+	"saghen/blink.cmp",
+	-- optional: provides snippets for the snippet source
+	-- dependencies = { "rafamadriz/friendly-snippets" },
 	dependencies = {
-		"hrsh7th/cmp-nvim-lsp",
-		"hrsh7th/cmp-buffer",
-		"hrsh7th/cmp-path",
 		"L3MON4D3/LuaSnip",
-		"saadparwaiz1/cmp_luasnip",
-		"onsails/lspkind.nvim", -- 圖標
-		"roobert/tailwindcss-colorizer-cmp.nvim", -- Tailwind 顏色
-		"L3MON4D3/LuaSnip",
+		"nvim-tree/nvim-web-devicons",
+		"onsails/lspkind.nvim",
 	},
-	config = function()
-		local ls = require("luasnip")
-		local cmp = require("cmp")
-		local tailwindcss_colorizer = require("tailwindcss-colorizer-cmp")
-		require("tailwindcss-colorizer-cmp").setup({
-			color_square_width = 2,
-		})
+	version = "1.*",
 
-		local lspkind = require("lspkind")
-		local cmp_select = { behavior = cmp.SelectBehavior.Select }
+	---@module 'blink.cmp'
+	---@type blink.cmp.Config
+	opts = {
+		-- See :h blink-cmp-config-keymap for defining your own keymap
+		-- keymap = { preset = "default" },
+		keymap = {
+			preset = "none",
+			["<C-k>"] = { "select_prev", "fallback" },
+			["<C-j>"] = { "select_next", "fallback" },
+			["<CR>"] = { "accept", "fallback" },
+			["<C-Space>"] = { "show", "show_documentation", "hide_documentation" },
+			["<C-e>"] = { "hide" },
+		},
 
-		cmp.setup({
-			window = {
-				completion = {
-					border = { "", "─", "╮", "│", "╯", "─", "╰", "│" },
-					winhighlight = "Normal:Pmenu,FloatBorder:CmpFloatBorder,CursorLine:PmenuSel,Search:None",
+		appearance = {
+			-- 'mono' (default) for 'Nerd Font Mono' or 'normal' for 'Nerd Font'
+			-- Adjusts spacing to ensure icons are aligned
+			nerd_font_variant = "mono",
+		},
+
+		signature = { enabled = true },
+
+		snippets = {
+			preset = "luasnip",
+		},
+
+		-- (Default) Only show the documentation popup when manually triggered
+		completion = {
+			documentation = {
+				auto_show = true,
+				auto_show_delay_ms = 200,
+				window = {
+					border = "rounded",
 				},
-				documentation = {
-					border = { "╭", "─", "", "│", "╯", "─", "╰", "│" },
-					winhighlight = "Normal:NormalFloat,FloatBorder:DocFloatBorder",
+			},
+			ghost_text = { enabled = false },
+			menu = {
+				border = "rounded", -- "single", "double", "rounded", "solid", "shadow"
+				winblend = 0, -- no transparent
+				draw = {
+					components = {
+						kind_icon = {
+							text = function(ctx)
+								local icon = ctx.kind_icon
+								if vim.tbl_contains({ "Path" }, ctx.source_name) then
+									local dev_icon, _ = require("nvim-web-devicons").get_icon(ctx.label)
+									if dev_icon then
+										icon = dev_icon
+									end
+								else
+									icon = require("lspkind").symbol_map[ctx.kind] or ""
+								end
+
+								return icon .. ctx.icon_gap
+							end,
+
+							-- Optionally, use the highlight groups from nvim-web-devicons
+							-- You can also add the same function for `kind.highlight` if you want to
+							-- keep the highlight groups in sync with the icons.
+							highlight = function(ctx)
+								local hl = ctx.kind_hl
+								if vim.tbl_contains({ "Path" }, ctx.source_name) then
+									local dev_icon, dev_hl = require("nvim-web-devicons").get_icon(ctx.label)
+									if dev_icon then
+										hl = dev_hl
+									end
+								end
+								return hl
+							end,
+						},
+					},
 				},
 			},
-			snippet = {
-				expand = function(args)
-					require("luasnip").lsp_expand(args.body)
-				end,
-			},
+		},
 
-			mapping = cmp.mapping.preset.insert({
-				-- 上下移動選單
-				["<C-k>"] = cmp.mapping.select_prev_item(cmp_select),
-				["<C-j>"] = cmp.mapping.select_next_item(cmp_select),
+		-- Default list of enabled providers defined so that you can extend it
+		-- elsewhere in your config, without redefining it, due to `opts_extend`
+		sources = {
+			default = { "lsp", "path", "snippets", "buffer" },
+		},
 
-				-- 只有 Enter 負責確認補全
-				["<CR>"] = cmp.mapping.confirm({
-					behavior = cmp.ConfirmBehavior.Replace,
-					select = true,
-				}),
-
-				-- Alt-Tab 專門用於：展開 Snippet 或 跳到下一個輸入塊
-				["<A-Tab>"] = cmp.mapping(function(fallback)
-					if ls.expand_or_locally_jumpable() then
-						-- 如果選單開著，先把它關掉，避免干擾跳轉
-						if cmp.visible() then
-							cmp.close()
-						end
-						ls.expand_or_jump()
-					else
-						fallback() -- 正常的 Tab 功能（縮排）
-					end
-				end, { "i", "s" }),
-
-				-- Shift-Tab 專門用於：跳回上一個輸入塊
-				["<A-S-Tab>"] = cmp.mapping(function(fallback)
-					if ls.locally_jumpable(-1) then
-						if cmp.visible() then
-							cmp.close()
-						end
-						ls.jump(-1)
-					else
-						fallback()
-					end
-				end, { "i", "s" }),
-
-				["<C-Space>"] = cmp.mapping.complete(),
-			}),
-
-			sources = cmp.config.sources({
-				{ name = "nvim_lsp" },
-				{ name = "luasnip" },
-			}, {
-				{ name = "buffer" },
-				{ name = "path" },
-			}),
-			formatting = {
-				expandable_indicators = { "", "", "" },
-				format = lspkind.cmp_format({
-					mode = "symbol_text", -- 同時顯示圖標與文字
-					maxwidth = 50,
-					ellipsis_char = "...",
-					before = tailwindcss_colorizer.formatter,
-				}),
-			},
-		})
-	end,
+		-- (Default) Rust fuzzy matcher for typo resistance and significantly better performance
+		-- You may use a lua implementation instead by using `implementation = "lua"` or fallback to the lua implementation,
+		-- when the Rust fuzzy matcher is not available, by using `implementation = "prefer_rust"`
+		--
+		-- See the fuzzy documentation for more information
+		fuzzy = { implementation = "prefer_rust_with_warning" },
+	},
+	opts_extend = { "sources.default" },
 }

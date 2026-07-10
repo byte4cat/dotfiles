@@ -5,8 +5,7 @@ return {
 			"williamboman/mason.nvim",
 			"williamboman/mason-lspconfig.nvim",
 			"WhoIsSethDaniel/mason-tool-installer.nvim",
-			"hrsh7th/nvim-cmp",
-			"hrsh7th/cmp-nvim-lsp",
+			{ "saghen/blink.cmp", version = "1.*" },
 		},
 		event = { "BufReadPre", "BufNewFile" },
 		config = function()
@@ -17,11 +16,9 @@ return {
 
 			local mason_lspconfig = require("mason-lspconfig")
 			local mason_tool_installer = require("mason-tool-installer")
-			local cmp_lsp = require("cmp_nvim_lsp")
 			local keymap = require("neil.lsp-keybindings")
 
-			local capabilities = vim.lsp.protocol.make_client_capabilities()
-			capabilities = cmp_lsp.default_capabilities(capabilities)
+			local capabilities = require("blink.cmp").get_lsp_capabilities()
 
 			-- LSP Servers 列表
 			local servers = {
@@ -68,7 +65,6 @@ return {
 				"sql-formatter",
 			}
 
-			-- 建立共用的 on_attach
 			local on_attach = function(client, bufnr)
 				keymap.setup(bufnr)
 			end

@@ -1,5 +1,0 @@
-return {
-	{
-		"vimpostor/vim-tpipeline",
-	},
-}

@@ -10,7 +10,7 @@ return {
 		-- 避免跟補全選單重疊的關鍵設定
 		floating_window = true, -- 顯示浮動視窗
 		floating_window_above_cur_line = true, -- 盡量顯示在游標上方，避免擋住下方的 cmp 選單
-		zindex = 45, -- 設定比 cmp (預設 50) 稍微低一點，避免遮擋
+		-- zindex = 45, -- 設定比 cmp (預設 50) 稍微低一點，避免遮擋
 
 		-- 提示視覺化
 		hint_enable = true, -- 啟用行尾虛擬文字提醒
