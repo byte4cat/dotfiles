@@ -3,6 +3,8 @@
 ---- KEYBINDINGS ----
 ---------------------
 
+local scripts = require("modules.scripts")
+
 local mainMod = (myEnv and myEnv.mainMod) or "SUPER"
 local secMod = (myEnv and myEnv.secMod) or "ALT"
 
@@ -40,7 +42,9 @@ hl.bind(mainMod .. " + SHIFT + N", hl.dsp.exec_cmd("swaync-client -t"))
 hl.bind(mainMod .. " + C", hl.dsp.exec_cmd("byte4work-wofi-quick-menu"))
 hl.bind(mainMod .. " + W", hl.dsp.exec_cmd("byte4work-waypaper-theme-switcher"))
 hl.bind(mainMod .. " + SHIFT + B", hl.dsp.exec_cmd("byte4work-babycam"))
-hl.bind(mainMod .. " + SHIFT + P", hl.dsp.exec_cmd("byte4work-hyprland-toggle-pin"))
+hl.bind(mainMod .. " + SHIFT + P", function()
+	scripts.toggle_pin_float()
+end)
 
 -- 剪貼簿管理
 hl.bind(mainMod .. " + " .. secMod .. " + C", hl.dsp.exec_cmd("byte4work-wofi-clipboard"))

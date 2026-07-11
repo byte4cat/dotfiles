@@ -1,4 +1,5 @@
 #!/bin/bash
+# NOTE: it's not working in hyprland anymore after v0.55
 if [ "$(hyprctl activewindow -j | jq '.pinned')" = "true" ]; then
 	hyprctl dispatch pin
 	hyprctl dispatch togglefloating
