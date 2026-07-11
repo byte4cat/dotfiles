@@ -37,7 +37,7 @@ hl.window_rule({
 	match = { class = "^(waypaper)$" },
 	float = true,
 	center = true,
-	size = { "(monitor_w * 0.5)", "(monitor_h * 0.5)" },
+	size = { "(monitor_w * 0.6)", "(monitor_h * 0.8)" },
 })
 
 -- Show Me The Key (展示工具)
