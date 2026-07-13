@@ -23,6 +23,7 @@
 	local-branches = !git branch -vv | cut -c 3- | awk '$3 !~/\\[/ { print $1 }'
 	recent-branches = !git branch --sort=-committerdate | head
 	authors = shortlog -sn --all
+	sign = commit --amend --no-edit -S
 
 [core]
     editor = vim
