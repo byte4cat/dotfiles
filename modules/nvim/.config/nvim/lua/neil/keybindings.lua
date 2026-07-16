@@ -1,17 +1,24 @@
+-- ==========================================================================
+-- 基礎模式與包圍文字功能
+-- ==========================================================================
+
 vim.api.nvim_set_keymap("i", "jk", "<Esc>", { noremap = true, silent = true, desc = "Exit Insert Mode" })
 
 local function wrap_visual(open_sym, close_sym)
 	local mode = vim.fn.mode()
 
 	if mode == "V" then
+		-- 整行選取
 		return string.format([[c%s<CR><C-r>"%s<ESC>='[]], open_sym, close_sym)
 	elseif mode == "\22" or mode == "\16" then
+		-- 區塊選取
 		return string.format([[I%s<ESC>gvA%s<ESC>]], open_sym, close_sym)
 	else
+		-- 局部選取
 		return string.format([[c%s<C-r>"%s<ESC>]], open_sym, close_sym)
 	end
 end
--- 綁定快捷鍵 (使用 expr = true 讓 function 動態回傳 Vim 鍵盤指令)
+
 vim.keymap.set("v", "(", function()
 	return wrap_visual("(", ")")
 end, { expr = true })
@@ -30,6 +37,10 @@ end, { expr = true })
 vim.keymap.set("v", "`", function()
 	return wrap_visual("`", "`")
 end, { expr = true })
+
+-- ==========================================================================
+-- 視窗與分割管理
+-- ==========================================================================
 
 -- 使用 <F3> 交換當前視窗和下一個視窗的位置
 vim.api.nvim_set_keymap("n", "<F3>", "<C-w>x", { noremap = true, silent = true, desc = "Swap Window Position" })
@@ -51,7 +62,14 @@ vim.api.nvim_set_keymap("n", "<C-n>", "<C-w>w", { noremap = true, silent = true,
 -- previous window
 vim.api.nvim_set_keymap("n", "<C-p>", "<C-w>p", { noremap = true, silent = true, desc = "Previous Window" })
 
--- move lines up and down
+-- Split window
+vim.api.nvim_set_keymap("n", "<leader>v", ":vsplit<CR>", { noremap = true, silent = true, desc = "Vertical Split" })
+vim.api.nvim_set_keymap("n", "<leader>s", ":split<CR>", { noremap = true, silent = true, desc = "Horizontal Split" })
+
+-- ==========================================================================
+-- 程式碼行與區塊移動 (Alt + jk)
+-- ==========================================================================
+
 -- normal
 vim.keymap.set("n", "<A-j>", ":m .+1<CR>==", { noremap = true, silent = true, desc = "Move Line Down" })
 vim.keymap.set("n", "<A-k>", ":m .-2<CR>==", { noremap = true, silent = true, desc = "Move Line Up" })
@@ -63,6 +81,10 @@ vim.keymap.set("i", "<A-k>", "<Esc>:m .-2<CR>==gi", { noremap = true, silent = t
 -- visual with multiple lines selected, move the block up and down
 vim.keymap.set("v", "<A-j>", ":m '>+1<CR>gv=gv", { noremap = true, silent = true, desc = "Move Block Down" })
 vim.keymap.set("v", "<A-k>", ":m '<-2<CR>gv=gv", { noremap = true, silent = true, desc = "Move Block Up" })
+
+-- ==========================================================================
+-- 外部工具整合 (Tmux, Oil, File Tree, Git, Buffer)
+-- ==========================================================================
 
 -- nvim-tmux-navigator (會覆蓋 <C-h/j/k/l> 的視窗切換)
 vim.api.nvim_set_keymap(
@@ -90,24 +112,11 @@ vim.api.nvim_set_keymap(
 	{ noremap = true, silent = true, desc = "Tmux/Nvim Right" }
 )
 
--- Split window
-vim.api.nvim_set_keymap("n", "<leader>v", ":vsplit<CR>", { noremap = true, silent = true, desc = "Vertical Split" })
-vim.api.nvim_set_keymap("n", "<leader>s", ":split<CR>", { noremap = true, silent = true, desc = "Horizontal Split" })
-
 -- Pressing <Esc> in Normal mode will clear the highlight
 vim.keymap.set("n", "<Esc>", "<cmd>nohlsearch<CR>", { noremap = true, silent = true, desc = "Clear Search Highlight" })
 
 -- Buffer
 vim.keymap.set("n", "<leader>bd", ":bd<CR>", { desc = "Delete Buffer" })
-
--- lsp restart
-vim.keymap.set("n", "<leader>R", function()
-	vim.lsp.stop_client(vim.lsp.get_clients())
-	vim.defer_fn(function()
-		vim.cmd("edit") -- 重新載入檔案會觸發原生 vim.lsp.enable
-	end, 100)
-	vim.notify("LSP Clients stopped & reloaded", "info", { title = "LSP" })
-end, { noremap = true, silent = true, desc = "LSP Restart" })
 
 -- Nvim tree
 -- vim.api.nvim_set_keymap(
@@ -124,7 +133,22 @@ vim.api.nvim_set_keymap(
 	{ noremap = true, silent = true, desc = "Toggle Mini file" }
 )
 
--- Fold
+-- Oil.nvim
+-- open parent directory in new floating window
+vim.keymap.set(
+	"n",
+	"<space>-",
+	require("oil").toggle_float,
+	{ noremap = true, silent = true, desc = "Toggle Oil Floating Window" }
+)
+
+-- Undotree
+vim.keymap.set("n", "<leader>u", vim.cmd.UndotreeToggle, { noremap = true, silent = true, desc = "Toggle Undotree" })
+
+-- ==========================================================================
+-- 折疊 (Folding)
+-- ==========================================================================
+
 -- Key mappings for folding and unfolding
 vim.api.nvim_set_keymap("n", "zj", ":foldopen!<CR>", { noremap = true, silent = true, desc = "Fold Open Cursor" })
 vim.api.nvim_set_keymap("n", "zk", ":foldclose!<CR>", { noremap = true, silent = true, desc = "Fold Close Cursor" })
@@ -146,7 +170,10 @@ vim.keymap.set("n", "<leader>zm", function()
 	end
 end, { noremap = true, silent = true, desc = "Toggle Folding" })
 
+-- ==========================================================================
 -- Telescope
+-- ==========================================================================
+
 -- vim.api.nvim_set_keymap(
 -- 	"n",
 -- 	"<leader>ff",
@@ -196,6 +223,10 @@ vim.keymap.set("n", "<leader>cs", ":Telescope lsp_document_symbols<CR>", { desc 
 -- 	":Telescope man_pages<CR>",
 -- 	{ noremap = true, silent = true, desc = "Search Man Pages" }
 -- )
+
+-- ==========================================================================
+-- Git 操作 (Neogit, Gitsigns, Diffview)
+-- ==========================================================================
 
 -- Neogit
 vim.api.nvim_set_keymap(
@@ -269,21 +300,22 @@ local function diffview_toggle()
 end
 vim.keymap.set("n", "<leader>dv", diffview_toggle, { noremap = true, silent = true, desc = "Toggle Diffview" })
 
+-- ==========================================================================
+-- Quickfix, Harpoon, LSP, DAP
+-- ==========================================================================
+
 -- Quickfix List
 vim.keymap.set("n", "[c", ":cprev<CR>", { noremap = true, silent = true, desc = "Previous Quickfix Item" })
 vim.keymap.set("n", "]c", ":cnext<CR>", { noremap = true, silent = true, desc = "Next Quickfix Item" })
 
--- Oil.nvim
--- open parent directory in new floating window
-vim.keymap.set(
-	"n",
-	"<space>-",
-	require("oil").toggle_float,
-	{ noremap = true, silent = true, desc = "Toggle Oil Floating Window" }
-)
-
--- Undotree
-vim.keymap.set("n", "<leader>u", vim.cmd.UndotreeToggle, { noremap = true, silent = true, desc = "Toggle Undotree" })
+-- lsp restart
+vim.keymap.set("n", "<leader>R", function()
+	vim.lsp.stop_client(vim.lsp.get_clients())
+	vim.defer_fn(function()
+		vim.cmd("edit") -- 重新載入檔案會觸發原生 vim.lsp.enable
+	end, 100)
+	vim.notify("LSP Clients stopped & reloaded", "info", { title = "LSP" })
+end, { noremap = true, silent = true, desc = "LSP Restart" })
 
 -- DAP
 vim.keymap.set("n", "<leader>du", function()
@@ -330,7 +362,10 @@ vim.keymap.set("n", "<A-l>", function()
 	harpoon:list():next()
 end, { noremap = true, silent = true, desc = "Harpoon: Next File" })
 
--- Go testing
+-- ==========================================================================
+-- Go testing (已備份註解)
+-- ==========================================================================
+
 -- vim.keymap.set("n", "<leader>tt", function()
 -- 	if vim.bo.filetype == "go" then
 -- 		vim.cmd("GoTestFile")
