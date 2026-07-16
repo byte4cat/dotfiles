@@ -1,7 +1,35 @@
 vim.api.nvim_set_keymap("i", "jk", "<Esc>", { noremap = true, silent = true, desc = "Exit Insert Mode" })
 
--- 解决 visual 模式下 p (paste) 會覆蓋寄存器問題
-vim.keymap.set("v", "p", '"_dP', { desc = "Paste without overwriting register" })
+local function wrap_visual(open_sym, close_sym)
+	local mode = vim.fn.mode()
+
+	if mode == "V" then
+		return string.format([[c%s<CR><C-r>"%s<ESC>='[]], open_sym, close_sym)
+	elseif mode == "\22" or mode == "\16" then
+		return string.format([[I%s<ESC>gvA%s<ESC>]], open_sym, close_sym)
+	else
+		return string.format([[c%s<C-r>"%s<ESC>]], open_sym, close_sym)
+	end
+end
+-- 綁定快捷鍵 (使用 expr = true 讓 function 動態回傳 Vim 鍵盤指令)
+vim.keymap.set("v", "(", function()
+	return wrap_visual("(", ")")
+end, { expr = true })
+vim.keymap.set("v", "[", function()
+	return wrap_visual("[", "]")
+end, { expr = true })
+vim.keymap.set("v", "{", function()
+	return wrap_visual("{", "}")
+end, { expr = true })
+vim.keymap.set("v", '"', function()
+	return wrap_visual('"', '"')
+end, { expr = true })
+vim.keymap.set("v", "'", function()
+	return wrap_visual("'", "'")
+end, { expr = true })
+vim.keymap.set("v", "`", function()
+	return wrap_visual("`", "`")
+end, { expr = true })
 
 -- 使用 <F3> 交換當前視窗和下一個視窗的位置
 vim.api.nvim_set_keymap("n", "<F3>", "<C-w>x", { noremap = true, silent = true, desc = "Swap Window Position" })
@@ -242,8 +270,8 @@ end
 vim.keymap.set("n", "<leader>dv", diffview_toggle, { noremap = true, silent = true, desc = "Toggle Diffview" })
 
 -- Quickfix List
-vim.keymap.set("n", "[c", ":cnext<CR>", { noremap = true, silent = true, desc = "Next Quickfix Item" })
-vim.keymap.set("n", "]c", ":cprev<CR>", { noremap = true, silent = true, desc = "Previous Quickfix Item" })
+vim.keymap.set("n", "[c", ":cprev<CR>", { noremap = true, silent = true, desc = "Previous Quickfix Item" })
+vim.keymap.set("n", "]c", ":cnext<CR>", { noremap = true, silent = true, desc = "Next Quickfix Item" })
 
 -- Oil.nvim
 -- open parent directory in new floating window
@@ -293,7 +321,7 @@ vim.keymap.set("n", "<leader>fj", function()
 	harpoon.ui:toggle_quick_menu(harpoon:list())
 end, { noremap = true, silent = true, desc = "Harpoon: Quick Menu" })
 
--- Toggle previous & next juffers stored within Harpoon list
+-- Toggle previous & next buffers stored within Harpoon list
 vim.keymap.set("n", "<A-h>", function()
 	harpoon:list():prev()
 end, { noremap = true, silent = true, desc = "Harpoon: Previous File" })
