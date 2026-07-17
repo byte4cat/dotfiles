@@ -20,6 +20,8 @@ return {
 
 			local capabilities = require("blink.cmp").get_lsp_capabilities()
 
+			vim.treesitter.language.register("html", "handlebars")
+
 			-- LSP Servers 列表
 			local servers = {
 				"lua_ls",
@@ -31,19 +33,18 @@ return {
 				"ts_ls",
 				"eslint",
 				"emmet_language_server",
-				"html",
+				"html", -- 負責 .hbs 內 HTML 補全
+				"ember", -- 負責 .hbs 內 Handlebars 語法補全
 				"cssls",
 				"tailwindcss",
 				"pyright",
 				"jsonls",
 				"dockerls",
 				"docker_compose_language_service",
-				-- "markdown_oxide",
 				"sqls",
 				"taplo",
 				"yamlls",
 				"zls",
-				-- "volar",
 				"qmlls",
 			}
 
@@ -61,7 +62,6 @@ return {
 				"prettierd",
 				"clang-format",
 				"shfmt",
-				-- "codespell",
 				"sql-formatter",
 			}
 
@@ -75,19 +75,6 @@ return {
 					on_attach = on_attach,
 				}, user_config or {})
 
-				-- 自動過濾該 Server 不被 Neovim 識別的 filetypes
-				local ok, lsp_config = pcall(require, "lspconfig.configs." .. name)
-				if ok and lsp_config.default_config.filetypes then
-					local filtered_ft = {}
-					for _, ft in ipairs(lsp_config.default_config.filetypes) do
-						if vim.fn.getcompletion(ft, "filetype")[1] ~= "" then
-							table.insert(filtered_ft, ft)
-						end
-					end
-					-- 如果使用者沒手動指定 filetypes，才用過濾後的
-					final_config.filetypes = user_config.filetypes or filtered_ft
-				end
-
 				vim.lsp.config(name, final_config)
 				vim.lsp.enable(name)
 			end
@@ -99,6 +86,8 @@ return {
 				"vue_ls",
 				"ts_ls",
 				"clangd",
+				"html",
+				"ember",
 			}
 
 			for _, server in ipairs(servers) do
@@ -109,65 +98,39 @@ return {
 						break
 					end
 				end
-
 				if not skip then
 					apply_lsp_config(server, {})
 				end
 			end
 
-			apply_lsp_config("rust_analyzer", {
+			-- =======================
+			-- Custom Configurations
+			-- =======================
+
+			apply_lsp_config("html", {
 				capabilities = capabilities,
 				on_attach = on_attach,
-				settings = {
-					["rust-analyzer"] = {
-						procMacro = { enable = true },
-						cargo = { allFeatures = true },
-						check = { command = "clippy" },
-					},
+				filetypes = { "html", "handlebars" },
+				init_options = {
+					configurationSection = { "html", "css", "javascript" },
+					embeddedLanguages = { css = true, javascript = true },
 				},
 			})
 
-			-- apply_lsp_config("clangd", {
-			-- 	capabilities = capabilities,
-			-- 	on_attach = function(client, bufnr)
-			-- 		-- 呼叫你原本通用的 on_attach (處理快速鍵等)
-			-- 		if on_attach then
-			-- 			on_attach(client, bufnr)
-			-- 		end
-			--
-			-- 		-- 設定 C 檔案存檔時自動呼叫 LSP 格式化
-			-- 		vim.api.nvim_create_autocmd("BufWritePre", {
-			-- 			buffer = bufnr,
-			-- 			callback = function()
-			-- 				vim.lsp.buf.format({
-			-- 					bufnr = bufnr,
-			-- 					async = false, -- 同步執行確保存檔前完成
-			-- 					-- 這裡強迫只用 clangd 格式化，避免跟 conform 撞車
-			-- 					filter = function(c)
-			-- 						return c.name == "clangd"
-			-- 					end,
-			-- 				})
-			-- 			end,
-			-- 		})
-			-- 	end,
-			-- 	-- 設定啟動參數
-			-- 	cmd = {
-			-- 		"clangd",
-			-- 		"--background-index",
-			-- 		"--clang-tidy",
-			-- 		"--header-insertion=iwyu",
-			-- 		"--completion-style=detailed",
-			-- 		"--function-arg-placeholders",
-			-- 		"--fallback-style=llvm", -- 如果找不到 .clang-format 才用這個
-			-- 	},
-			-- })
+			apply_lsp_config("ember", {
+				capabilities = capabilities,
+				on_attach = on_attach,
+				filetypes = { "handlebars" },
+			})
 
+			-- Tailwind CSS
 			apply_lsp_config("tailwindcss", {
 				capabilities = capabilities,
 				on_attach = on_attach,
-				filetypes = { "html", "css", "javascriptreact", "typescriptreact", "vue", "svelte" },
+				filetypes = { "html", "css", "javascriptreact", "typescriptreact", "vue", "svelte", "handlebars" },
 			})
 
+			-- Emmet
 			apply_lsp_config("emmet_language_server", {
 				capabilities = capabilities,
 				on_attach = on_attach,
@@ -181,68 +144,33 @@ return {
 					"svelte",
 					"eruby",
 					"html",
-					"htmlangular",
-					"htmldjango",
 					"javascriptreact",
 					"typescriptreact",
+					"handlebars",
 				},
 			})
 
-			-- apply_lsp_config("markdown_oxide", {
-			-- 	filetypes = { "markdown" },
-			-- })
-			--
-			-- apply_lsp_config("htmx", {
-			-- 	filetypes = { "html", "templ", "handlebars" },
-			-- })
-
-			apply_lsp_config("vue_ls", {
-				capabilities = capabilities,
-				on_attach = on_attach,
-				-- Hybrid Mode, just like Volar's Take Over Mode but without the need of Volar
-			})
-
-			local mason_path = vim.fn.stdpath("data") .. "/mason"
-
-			local vue_plugin_rel_path = "/packages/vue-language-server/node_modules/@vue/typescript-plugin"
-			local vue_ts_plugin_location = mason_path .. vue_plugin_rel_path
-
-			local is_vue_project = function()
-				local f = io.open(vim.fn.getcwd() .. "/package.json", "r")
-				if f then
-					local content = f:read("*all")
-					f:close()
-					return content:find("vue") ~= nil
-				end
-				return false
-			end
-
-			local ts_plugins = {}
-			if is_vue_project() then
-				table.insert(ts_plugins, {
-					name = "@vue/typescript-plugin",
-					location = vue_ts_plugin_location,
-					languages = { "vue" },
-				})
-			end
-
+			-- TypeScript
 			apply_lsp_config("ts_ls", {
 				capabilities = capabilities,
 				on_attach = on_attach,
-				init_options = {
-					plugins = ts_plugins,
-				},
-				filetypes = {
-					"javascript",
-					"javascriptreact",
-					"javascript.jsx",
-					"typescript",
-					"typescriptreact",
-					"typescript.tsx",
-					"vue",
+				filetypes = { "javascript", "javascriptreact", "typescript", "typescriptreact", "vue" },
+			})
+
+			-- Rust Analyzer
+			apply_lsp_config("rust_analyzer", {
+				capabilities = capabilities,
+				on_attach = on_attach,
+				settings = {
+					["rust-analyzer"] = {
+						procMacro = { enable = true },
+						cargo = { allFeatures = true },
+						check = { command = "clippy" },
+					},
 				},
 			})
 
+			-- ESLint
 			apply_lsp_config("eslint", {
 				capabilities = capabilities,
 				settings = {
@@ -251,7 +179,6 @@ return {
 				},
 				on_attach = function(client, bufnr)
 					on_attach(client, bufnr)
-					-- ESLint 儲存時自動修復
 					vim.api.nvim_create_autocmd("BufWritePre", {
 						buffer = bufnr,
 						command = "EslintFixAll",
@@ -259,6 +186,7 @@ return {
 				end,
 			})
 
+			-- Mason
 			mason_lspconfig.setup({
 				ensure_installed = servers,
 				automatic_installation = true,

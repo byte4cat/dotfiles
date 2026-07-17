@@ -119,12 +119,12 @@ vim.keymap.set("n", "<Esc>", "<cmd>nohlsearch<CR>", { noremap = true, silent = t
 vim.keymap.set("n", "<leader>bd", ":bd<CR>", { desc = "Delete Buffer" })
 
 -- Nvim tree
--- vim.api.nvim_set_keymap(
--- 	"n",
--- 	"<leader>e",
--- 	":NvimTreeToggle<CR>",
--- 	{ noremap = true, silent = true, desc = "Toggle NvimTree" }
--- )
+vim.api.nvim_set_keymap(
+	"n",
+	"<leader>E",
+	":NvimTreeToggle<CR>",
+	{ noremap = true, silent = true, desc = "Toggle NvimTree" }
+)
 -- Let's try mini.file
 vim.api.nvim_set_keymap(
 	"n",
@@ -173,7 +173,6 @@ end, { noremap = true, silent = true, desc = "Toggle Folding" })
 -- ==========================================================================
 -- Telescope
 -- ==========================================================================
-
 -- vim.api.nvim_set_keymap(
 -- 	"n",
 -- 	"<leader>ff",
@@ -204,13 +203,13 @@ vim.api.nvim_set_keymap(
 	":TodoTelescope<cr>",
 	{ noremap = true, silent = true, desc = "Todo Search" }
 )
-vim.api.nvim_set_keymap(
-	"n",
-	"<leader>ps",
-	":Telescope live_grep<CR>",
-	{ noremap = true, silent = true, desc = "Live Grep (Text Search)" }
-)
-vim.keymap.set("n", "<leader>cs", ":Telescope lsp_document_symbols<CR>", { desc = "LSP Symbols" })
+-- vim.api.nvim_set_keymap(
+-- 	"n",
+-- 	"<leader>ps",
+-- 	":Telescope live_grep<CR>",
+-- 	{ noremap = true, silent = true, desc = "Live Grep (Text Search)" }
+-- )
+-- vim.keymap.set("n", "<leader>cs", ":Telescope lsp_document_symbols<CR>", { desc = "LSP Symbols" })
 -- vim.api.nvim_set_keymap(
 -- 	"n",
 -- 	"<leader>fh",

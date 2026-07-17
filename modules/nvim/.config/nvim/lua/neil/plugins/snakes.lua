@@ -22,6 +22,18 @@ return {
 						"**/*.gif",
 					},
 				},
+				grep = {
+					hidden = true,
+					untracked = true,
+					follow = true,
+					exclude = {
+						"**/*.jpg",
+						"**/*.jpeg",
+						"**/*.png",
+						"**/*.webp",
+						"**/*.gif",
+					},
+				},
 			},
 			prompt = "🔭 ",
 			layout = {
@@ -42,7 +54,17 @@ return {
 		},
 
 		-- focus
-		zen = { enabled = true },
+		zen = {
+			enabled = true,
+			win = {
+				height = 0.9,
+				width = 0.6,
+				wo = {
+					colorcolumn = "",
+					signcolumn = "no",
+				},
+			},
+		},
 		dim = { enabled = true },
 
 		-- open git repo in browser
@@ -106,19 +128,33 @@ return {
 			end,
 			desc = "Find Files (Snacks)",
 		},
-		-- {
-		-- 	"<leader>ps",
-		-- 	function()
-		-- 		Snacks.picker.grep()
-		-- 	end,
-		-- 	desc = "Grep (Snacks)",
-		-- },
+		{
+			"<leader>ps",
+			function()
+				Snacks.picker.grep()
+			end,
+			desc = "Grep (Snacks)",
+		},
 		{
 			"<leader>ff",
 			function()
 				Snacks.picker.buffers()
 			end,
 			desc = "Buffers (Snacks)",
+		},
+		-- {
+		-- 	"<leader>td",
+		-- 	function()
+		-- 		Snacks.picker.todo_comments()
+		-- 	end,
+		-- 	desc = "Search TODOs",
+		-- },
+		{
+			"<leader>cs",
+			function()
+				Snacks.picker.lsp_symbols()
+			end,
+			desc = "LSP Symbols (Snacks)",
 		},
 		{
 			"<leader>pm",

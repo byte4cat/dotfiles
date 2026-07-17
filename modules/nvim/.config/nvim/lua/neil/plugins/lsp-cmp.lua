@@ -6,6 +6,8 @@ return {
 		"L3MON4D3/LuaSnip",
 		"nvim-tree/nvim-web-devicons",
 		"onsails/lspkind.nvim",
+		"uga-rosa/cmp-dictionary",
+		"saghen/blink.compat",
 	},
 	version = "1.*",
 
@@ -104,4 +106,28 @@ return {
 		fuzzy = { implementation = "prefer_rust_with_warning" },
 	},
 	opts_extend = { "sources.default" },
+	config = function(_, opts)
+		require("cmp_dictionary").setup({
+			paths = { "/usr/share/dict/words" },
+			exact_length = 2,
+		})
+
+		opts.sources = {
+			default = { "lsp", "path", "snippets", "buffer", "dictionary" },
+			providers = {
+				dictionary = {
+					name = "dictionary",
+					module = "blink.compat.source",
+					score_offset = -10, -- 權重稍微調低，不干擾程式碼
+					min_keyword_length = 2, -- 打 2 個字母才觸發
+					enabled = function()
+						-- 僅在 markdown 和 vimwiki 下啟用
+						return vim.bo.filetype == "markdown" or vim.bo.filetype == "vimwiki"
+					end,
+				},
+			},
+		}
+
+		require("blink-cmp").setup(opts)
+	end,
 }

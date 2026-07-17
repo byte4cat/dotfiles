@@ -1,6 +1,8 @@
 return {
 	{
 		"nvim-treesitter/nvim-treesitter-context",
+		dependencies = { "neovim/nvim-lspconfig" },
+		event = { "BufReadPost", "BufNewFile" },
 		config = function()
 			require("treesitter-context").setup({
 				enable = true, -- Enable this plugin (Can be enabled/disabled later via commands)
@@ -14,7 +16,11 @@ return {
 				-- When separator is set, the context will only show up when there are at least 2 lines above cursorline.
 				separator = nil,
 				zindex = 20, -- The Z-index of the context window
-				on_attach = nil, -- (fun(buf: integer): boolean) return false to disable attaching
+				on_attach = function(buf)
+					local ft = vim.bo[buf].filetype
+					local has_parser = pcall(vim.treesitter.get_parser, buf, ft)
+					return has_parser
+				end,
 			})
 		end,
 	},

@@ -32,3 +32,9 @@ vim.api.nvim_create_autocmd("FileType", {
 		vim.opt_local.breakindent = true
 	end,
 })
+
+vim.filetype.add({
+	extension = {
+		hbs = "handlebars",
+	},
+})
