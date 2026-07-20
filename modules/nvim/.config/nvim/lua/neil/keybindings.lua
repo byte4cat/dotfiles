@@ -121,14 +121,14 @@ vim.keymap.set("n", "<leader>bd", ":bd<CR>", { desc = "Delete Buffer" })
 -- Nvim tree
 vim.api.nvim_set_keymap(
 	"n",
-	"<leader>E",
+	"<leader>e",
 	":NvimTreeToggle<CR>",
 	{ noremap = true, silent = true, desc = "Toggle NvimTree" }
 )
 -- Let's try mini.file
 vim.api.nvim_set_keymap(
 	"n",
-	"<leader>e",
+	"<leader>E",
 	":lua MiniFiles.open()<CR>",
 	{ noremap = true, silent = true, desc = "Toggle Mini file" }
 )
@@ -306,6 +306,18 @@ vim.keymap.set("n", "<leader>dv", diffview_toggle, { noremap = true, silent = tr
 -- Quickfix List
 vim.keymap.set("n", "[c", ":cprev<CR>", { noremap = true, silent = true, desc = "Previous Quickfix Item" })
 vim.keymap.set("n", "]c", ":cnext<CR>", { noremap = true, silent = true, desc = "Next Quickfix Item" })
+-- Quicker
+vim.keymap.set("n", "<leader>l", function()
+	require("quicker").toggle()
+end, {
+	desc = "Toggle quickfix",
+})
+
+-- vim.keymap.set("n", "<leader>ll", function()
+-- 	require("quicker").toggle({ loclist = true })
+-- end, {
+-- 	desc = "Toggle loclist",
+-- })
 
 -- lsp restart
 vim.keymap.set("n", "<leader>R", function()

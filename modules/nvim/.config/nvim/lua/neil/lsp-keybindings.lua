@@ -12,9 +12,9 @@ function M.setup(bufnr)
 	-- vim.keymap.set("n", "gr", vim.lsp.buf.references, opts)
 	vim.keymap.set("i", "<C-s>", vim.lsp.buf.signature_help, opts)
 	-- vim.keymap.set("n", "K", vim.lsp.buf.hover, opts)
+
 	vim.keymap.set("n", "K", "<cmd>Lspsaga hover_doc<CR>", opts)
 	-- vim.keymap.set("n", "<leader>cn", "<cmd>Lspsaga rename<CR>", opts)
-
 	vim.keymap.set("n", "<C-d>", "<cmd>Lspsaga peek_definition<CR>", opts)
 	vim.keymap.set("n", "<leader>o", "<cmd>Lspsaga outline<CR>", opts)
 	vim.keymap.set("n", "gr", "<cmd>Lspsaga finder ref<CR>", opts)

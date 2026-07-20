@@ -74,3 +74,23 @@ vim.opt.pumblend = 10 -- 選單透明度 (10%)
 vim.opt.winblend = 0 -- 浮動視窗透明度
 
 vim.lsp.log.set_level("error")
+
+if vim.fn.executable("rg") == 1 then
+	vim.opt.grepprg = "rg --vimgrep --smart-case"
+end
+
+vim.api.nvim_create_autocmd("BufReadCmd", {
+	pattern = "*.pdf",
+	callback = function()
+		-- Get the full path of the target PDF file
+		local file = vim.fn.expand("<afile>:p")
+
+		-- Clean up the empty or binary buffer forced open by nvim-tree or other plugins
+		local current_buf = vim.api.nvim_get_current_buf()
+		vim.cmd("b#") -- Switch back to the previous buffer
+		pcall(vim.api.nvim_buf_delete, current_buf, { force = true })
+
+		-- Launch zathura in the background without blocking Neovim
+		vim.fn.jobstart({ "zathura", file }, { detach = true })
+	end,
+})

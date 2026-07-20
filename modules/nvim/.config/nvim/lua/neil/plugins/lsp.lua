@@ -33,8 +33,8 @@ return {
 				"ts_ls",
 				"eslint",
 				"emmet_language_server",
-				"html", -- 負責 .hbs 內 HTML 補全
-				"ember", -- 負責 .hbs 內 Handlebars 語法補全
+				"html",
+				"ember",
 				"cssls",
 				"tailwindcss",
 				"pyright",
@@ -76,7 +76,9 @@ return {
 				}, user_config or {})
 
 				vim.lsp.config(name, final_config)
-				vim.lsp.enable(name)
+				if not vim.lsp.is_enabled({ name = name }) then
+					vim.lsp.enable(name)
+				end
 			end
 
 			local skip_servers = {
@@ -184,6 +186,14 @@ return {
 						command = "EslintFixAll",
 					})
 				end,
+			})
+
+			-- Clangd
+			apply_lsp_config("clangd", {
+				capabilities = vim.tbl_deep_extend("force", capabilities, {
+					offsetEncoding = { "utf-16" },
+				}),
+				on_attach = on_attach,
 			})
 
 			-- Mason

@@ -15,7 +15,8 @@ info "=== [1/7] System Base & Build Layer ==="
 if confirm "Perform a full system upgrade?"; then
 	sudo pacman -Syu --noconfirm
 fi
-sudo pacman -S --noconfirm --needed git base-devel ccache linux-headers p7zip unrar unzip tar stow
+sudo pacman -S --noconfirm --needed git base-devel ccache linux-headers \
+	unrar unzip tar 7zip stow
 
 # AUR Helper (yay)
 if ! command -v yay &>/dev/null; then
@@ -64,7 +65,7 @@ sudo pacman -S --noconfirm --needed \
 	fastfetch matugen rofi-wayland swaync thunar thunar-archive-plugin file-roller \
 	qt5-wayland qt6-wayland polkit-kde-agent adw-gtk-theme nwg-look dunst waybar yazi libnotify \
 	quickshell cliphist xdg-desktop-portal-hyprland grim slurp satty wl-clipboard \
-	brightnessctl playerctl swayosd awww zoxide gnome-disk-utility
+	brightnessctl playerctl swayosd awww zoxide gnome-disk-utility zathura zathura-pdf-poppler
 
 info "=== AUR Custom Targets (yay) ==="
 yay -S --noconfirm --needed \
