@@ -33,7 +33,7 @@ sudo pacman -S --noconfirm --needed \
 	cmake meson ninja gcc clang make pkg-config libxkbcommon \
 	libinput libxcb xcb-util xcb-util-keysyms xcb-util-wm xcb-util-renderutil \
 	zsh rustup tmux gdb lld vlc go starship fnm code neovim docker docker-compose docker-buildx \
-	words
+	words gvim
 # Setup Node.js via FNM
 info "Setting up nodejs tool chain"
 eval "$(fnm env --use-on-cd)"
@@ -55,7 +55,7 @@ info "=== [3/7] Ecosystem & Networking ==="
 sudo pacman -S --noconfirm --needed \
 	networkmanager network-manager-applet bluez bluez-utils fail2ban \
 	pipewire wireplumber pipewire-pulse pipewire-alsa pipewire-jack gst-plugin-pipewire \
-	openssh curl jq ripgrep fd bat eza tree btop htop ncdu
+	openssh curl jq ripgrep fd fzf bat eza tree btop htop ncdu
 
 sudo systemctl enable --now NetworkManager bluetooth fail2ban
 
