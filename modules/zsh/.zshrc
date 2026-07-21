@@ -115,8 +115,6 @@ gacp() {
 
 alias ls='eza --icons --group-directories-first'
 alias ll='eza -la --icons --git --group-directories-first'
-alias vim="nvim"
-alias vi="vim"
 alias zz='yazi'
 alias tcs='byte4work-tmux-choose-session'
 alias tss='byte4work-tmux-sessionizer'
