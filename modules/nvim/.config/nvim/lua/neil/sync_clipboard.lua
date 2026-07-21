@@ -1,4 +1,5 @@
 local is_ssh = os.getenv("SSH_TTY") ~= nil or os.getenv("SSH_CONNECTION") ~= nil
+local session_type = os.getenv("XDG_SESSION_TYPE")
 
 if is_ssh then
 	-- ==========================================
@@ -30,11 +31,8 @@ if is_ssh then
 			end,
 		},
 	}
-else
-	-- ==========================================
-	-- 本地環境：使用 Wayland 原生 wl-copy
-	-- ==========================================
-	-- wl-clipboard (sudo pacman -S wl-clipboard)
+elseif session_type == "wayland" then
+	-- 本地 Wayland
 	vim.g.clipboard = {
 		name = "Wayland-Local",
 		copy = {
@@ -44,6 +42,20 @@ else
 		paste = {
 			["+"] = "wl-paste --no-newline",
 			["*"] = "wl-paste --no-newline",
+		},
+		cache_enabled = 1,
+	}
+elseif session_type == "x11" then
+	-- 本地 X11
+	vim.g.clipboard = {
+		name = "X11-Local",
+		copy = {
+			["+"] = "xclip -selection clipboard",
+			["*"] = "xclip -selection primary",
+		},
+		paste = {
+			["+"] = "xclip -selection clipboard -o",
+			["*"] = "xclip -selection primary -o",
 		},
 		cache_enabled = 1,
 	}

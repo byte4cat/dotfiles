@@ -55,6 +55,7 @@ function M.set_theme(name)
 			vim.cmd("let g:colors_name = 'matugen'")
 		end
 	else
+		pcall(require("lazy").load, { plugins = { name } })
 		pcall(vim.cmd.colorscheme, name)
 	end
 
@@ -64,6 +65,18 @@ function M.set_theme(name)
 		vim.g.neil_theme_locked = false
 	end, 500)
 end
+
+vim.api.nvim_create_autocmd("VimEnter", {
+	callback = function()
+		local last_theme = M.get_last_theme()
+		M.set_theme(last_theme)
+
+		-- 延遲 2 秒後允許接收 matugen 的動態變色訊號
+		vim.defer_fn(function()
+			is_starting = false
+		end, 2000)
+	end,
+})
 
 -- 初始化監聽
 vim.schedule(function()
