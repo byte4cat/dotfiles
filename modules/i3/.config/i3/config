@@ -75,9 +75,9 @@ default_border pixel 1
 for_window [class="^.*"] border pixel 1
 
 # 浮動視窗規則
-for_window [class="Rofi|Wofi|Walker"] floating enable
-for_window [class="Rofi|Wofi|Walker"] focus_on_window activation
-for_window [class="Rofi|Wofi|Walker"] move position center
+for_window [class="Rofi"] floating enable
+for_window [class="Rofi"] focus_on_window activation
+for_window [class="Rofi"] move position center
 
 ###################
 ### 5. 按鍵綁定 ###

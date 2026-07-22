@@ -17,9 +17,9 @@ end
 -- ===================
 hl.bind(mainMod .. " + RETURN", hl.dsp.exec_cmd(myEnv.terminal))
 hl.bind(mainMod .. " + Q", hl.dsp.window.close())
-hl.bind(mainMod .. " + M", hl.dsp.exec_cmd("byte4work-wofi-power-menu"))
+hl.bind(mainMod .. " + M", hl.dsp.exec_cmd(myEnv.powerMenuCmd))
 hl.bind(mainMod .. " + B", hl.dsp.exec_cmd(myEnv.browser))
-hl.bind(mainMod .. " + SHIFT + E", hl.dsp.exec_cmd(myEnv.emojiPicker))
+hl.bind(mainMod .. " + SHIFT + E", hl.dsp.exec_cmd(myEnv.emojiPickerCmd))
 hl.bind(mainMod .. " + E", hl.dsp.exec_cmd(myEnv.terminalFileManager))
 
 -- =============
@@ -27,7 +27,7 @@ hl.bind(mainMod .. " + E", hl.dsp.exec_cmd(myEnv.terminalFileManager))
 -- =============
 hl.bind(mainMod .. " + SHIFT + F", hl.dsp.window.float({ action = "toggle" }))
 hl.bind(mainMod .. " + F", hl.dsp.window.fullscreen())
-hl.bind(mainMod .. " + D", hl.dsp.exec_cmd(myEnv.menu .. ' --show drun --prompt "Search Apps"'))
+hl.bind(mainMod .. " + D", hl.dsp.exec_cmd(myEnv.launcherCmd))
 hl.bind(mainMod .. " + P", hl.dsp.window.pseudo())
 hl.bind(
 	mainMod .. " + SHIFT + R",
@@ -39,7 +39,8 @@ hl.bind(mainMod .. " + N", hl.dsp.window.cycle_next({}))
 hl.bind(mainMod .. " + SHIFT + N", hl.dsp.exec_cmd("swaync-client -t"))
 
 -- 快捷選單與附加功能
-hl.bind(mainMod .. " + C", hl.dsp.exec_cmd("byte4work-wofi-quick-menu"))
+hl.bind(mainMod .. " + C", hl.dsp.exec_cmd(myEnv.clipboardCmd))
+
 hl.bind(mainMod .. " + W", hl.dsp.exec_cmd("byte4work-waypaper-theme-switcher"))
 hl.bind(mainMod .. " + SHIFT + B", hl.dsp.exec_cmd("byte4work-babycam"))
 hl.bind(mainMod .. " + SHIFT + P", function()
@@ -47,7 +48,7 @@ hl.bind(mainMod .. " + SHIFT + P", function()
 end)
 
 -- 剪貼簿管理
-hl.bind(mainMod .. " + " .. secMod .. " + C", hl.dsp.exec_cmd("byte4work-wofi-clipboard"))
+hl.bind(mainMod .. " + " .. secMod .. " + C", hl.dsp.exec_cmd(myEnv.clipboardCmd))
 
 -- ====================
 -- 視窗微調 (HJKL 移動與縮放)

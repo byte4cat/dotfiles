@@ -6,4 +6,4 @@ selected=$(cliphist list | wofi --dmenu --allow-images --prompt "Clipboard" --wi
 
 echo "$selected" | cliphist decode | wl-copy
 
-notify-send "Cliphist" "已複製到剪貼簿" -t 1000
+notify-send "Cliphist" "Copy to Clipboard" -t 1000

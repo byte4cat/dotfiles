@@ -6,7 +6,7 @@ SCRIPTS_COMMON_DIR="$HOME/.local/bin/common"
 SCRIPTS_WAYLAND_DIR="$HOME/.local/bin/wayland"
 SCRIPTS_HYPRLAND_DIR="$HOME/.local/bin/hyprland"
 SCRIPTS_SWAY_DIR="$HOME/.local/bin/sway"
-LOG_PATH="$SCRIPTS_DIR/logs/wofi_quick_menu.log"
+LOG_PATH="$HOME/.local/bin/logs/wofi_quick_memu.log"
 WOFI_CMD="wofi --show dmenu --width 800 --height 400"
 
 MON_NAME="HDMI-A-1"

@@ -19,7 +19,7 @@ fi
 case "$selection" in
 "🟢 Logout")
 	if [ "$XDG_CURRENT_DESKTOP" = "Hyprland" ]; then
-		hyprctl dispatch exit
+		hyprctl dispatch "hl.dsp.exit()"
 	else
 		swaymsg exit
 	fi

@@ -45,6 +45,7 @@ return {
 				"scss",
 				"tmux",
 				"toml",
+				"typst",
 				"typescript",
 				"vim",
 				"vimdoc",

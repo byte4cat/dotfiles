@@ -24,6 +24,14 @@ return {
 					filetypes = { "markdown", "vimwiki" },
 					with_virtual_padding = true,
 				},
+				typst = {
+					enabled = true,
+					download_remote_images = true,
+					only_render_image_at_cursor = true,
+					clear_in_insert_mode = true,
+					filetypes = { "typst" },
+					with_virtual_padding = true,
+				},
 			},
 			window_overlap_clear_enabled = true,
 		})

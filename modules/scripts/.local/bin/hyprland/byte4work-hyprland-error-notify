@@ -1,0 +1,9 @@
+#!/bin/bash
+
+# read from stdin
+error_msg=$(cat)
+
+# no error return
+[ -z "$error_msg" ] && exit 0
+
+notify-send -a "Config Error" -u critical "❌ Configuration Error" "$error_msg"

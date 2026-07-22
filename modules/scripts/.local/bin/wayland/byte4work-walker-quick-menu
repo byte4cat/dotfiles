@@ -6,7 +6,7 @@ SCRIPTS_COMMON_DIR="$HOME/.local/bin/common"
 SCRIPTS_WAYLAND_DIR="$HOME/.local/bin/wayland"
 SCRIPTS_HYPRLAND_DIR="$HOME/.local/bin/hyprland"
 SCRIPTS_SWAY_DIR="$HOME/.local/bin/sway"
-LOG_PATH="$SCRIPTS_DIR/logs/walker_quick_memu.log"
+LOG_PATH="$HOME/.local/bin/logs/walker_quick_memu.log"
 
 MON_NAME="HDMI-A-1"
 MON_CFG="1920x1200@60,-1200x0,1,transform,1"

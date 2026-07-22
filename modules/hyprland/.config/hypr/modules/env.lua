@@ -14,8 +14,7 @@ p.primaryMonitor = "DP-1"
 
 p.terminal = "ghostty"
 p.browser = "firefox"
-p.menu = "wofi"
-p.emojiPicker = "rofimoji --selector $menu --action clipboard"
+p.menu = "walker"
 p.workMsg = "vesktop"
 p.personalMsg = "signal-desktop"
 p.babycam = "byte4work-babycam"
@@ -23,6 +22,52 @@ p.fileManager = "GTK_THEME=adw-gtk3-dark thunar"
 p.terminalFileManager = p.terminal .. " -e yazi ~/Downloads"
 -- p.music = p.terminal .. ' --title="spotify-player" -e spotify_player'
 p.music = "spotify"
+
+local LauncherMenuEntry = {
+	Wofi = "byte4work-wofi-entry",
+	Walker = "byte4work-walker-entry",
+}
+
+local QuickMenuEntry = {
+	Wofi = "byte4work-wofi-quick-menu",
+	Walker = "byte4work-walker-quick-menu",
+}
+
+local PowerMenuEntry = {
+	Wofi = "byte4work-wofi-power-menu",
+	Walker = "byte4work-walker-power-menu",
+}
+
+local EmojiPickerEntry = {
+	Wofi = "byte4work-wofi-emojipicker",
+	Walker = "byte4work-walker-emojipicker",
+}
+
+local ClipboardEntry = {
+	Wofi = "byte4work-wofi-clipboard",
+	Walker = "byte4work-walker-clipboard",
+}
+
+local function get_menu_cmd(entryTable, menuKey, defaultCmd, featureName)
+	local cmd = entryTable[menuKey]
+	if not cmd then
+		local err_msg = string.format(
+			"Unsupported menu type '%s' for feature '%s'. Falling back to default.",
+			tostring(p.menu),
+			featureName
+		)
+		os.execute(string.format("echo '%s' | byte4work-hyprland-error-notify &", err_msg))
+		return defaultCmd
+	end
+	return cmd
+end
+
+local menuKey = p.menu:gsub("^%l", string.upper)
+p.launcherCmd = get_menu_cmd(LauncherMenuEntry, menuKey, "byte4work-walker-entry", "Launcher")
+p.quickMenuCmd = get_menu_cmd(QuickMenuEntry, menuKey, "byte4work-walker-quick-menu", "Quick Menu")
+p.powerMenuCmd = get_menu_cmd(PowerMenuEntry, menuKey, "byte4work-walker-power-menu", "Power Menu")
+p.emojiPickerCmd = get_menu_cmd(EmojiPickerEntry, menuKey, "byte4work-walker-symbols", "Emoji Picker")
+p.clipboardCmd = get_menu_cmd(ClipboardEntry, menuKey, "byte4work-walker-clipboard", "Clipboard")
 
 hl.env("PRIMARY_MONITOR", "DP-1")
 hl.env("XCURSOR_SIZE", "24")

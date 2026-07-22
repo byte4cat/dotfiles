@@ -34,6 +34,11 @@ sudo pacman -S --noconfirm --needed \
 	libinput libxcb xcb-util xcb-util-keysyms xcb-util-wm xcb-util-renderutil \
 	zsh rustup tmux gdb lld vlc go starship fnm code neovim docker docker-compose docker-buildx \
 	words gvim
+
+# for markdown and documents converts
+sudo pacman -S --noconfirm --needed \
+	typst python-markdown python-weasyprint python-pygments
+
 # Setup Node.js via FNM
 info "Setting up nodejs tool chain"
 eval "$(fnm env --use-on-cd)"
@@ -119,7 +124,7 @@ sudo pacman -S --noconfirm --needed \
 	ffmpeg mpv vlc-plugin-ffmpeg vlc-plugin-live555 vlc-plugins-all vlc-plugins-extra libva-utils libvdpau \
 	fcitx5-chinese-addons fcitx5-configtool fcitx5-gtk rime-double-pinyin \
 	ttf-jetbrains-mono-nerd ttf-liberation noto-fonts-cjk noto-fonts-emoji noto-fonts-extra \
-	otf-font-awesome ttf-font-awesome
+	ttf-font-awesome otf-font-awesome ttf-roboto adobe-source-sans-fonts
 
 # Shell Configuration & Finalization
 info "=== [6/7] Finalizing Environment ==="

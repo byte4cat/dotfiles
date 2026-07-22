@@ -39,6 +39,13 @@ hl.window_rule({
 	no_blur = true,
 })
 
+hl.window_rule({
+	name = "terminal-alacritty-transparent",
+	match = { class = "^(Alacritty)$" },
+	opacity = "0.80 override 0.80 override 0.80 override",
+	no_blur = false,
+})
+
 -- 終端機全螢幕時：稍微調低透明度以專注 (0.90)
 hl.window_rule({
 	name = "terminal-fullscreen-opacity",
