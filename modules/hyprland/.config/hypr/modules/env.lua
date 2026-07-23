@@ -11,7 +11,6 @@ p.mainMod = "SUPER"
 p.secMod = "ALT" -- Sets "Alt" key as secondary modifier
 
 p.primaryMonitor = "DP-1"
-
 p.terminal = "ghostty"
 p.browser = "firefox"
 p.menu = "walker"
@@ -69,7 +68,7 @@ p.powerMenuCmd = get_menu_cmd(PowerMenuEntry, menuKey, "byte4work-walker-power-m
 p.emojiPickerCmd = get_menu_cmd(EmojiPickerEntry, menuKey, "byte4work-walker-symbols", "Emoji Picker")
 p.clipboardCmd = get_menu_cmd(ClipboardEntry, menuKey, "byte4work-walker-clipboard", "Clipboard")
 
-hl.env("PRIMARY_MONITOR", "DP-1")
+hl.env("PRIMARY_MONITOR", p.primaryMonitor)
 hl.env("XCURSOR_SIZE", "24")
 hl.env("HYPRCURSOR_SIZE", "24")
 

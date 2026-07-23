@@ -3,6 +3,8 @@
 ---- MONITORS ----
 ------------------
 
+-- for hostname 9950x
+
 -- https://wiki.hypr.land/Configuring/Basics/Monitors/
 
 -- 主螢幕：DP-1 (4K @ 60Hz, 坐標 0x0, 縮放 1.5, 開啟 VRR)

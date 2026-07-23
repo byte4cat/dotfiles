@@ -1,0 +1,9 @@
+---@diagnostic disable: undefined-global
+------------------
+---- MONITORS ----
+------------------
+
+-- https://wiki.hypr.land/Configuring/Basics/Monitors/
+
+-- default setting
+hl.monitor({ output = "", mode = "preferred", position = "auto", scale = 1 })

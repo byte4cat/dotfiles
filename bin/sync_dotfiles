@@ -16,6 +16,102 @@ source "$DOTFILES_DIR/lib/common"
 
 cd_or_error "$DOTFILES_DIR"
 
+prepare_host_files() {
+	local current_host
+	current_host=$(hostname)
+
+	local current_os
+	current_os=$(uname -s)
+
+	info "🏠 Detected system: Hostname=[$current_host], OS=[$current_os]"
+
+	# Prompt user to verify the target hostname
+	if ! confirm "Is this the correct hostname for deployment?"; then
+		read -rp "Please enter the target hostname manually: " custom_host
+		if [ -z "$custom_host" ]; then
+			error "Hostname cannot be empty. Aborting deployment."
+		fi
+		current_host="$custom_host"
+		info "🏠 Overriding target hostname to: $current_host"
+	fi
+
+	# ==========================================================================
+	# Alternate File Priorities (Highest to Lowest)
+	# ==========================================================================
+	local priorities=(
+		"hostname.${current_host}"
+		"os.${current_os}"
+		"default"
+	)
+
+	local search_dirs=(
+		"$DOTFILES_DIR/modules"
+		"$DOTFILES_DIR/private/modules"
+	)
+
+	local match_count=0
+
+	for dir in "${search_dirs[@]}"; do
+		[ -d "$dir" ] || continue
+
+		# # Find all alternate files containing '##' and extract unique base file paths
+		while IFS= read -r -d '' base_file; do
+			local chosen_alt=""
+			local base_name="$(basename "$base_file")"
+
+			# Evaluate suffix rules in order of priority
+			for suffix in "${priorities[@]}"; do
+				if [ -f "${base_file}##${suffix}" ]; then
+					chosen_alt="${base_file}##${suffix}"
+					break # 找到最高優先權的檔案就立刻跳出迴圈！
+				fi
+			done
+
+			# Process matched alternate file
+			if [ -n "$chosen_alt" ]; then
+				# Prevent structural conflict: Base file must not be tracked in Git
+				if git ls-files --error-unmatch "$base_file" >/dev/null 2>&1; then
+					error "🚨 Structural Error! '$base_name' is already tracked by Git, but alternate files (##) also exist.\n\
+        👉 Please run: git mv \"$base_file\" \"${base_file}##default\"\n\
+        Otherwise, future 'git pull' commands will result in conflicts!"
+				fi
+
+				info "  > Resolving priority: $base_name <- $(basename "$chosen_alt")"
+
+				cp -f "$chosen_alt" "$base_file"
+
+				# Ensure generated base file is ignored locally by Git
+				local rel_target="${base_file#$DOTFILES_DIR/}"
+				local exclude_file="$DOTFILES_DIR/.git/info/exclude"
+
+				mkdir -p "$(dirname "$exclude_file")"
+				[ -f "$exclude_file" ] || touch "$exclude_file"
+
+				if ! grep -Fxq "$rel_target" "$exclude_file"; then
+					echo "$rel_target" >>"$exclude_file"
+					info "    (‼️ Added $rel_target to git exclude)"
+				fi
+
+				match_count=$((match_count + 1))
+			fi
+
+		done < <(
+			# Extract base filenames by stripping everything after '##', then sort & deduplicate
+			find "$dir" -type f -name "*##*" -print0 2>/dev/null |
+				while IFS= read -r -d '' file; do
+					printf "%s\0" "${file%%##*}"
+				done | sort -z -u
+		)
+	done
+
+	# Output summary
+	if [ "$match_count" -eq 0 ]; then
+		info "  >⚠️ No alternate files (*##*) found. Using default configs."
+	else
+		success "  >✅ Successfully prepared $match_count dynamically resolved file(s)."
+	fi
+}
+
 link_librewolf_css() {
 	local lw_config_dir="$HOME/.config/librewolf/librewolf"
 	local dotfiles_chrome_src="$DOTFILES_DIR/modules/librewolf/chrome"
@@ -142,6 +238,7 @@ stow_dotfiles() {
 
 main() {
 	check_command git stow
+	prepare_host_files
 	stow_dotfiles
 
 	link_librewolf_css

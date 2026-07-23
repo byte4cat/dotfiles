@@ -3,7 +3,7 @@
 ---- KEYBINDINGS ----
 ---------------------
 
-local scripts = require("modules.scripts")
+local helper = require("modules.helper")
 
 local mainMod = (myEnv and myEnv.mainMod) or "SUPER"
 local secMod = (myEnv and myEnv.secMod) or "ALT"
@@ -39,12 +39,12 @@ hl.bind(mainMod .. " + N", hl.dsp.window.cycle_next({}))
 hl.bind(mainMod .. " + SHIFT + N", hl.dsp.exec_cmd("swaync-client -t"))
 
 -- 快捷選單與附加功能
-hl.bind(mainMod .. " + C", hl.dsp.exec_cmd(myEnv.clipboardCmd))
+hl.bind(mainMod .. " + C", hl.dsp.exec_cmd(myEnv.quickMenuCmd))
 
 hl.bind(mainMod .. " + W", hl.dsp.exec_cmd("byte4work-waypaper-theme-switcher"))
 hl.bind(mainMod .. " + SHIFT + B", hl.dsp.exec_cmd("byte4work-babycam"))
 hl.bind(mainMod .. " + SHIFT + P", function()
-	scripts.toggle_pin_float()
+	helper.scripts.toggle_pin_float()
 end)
 
 -- 剪貼簿管理

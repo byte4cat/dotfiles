@@ -1,6 +1,13 @@
-local M = {}
+---@diagnostic disable: undefined-global
+-- helper.lua
 
-M.toggle_pin_float = function()
+---@class HelperModule
+local M = {
+	scripts = {},
+}
+
+--- 切換視窗的釘選與浮動狀態
+M.scripts.toggle_pin_float = function()
 	local win = hl.get_active_window()
 	if win == nil then
 		return
