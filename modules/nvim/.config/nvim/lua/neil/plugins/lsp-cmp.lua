@@ -45,6 +45,12 @@ return {
 
 		-- (Default) Only show the documentation popup when manually triggered
 		completion = {
+			trigger = {
+				show_on_keyword = true,
+				show_on_trigger_character = true,
+				-- 當游標緊鄰這些字元時，不要自動跳出補全選單
+				show_on_blocked_trigger_characters = { ">", "<", "/", " ", "\n", "\t" },
+			},
 			documentation = {
 				auto_show = true,
 				auto_show_delay_ms = 200,
@@ -96,6 +102,17 @@ return {
 		-- elsewhere in your config, without redefining it, due to `opts_extend`
 		sources = {
 			default = { "lsp", "path", "snippets", "buffer" },
+			providers = {
+				lsp = {
+					min_keyword_length = 1, -- Only suggest after typing at least 1 character
+				},
+				buffer = {
+					min_keyword_length = 2, -- Require 2 characters for buffer completions
+				},
+				snippets = {
+					min_keyword_length = 1, -- Only suggest snippets after typing at least 1 character
+				},
+			},
 		},
 
 		-- (Default) Rust fuzzy matcher for typo resistance and significantly better performance

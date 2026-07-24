@@ -19,6 +19,8 @@ return {
 			local keymap = require("neil.lsp-keybindings")
 
 			local capabilities = require("blink.cmp").get_lsp_capabilities()
+			capabilities.general = capabilities.general or {}
+			capabilities.general.positionEncodings = { "utf-8", "utf-16" }
 
 			vim.treesitter.language.register("html", "handlebars")
 
@@ -43,6 +45,7 @@ return {
 				"docker_compose_language_service",
 				"sqls",
 				"taplo",
+				-- "typos_lsp",
 				"yamlls",
 				"zls",
 				"qmlls",
@@ -88,6 +91,7 @@ return {
 				"vue_ls",
 				"ts_ls",
 				"clangd",
+				-- "typos_lsp",
 				"html",
 				"ember",
 			}
@@ -116,6 +120,7 @@ return {
 				init_options = {
 					configurationSection = { "html", "css", "javascript" },
 					embeddedLanguages = { css = true, javascript = true },
+					autoClosingTags = false,
 				},
 			})
 
@@ -190,11 +195,15 @@ return {
 
 			-- Clangd
 			apply_lsp_config("clangd", {
-				capabilities = vim.tbl_deep_extend("force", capabilities, {
-					offsetEncoding = { "utf-16" },
-				}),
+				capabilities = capabilities,
 				on_attach = on_attach,
 			})
+
+			-- Typos
+			-- apply_lsp_config("typos_lsp", {
+			-- 	capabilities = capabilities,
+			-- 	on_attach = on_attach,
+			-- })
 
 			-- Mason
 			mason_lspconfig.setup({

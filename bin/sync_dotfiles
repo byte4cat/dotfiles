@@ -18,7 +18,16 @@ cd_or_error "$DOTFILES_DIR"
 
 prepare_host_files() {
 	local current_host
-	current_host=$(hostname)
+	if command -v hostname >/dev/null 2>&1; then
+		current_host=$(hostname)
+	elif [ -f /etc/hostname ]; then
+		current_host=$(cat /etc/hostname)
+	else
+		current_host=$(uname -n)
+	fi
+
+	# Fallback if still empty
+	[ -z "$current_host" ] && current_host="unknown"
 
 	local current_os
 	current_os=$(uname -s)

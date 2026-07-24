@@ -107,7 +107,7 @@ hl.window_rule({
 -- Music (Spotify)
 hl.window_rule({
 	name = "init-music",
-	match = { class = "^(spotify)$" },
+	match = { class = "^(Spotify)$" },
 	workspace = "special:music silent",
 })
 

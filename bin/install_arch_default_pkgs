@@ -33,7 +33,7 @@ sudo pacman -S --noconfirm --needed \
 	cmake meson ninja gcc clang make pkg-config libxkbcommon \
 	libinput libxcb xcb-util xcb-util-keysyms xcb-util-wm xcb-util-renderutil \
 	zsh rustup tmux gdb lld vlc go starship fnm code neovim docker docker-compose docker-buildx \
-	words gvim
+	words gvim man-db man-pages
 
 # for markdown and documents converts
 sudo pacman -S --noconfirm --needed \
@@ -70,7 +70,8 @@ sudo pacman -S --noconfirm --needed \
 	fastfetch matugen rofi-wayland swaync thunar thunar-archive-plugin file-roller \
 	qt5-wayland qt6-wayland polkit-kde-agent adw-gtk-theme nwg-look dunst waybar yazi libnotify \
 	quickshell cliphist xdg-desktop-portal-hyprland grim slurp satty wl-clipboard \
-	brightnessctl playerctl swayosd awww zoxide gnome-disk-utility zathura zathura-pdf-poppler
+	brightnessctl playerctl swayosd awww zoxide gnome-disk-utility zathura zathura-pdf-poppler \
+	spotify-launcher
 
 info "=== AUR Custom Targets (yay) ==="
 yay -S --noconfirm --needed \
@@ -82,7 +83,6 @@ yay -S --noconfirm --needed \
 	fcitx5-mcbopomofo-git \
 	mongodb-compass-bin \
 	networkmanager-fortisslvpn \
-	spotify \
 	another-redis-desktop-manager-bin \
 	bruno-bin \
 	postman-bin \

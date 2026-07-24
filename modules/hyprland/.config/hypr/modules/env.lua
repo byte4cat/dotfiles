@@ -20,7 +20,8 @@ p.babycam = "byte4work-babycam"
 p.fileManager = "GTK_THEME=adw-gtk3-dark thunar"
 p.terminalFileManager = p.terminal .. " -e yazi ~/Downloads"
 -- p.music = p.terminal .. ' --title="spotify-player" -e spotify_player'
-p.music = "spotify"
+-- p.music = "spotify"
+p.music = "spotify-launcher"
 
 local LauncherMenuEntry = {
 	Wofi = "byte4work-wofi-entry",
@@ -69,6 +70,7 @@ p.emojiPickerCmd = get_menu_cmd(EmojiPickerEntry, menuKey, "byte4work-walker-sym
 p.clipboardCmd = get_menu_cmd(ClipboardEntry, menuKey, "byte4work-walker-clipboard", "Clipboard")
 
 hl.env("PRIMARY_MONITOR", p.primaryMonitor)
+hl.env("MENU", p.menu)
 hl.env("XCURSOR_SIZE", "24")
 hl.env("HYPRCURSOR_SIZE", "24")
 

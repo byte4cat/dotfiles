@@ -82,6 +82,10 @@ vim.keymap.set("i", "<A-k>", "<Esc>:m .-2<CR>==gi", { noremap = true, silent = t
 vim.keymap.set("v", "<A-j>", ":m '>+1<CR>gv=gv", { noremap = true, silent = true, desc = "Move Block Down" })
 vim.keymap.set("v", "<A-k>", ":m '<-2<CR>gv=gv", { noremap = true, silent = true, desc = "Move Block Up" })
 
+-- zz after moving
+vim.keymap.set("n", "<C-f>", "<C-f>zz", { noremap = true, silent = true })
+vim.keymap.set("n", "<C-b>", "<C-b>zz", { noremap = true, silent = true })
+
 -- ==========================================================================
 -- 外部工具整合 (Tmux, Oil, File Tree, Git, Buffer)
 -- ==========================================================================

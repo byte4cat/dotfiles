@@ -43,6 +43,7 @@ return {
 				"sql",
 				"ssh_config",
 				"scss",
+				"svelte",
 				"tmux",
 				"toml",
 				"typst",

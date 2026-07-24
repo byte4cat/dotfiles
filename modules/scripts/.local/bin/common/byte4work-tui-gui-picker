@@ -6,6 +6,9 @@ PATH=/usr/bin:/usr/local/bin:$HOME/.local/bin
 # Capture input from stdin
 INPUT=$(cat)
 
+# Default menu (can be overridden by environment variable)
+MENU="${MENU:-wofi}"
+
 if [ -z "$INPUT" ]; then
 	exit 1
 fi
@@ -23,6 +26,10 @@ if [[ "$PARENT_TREE" =~ ($TERMINALS) ]]; then
 	# Use fzf for TUI selection.
 	echo "$INPUT" | fzf --height=40% --reverse --prompt="Select: "
 else
-	# Default to GUI mode using wofi for Hyprland/Wayland environments.
-	echo "$INPUT" | wofi --dmenu --allow-markup --width=400 --lines=10
+# Default to GUI mode using wofi or walker for Hyprland/Wayland environments.
+    if [ "$MENU" = "wofi" ]; then
+        echo "$INPUT" | wofi --dmenu --allow-markup --width=400 --lines=10
+    else
+        echo "$INPUT" | walker --dmenu --width=400
+    fi
 fi
