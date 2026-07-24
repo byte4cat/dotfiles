@@ -15,8 +15,8 @@ info "=== [1/7] System Base & Build Layer ==="
 if confirm "Perform a full system upgrade?"; then
 	sudo pacman -Syu --noconfirm
 fi
-sudo pacman -S --noconfirm --needed git base-devel ccache linux-headers \
-	unrar unzip tar 7zip stow
+sudo pacman -S --noconfirm --needed git git-lfs base-devel ccache linux-headers \
+	unrar unzip tar 7zip stow git-delta
 
 # AUR Helper (yay)
 if ! command -v yay &>/dev/null; then
@@ -79,9 +79,21 @@ yay -S --noconfirm --needed \
 	fzf-tab \
 	hyprshade \
 	waypaper \
-	walker-bin \
-	fcitx5-mcbopomofo-git \
-	mongodb-compass-bin \
+    elephant-bin \
+    elephant-bluetooth-bin \
+    elephant-calc-bin \
+    elephant-clipboard-bin \
+    elephant-desktopapplications-bin \
+    elephant-files-bin \
+    elephant-menus-bin \
+    elephant-providerlist-bin \
+    elephant-symbols-bin \
+    elephant-todo-bin \
+    elephant-unicode-bin \
+    elephant-websearch-bin \
+    walker-bin \
+    fcitx5-mcbopomofo-git \
+    mongodb-compass-bin \
 	networkmanager-fortisslvpn \
 	another-redis-desktop-manager-bin \
 	bruno-bin \
@@ -151,6 +163,9 @@ export PATH="$HOME/.cargo/bin:$PATH"
 mkdir -p "$HOME/.local/state"
 nohup bash -c 'nvim --headless "+Lazy! sync" "+MasonUpdate" "+MasonInstallAll" +qa' >"$HOME/.local/state/nvim_install.log" 2>&1 &
 success "Neovim installation started in the background. Check logs at ~/.local/state/nvim_install.log"
+
+# Pull wallpapers
+git lfs pull
 
 # Generate matugen colors
 DEFAULT_WALLPAPER="$HOME/dotfiles/modules/wallpapers/.local/share/wallpapers/wp12195667-arch-linux-4k-wallpapers.jpg"
