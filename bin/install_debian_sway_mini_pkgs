@@ -1,0 +1,1121 @@
+#!/bin/bash
+
+# ==============================================================================
+# Ubuntu/Debian Environment Setup Script for Sway Minimum Requirements
+# ==============================================================================
+
+# optional:
+# sudo adduser neil
+# sudo usermod -aG sudo neil
+# su - neil
+
+set -euo pipefail
+
+# ==============================================================================
+# Ubuntu/Debian LSP Environment Setup Script for Vanilla Vim
+# ==============================================================================
+
+show_cli_multi_menu() {
+	echo "=================================================="
+	echo " Select environments to install:"
+	echo " (Type numbers separated by space, e.g., 1 3 4, then press Enter)"
+	echo "=================================================="
+	echo "1) Go (gopls)"
+	echo "2) Python (uv + pylsp)"
+	echo "3) Rust (rustup + rust-analyzer)"
+	echo "4) JavaScript/TypeScript (fnm + node + lsp)"
+	echo "--------------------------------------------------"
+
+	read -rp "Enter your choices (or 'all' / 'q' to quit): " -a choices
+
+	# 檢查是否離開
+	for choice in "${choices[@]}"; do
+		if [ "$choice" = "q" ] || [ "$choice" = "Q" ]; then
+			echo "Skipping environment setup."
+			return
+		fi
+		if [ "$choice" = "all" ]; then
+			enable_go_env
+			enable_py_env
+			enable_rs_env
+			enable_ts_env
+			return
+		fi
+	done
+
+	# 根據輸入的數字清單逐一觸發對應的安裝函數
+	for choice in "${choices[@]}"; do
+		case "$choice" in
+		1) enable_go_env ;;
+		2) enable_py_env ;;
+		3) enable_rs_env ;;
+		4) enable_ts_env ;;
+		*) echo "Unknown option: $choice (skipping)" ;;
+		esac
+	done
+}
+
+enable_go_env() {
+	echo "=== [1/3] Installing Golang Basic ==="
+	sudo apt install -y golang-go
+
+	echo "=== [2/3] Adding Golang LSP ==="
+	go install golang.org/x/tools/gopls@latest
+
+	echo "=== [3/3] Golang env setup! ==="
+	if ! echo "$PATH" | grep -q "$HOME/go/bin"; then
+		echo 'export PATH=$PATH:$HOME/go/bin' >>~/.bashrc
+		export PATH=$PATH:$HOME/go/bin
+	fi
+	echo "=== Golang & gopls setup complete! ==="
+	go version
+}
+
+enable_py_env() {
+	echo "=== [1/3] Installing Python Basic Tools ==="
+	sudo apt install -y python3-pip python3-venv curl
+
+	echo "=== [2/3] Installing Astral uv ==="
+	curl -LsSf https://astral.sh/uv/install.sh | sh
+	export PATH="$HOME/.local/bin:$PATH"
+
+	echo "=== [3/3] Installing Python LSP (pylsp) ==="
+	uv tool install python-lsp-server
+
+	echo "=== Python & pylsp setup complete! ==="
+	uv --version
+}
+
+enable_rs_env() {
+	echo "=== [1/2] Installing Rust via rustup ==="
+	curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+
+	source "$HOME/.cargo/env"
+
+	echo "=== [2/2] Adding rust-analyzer component ==="
+	rustup default stable
+	rustup component add rust-analyzer
+
+	echo "=== Rust & rust-analyzer setup complete! ==="
+	rustc --version
+	cargo --version
+	rust-analyzer --version
+}
+
+enable_ts_env() {
+	echo "=== [1/4] Installing fnm via official install script ==="
+	curl -fsSL https://fnm.vercel.app/install | bash
+
+	echo "=== [2/4] Configuring shell environment for fnm ==="
+	export PATH="$HOME/.local/share/fnm:$PATH"
+
+	if ! grep -q 'fnm env' "$HOME/.bashrc"; then
+		echo 'eval "$(fnm env --use-on-cd)"' >>"$HOME/.bashrc"
+	fi
+
+	eval "$(fnm env --use-on-cd)"
+
+	echo "=== [3/4] Installing latest LTS Node.js via fnm ==="
+	fnm install --lts
+	fnm default lts-latest
+
+	echo "=== [4/4] Installing JavaScript/TypeScript Language Server ==="
+	npm install -g typescript typescript-language-server
+
+	echo "=== JS/TS, Node.js & LSP setup complete! ==="
+	fnm --version
+	node -v
+	typescript-language-server --version
+}
+
+echo "=== [1/9] Updating System and Installing Sway Minimal Core Packages ==="
+sudo apt update && sudo apt upgrade -y
+
+# Install Sway core, i3status for the built-in bar, audio, network, and essential tools
+sudo apt install -y \
+	fzf ripgrep git tmux curl build-essential \
+	vim sway swaylock swayidle swaybg \
+	i3status wofi dunst alacritty cliphist \
+	pipewire wireplumber pipewire-audio-client-libraries \
+	network-manager network-manager-gnome \
+	brightnessctl playerctl \
+	grim slurp wl-clipboard \
+	fonts-jetbrains-mono fonts-font-awesome fonts-noto-color-emoji \
+	firefox thunar git curl unzip fastfetch
+
+echo "=== [2/9] Enabling Necessary System Services ==="
+sudo systemctl enable NetworkManager
+sudo systemctl start NetworkManager
+
+echo "=== [3/9] Writing Sway Configuration File to Target Path ==="
+SWAY_CONFIG_DIR="$HOME/.config/sway"
+mkdir -p "$SWAY_CONFIG_DIR"
+
+cat <<'EOF' >"$SWAY_CONFIG_DIR/config"
+# --- Basic Settings ---
+set $mainMod Mod4
+set $secMod Mod1
+set $terminal alacritty
+set $menu wofi --show drun
+set $browser firefox
+set $file-manager thunar
+
+exec systemctl --user import-environment GTK_IM_MODULE QT_IM_MODULE XMODIFIERS SDL_IM_MODULE INPUT_METHOD
+exec dbus-update-activation-environment --systemd GTK_IM_MODULE QT_IM_MODULE XMODIFIERS SDL_IM_MODULE INPUT_METHOD
+
+# Start Essential Background Services
+exec dunst
+exec wl-paste --watch cliphist store
+exec fcitx5 -d
+exec thunar --daemon
+exec swaybg -i ~/Documents/walpapers/default.png
+
+# --- Window Appearance ---
+gaps inner 10
+gaps outer 5
+default_border pixel 2
+
+# --- Basic Keybindings ---
+bindsym $mainMod+Return exec $terminal
+bindsym $mainMod+q kill
+bindsym $mainMod+d exec $menu
+bindsym $mainMod+b exec $browser
+bindsym $mainMod+e exec thunar
+bindsym $mainMod+$secMod+c exec $HOME/.local/bin/byte4work-wofi-clipboard
+bindsym $mainMod+n cyclenext
+
+# Focus Movement (Vim Style)
+bindsym $mainMod+h focus left
+bindsym $mainMod+j focus down
+bindsym $mainMod+k focus up
+bindsym $mainMod+l focus right
+
+# Workspace Switching
+bindsym $mainMod+1 workspace number 1
+bindsym $mainMod+2 workspace number 2
+bindsym $mainMod+3 workspace number 3
+bindsym $mainMod+4 workspace number 4
+bindsym $mainMod+5 workspace number 5
+bindsym $mainMod+6 workspace number 6
+bindsym $mainMod+7 workspace number 7
+bindsym $mainMod+8 workspace number 8
+bindsym $mainMod+9 workspace number 9
+
+for_window [workspace="2"] layout tabbed
+
+# --- Volume and Media Controls ---
+bindsym XF86AudioRaiseVolume exec "wpctl set-volume -l 1 @DEFAULT_AUDIO_SINK@ 5%+"
+bindsym XF86AudioLowerVolume exec "wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-"
+bindsym XF86AudioMute exec "wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle"
+
+# --- Screen Brightness ---
+bindsym XF86MonBrightnessUp exec "brightnessctl set 5%+"
+bindsym XF86MonBrightnessDown exec "brightnessctl set 5%-"
+
+# --- Screenshot Tools ---
+bindsym $mainMod+Control+1 exec grim - | wl-copy && notify-send "Screenshot copied"
+bindsym $mainMod+Control+2 exec grim -g "$(slurp)" - | wl-copy && notify-send "Selected area copied"
+
+input "type:keyboard" {
+    xkb_layout us
+	xkb_options altwin:swap_alt_win,ctrl:nocaps
+}
+
+# --- Built-in Status Bar (swaybar) ---
+bar {
+    swaybar_command swaybar
+    position top
+    status_command i3status
+
+    colors {
+        background #2e3440
+        statusline #d8dee9
+        focused_workspace #88c0d0 #88c0d0 #2e3440
+        inactive_workspace #3b4252 #3b4252 #d8dee9
+    }
+}
+EOF
+
+echo "=== [4/9] Installing Chinese Input Method & Flypy Double Pinyin (Fcitx5 + Rime) ==="
+sudo apt install -y \
+	librime-data librime-data-luna-pinyin \
+	fcitx5 fcitx5-frontend-gtk3 fcitx5-frontend-qt6 \
+	fcitx5-config-qt fcitx5-chinese-addons fcitx5-rime
+
+mkdir -p ~/.config/environment.d
+cat <<'EOF' >~/.config/environment.d/fcitx5.conf
+GTK_IM_MODULE=fcitx
+QT_IM_MODULE=fcitx
+XMODIFIERS=@im=fcitx
+SDL_IM_MODULE=fcitx
+INPUT_METHOD=fcitx
+EOF
+
+# Create Fcitx5 Rime user configuration directory
+RIME_USER_DIR="$HOME/.local/share/fcitx5/rime"
+mkdir -p "$RIME_USER_DIR"
+
+# Write default custom configuration to enable Flypy Double Pinyin
+cat <<'EOF' >"$RIME_USER_DIR/default.custom.yaml"
+patch:
+  schema_list:
+    - schema: double_pinyin_flypy
+EOF
+
+# Write custom settings for Flypy Double Pinyin (Rename and Traditional Chinese s2twp profile)
+cat <<'EOF' >"$RIME_USER_DIR/double_pinyin_flypy.custom.yaml"
+patch:
+  schema/name: "鶴"                              # Flypy Double Pinyin custom name
+  "switches/@2/reset": 1                      # Reset to preset switch state
+  "simplifier/opencc_config": s2twp.json      # Switch to Traditional Chinese (Taiwan vocabulary) mode
+EOF
+
+# Write the core schema configuration file
+cat <<'EOF' >"$RIME_USER_DIR/double_pinyin_flypy.schema.yaml"
+# Rime schema
+# encoding: utf-8
+
+schema:
+  schema_id: double_pinyin_flypy
+  name: 小鶴雙拼
+  version: "0.18"
+  author:
+    - double pinyin layout by 鶴
+    - Rime schema by 佛振 <chen.sst@gmail.com>
+  description: |
+    朙月拼音＋小鶴雙拼方案。
+  dependencies:
+    - stroke
+
+switches:
+  - name: ascii_mode
+    reset: 0
+    states: [ 中文, 西文 ]
+  - name: full_shape
+    states: [ 半角, 全角 ]
+  - name: simplification
+    states: [ 漢字, 汉字 ]
+  - name: ascii_punct
+    states: [ 。，, ．， ]
+
+engine:
+  processors:
+    - ascii_composer
+    - recognizer
+    - key_binder
+    - speller
+    - punctuator
+    - selector
+    - navigator
+    - express_editor
+  segmentors:
+    - ascii_segmentor
+    - matcher
+    - abc_segmentor
+    - punct_segmentor
+    - fallback_segmentor
+  translators:
+    - punct_translator
+    - reverse_lookup_translator
+    - script_translator
+  filters:
+    - simplifier
+    - uniquifier
+
+speller:
+  alphabet: zyxwvutsrqponmlkjihgfedcba
+  delimiter: " '"
+  algebra:
+    - erase/^xx$/
+    - derive/^([jqxy])u$/$1v/
+    - derive/^([aoe])([ioun])$/$1$1$2/
+    - xform/^([aoe])(ng)?$/$1$1$2/
+    - xform/iu$/Q/
+    - xform/(.)ei$/$1W/
+    - xform/uan$/R/
+    - xform/[uv]e$/T/
+    - xform/un$/Y/
+    - xform/^sh/U/
+    - xform/^ch/I/
+    - xform/^zh/V/
+    - xform/uo$/O/
+    - xform/ie$/P/
+    - xform/i?ong$/S/
+    - xform/ing$|uai$/K/
+    - xform/(.)ai$/$1D/
+    - xform/(.)en$/$1F/
+    - xform/(.)eng$/$1G/
+    - xform/[iu]ang$/L/
+    - xform/(.)ang$/$1H/
+    - xform/ian$/M/
+    - xform/(.)an$/$1J/
+    - xform/(.)ou$/$1Z/
+    - xform/[iu]a$/X/
+    - xform/iao$/N/
+    - xform/(.)ao$/$1C/
+    - xform/ui$/V/
+    - xform/in$/B/
+    - xlit/QWRTYUIOPSDFGHJKLZXCVBNM/qwrtyuiopsdfghjklzxcvbnm/
+    #- abbrev/^(.).+$/$1/
+
+translator:
+  dictionary: luna_pinyin
+  prism: double_pinyin_flypy
+  preedit_format:
+    - xform/([bpmfdtnljqx])n/$1iao/
+    - xform/(\w)g/$1eng/
+    - xform/(\w)q/$1iu/
+    - xform/(\w)w/$1ei/
+    - xform/([dtnlgkhjqxyvuirzcs])r/$1uan/
+    - xform/(\w)t/$1ve/
+    - xform/(\w)y/$1un/
+    - xform/([dtnlgkhvuirzcs])o/$1uo/
+    - xform/(\w)p/$1ie/
+    - xform/([jqx])s/$1iong/
+    - xform/(\w)s/$1ong/
+    - xform/(\w)d/$1ai/
+    - xform/(\w)f/$1en/
+    - xform/(\w)h/$1ang/
+    - xform/(\w)j/$1an/
+    - xform/([gkhvuirzcs])k/$1uai/
+    - xform/([gkhvuirzcs])k/$1ing/
+    - xform/([jqxnl])l/$1iang/
+    - xform/(\w)l/$1uang/
+    - xform/(\w)z/$1ou/
+    - xform/([gkhvuirzcs])x/$1ua/
+    - xform/(\w)x/$1ia/
+    - xform/(\w)c/$1ao/
+    - xform/([dtgkhvuirzcs])v/$1ui/
+    - xform/(\w)b/$1in/
+    - xform/(\w)m/$1ian/
+    - xform/([aoe])\1(\w)/$1$2/
+    - "xform/(^|[ '])v/$1zh/"
+    - "xform/(^|[ '])i/$1ch/"
+    - "xform/(^|[ '])u/$1sh/"
+    - xform/([jqxy])v/$1u/
+    - xform/([nl])v/$1ü/
+
+reverse_lookup:
+  dictionary: stroke
+  enable_completion: true
+  prefix: "`"
+  suffix: "'"
+  tips: 〔筆畫〕
+  preedit_format:
+    - xlit/hspnz/一丨丿丶乙/
+  comment_format:
+    - xform/([nl])v/$1ü/
+
+punctuator:
+  import_preset: default
+
+key_binder:
+  import_preset: default
+
+recognizer:
+  import_preset: default
+  patterns:
+    reverse_lookup: "`[a-z]*'?$"
+EOF
+
+echo "Flypy Double Pinyin (Rime) configuration completed!"
+
+echo "=== [5/9] Sync Vim configs ==="
+VIM_CONFIG_FOLDER="$HOME/.vim"
+mkdir -p $VIM_CONFIG_FOLDER
+
+cat <<'EOF' >"$HOME/.vimrc"
+source $HOME/.vim/vimrc
+EOF
+
+cat <<'EOF' >"$VIM_CONFIG_FOLDER/vimrc"
+source ~/.vim/options.vim
+source ~/.vim/keybindings.vim
+source ~/.vim/plugins.vim
+source ~/.vim/colors.vim
+source ~/.vim/fzf.vim
+source ~/.vim/lightline.vim
+source ~/.vim/lsp.vim
+EOF
+
+cat <<'EOF' >"$VIM_CONFIG_FOLDER/options.vim"
+" 檔案類型與編碼 (Filetype & Encoding)
+filetype plugin indent on   " 自動識別檔案類型，並載入對應的插件與縮排規則
+syntax on                   " 開啟語法高亮
+
+set encoding=utf-8          " Vim 內部處理字串的預設編碼
+set fileencodings=utf-8,cp950 " 開啟檔案時的編碼嘗試順序（優先 UTF-8，其次繁體中文 Big5/CP950）
+set clipboard=unnamedplus
+set mouse=a
+
+
+" 縮排與 Tab 控制 (Indentation & Tabs)
+set autoindent              " 新行自動跟隨上一行的縮排格式
+set smartindent             " 開啟智慧縮排（自動根據 C 語言風格的括號等調整縮排）
+set tabstop=4               " 1 個 Tab 鍵在畫面上顯示為 4 個空白的寬度
+set softtabstop=4           " 按下 Tab/Backspace 時，一次插入/刪除 4 個空白
+set shiftwidth=4            " 自動縮排（如按 > 或 < 時）移動的空白數量為 4
+set expandtab               " 將輸入的 Tab 自動轉換為半角空白字元（Space）
+
+
+" 介面與顯示樣式 (UI & Visuals)
+set number                  " 顯示絕對行號
+set relativenumber          " 顯示相對行號（方便用 5j / 10k 等指令精準跳行）
+set ruler                   " 在右下角顯示目前的列號、欄號與游標位置
+set background=dark         " 設定背景模式為深色，供主題/語法顏色選擇合適配色
+set signcolumn=yes          " 永遠顯示左側的標記欄（防止 Git 提示或 LSP 報錯符號跳出時畫面擠壓）
+set cursorline              " 高亮顯示目前的游標所在行
+set colorcolumn=80          " 在第 80 個字元處顯示一條垂直邊界線（提醒程式碼長度）
+set nowrap                  " 當單行文字過長時不自動換行
+set showmatch               " 當游標移到括號時，短暫高亮顯示對應的另一半括號
+set laststatus=2            " 永遠顯示底部的狀態列（Statusline）
+set scrolloff=10            " 畫面上下捲動時，游標上方與下方至少保留 10 行空間
+
+
+" 搜尋行為設定 (Search Configuration)
+set hlsearch                " 高亮顯示所有搜尋到的匹配結果
+set incsearch               " 邊輸入搜尋關鍵字，邊即時跳轉並高亮匹配內容
+set ignorecase              " 搜尋時預設忽略大小寫
+set smartcase               " 如果搜尋關鍵字包含大寫字母，則自動切換回敏感大小寫搜尋
+
+
+" 視窗分割與編輯行為 (Window Splits & Editing Behavior)
+set splitbelow              " 新的水平分割視窗（:sp）會開在當前視窗的「下方」
+set splitright              " 新的垂直分割視窗（:vs）會開在當前視窗的「右方」
+set backspace=indent,eol,start " 讓 Backspace 鍵可以正常刪除縮排、換行符號與進入 Insert 模式前的字
+
+" 將減號 - 視為單字的一部分（讓 dw/diw/ciw 可以把 user-controller 當成單一單字處理）
+set iskeyword+=-
+
+
+" 程式碼折疊 (Code Folding)
+set foldmethod=indent       " 根據程式碼的縮排（Indent）自動建立折疊區塊
+set nofoldenable            " 剛打開檔案時預設展開所有折疊，不自動收合程式碼
+
+
+" 系統效能與互動 (System & Performance)
+set updatetime=50           " 將觸發 CursorHold 事件的延遲改為 50ms（讓 LSP/GitSigns 提示反應極快）
+set confirm                 " 關閉未儲存檔案等衝突操作時，彈出對話框明確詢問（不用強加 !）
+set history=200             " 保留最近使用過的 200 條命令行指令歷史紀錄
+EOF
+
+cat <<'EOF' >"$VIM_CONFIG_FOLDER/keybindings.vim"
+" Set leader key
+let mapleader = " "
+
+" Esc mapping
+inoremap jk <Esc>
+
+" Open netrw with <leader>cd
+nnoremap <leader>e :Ex<CR>
+
+" Move selected lines up/down (like Alt-Up/Down)
+vnoremap J :m '>+1<CR>gv=gv
+vnoremap K :m '<-2<CR>gv=gv
+
+" Join lines with cursor preserved
+nnoremap J mzJ`z
+
+" Scroll half-page and center cursor
+nnoremap <C-d> <C-d>zz
+nnoremap <C-u> <C-u>zz
+
+" Center on next/previous search result
+nnoremap n nzzzv
+nnoremap N Nzzzv
+
+" Paste without overwriting clipboard
+xnoremap <leader>p "_dP
+nnoremap <leader>d "_d
+vnoremap <leader>d "_d
+
+" Make <C-c> behave like <Esc> in insert mode
+inoremap <C-c> <Esc>
+
+" Navigate quickfix list using Ctrl-j/k
+nnoremap <C-j> :lnext<CR>
+nnoremap <C-k> :lprev<CR>
+nnoremap <leader>cl :lclose<CR>
+
+" Disable Ex mode (accidental Q)
+nnoremap Q <nop>
+
+" Location list navigation
+nnoremap <leader>k :lnext<CR>zz
+nnoremap <leader>j :lprev<CR>zz
+
+" Doge doc generator
+nnoremap <leader>dg :DogeGenerate<CR>
+
+" Substitute word under cursor on line
+nnoremap <leader>s :s/\<<C-r><C-w>\>//gI<Left><Left><Left>
+
+" Make current file executable
+nnoremap <leader>x :!chmod +x %<CR>
+
+" Yank via OSCYank
+nmap <leader>y <Plug>OSCYankOperator
+vmap <leader>y <Plug>OSCYankVisual
+
+" Reload vimrc (adjust path as needed)
+nnoremap <leader>rl :source ~/.vim/vimrc<CR>
+EOF
+
+cat <<'EOF' >"$VIM_CONFIG_FOLDER/plugins.vim"
+" plugins.vim - Dead simple plugin manager
+" Just source this file in your vimrc
+let s:plugin_dir = expand('~/.vim/plugged')
+
+" Install a plugin if it doesn't exist
+function! s:ensure(repo)
+  let name = split(a:repo, '/')[-1]
+  let path = s:plugin_dir . '/' . name
+  
+  if !isdirectory(path)
+    if !isdirectory(s:plugin_dir)
+      call mkdir(s:plugin_dir, 'p')
+    endif
+    execute '!git clone --depth=1 https://github.com/' . a:repo . ' ' . shellescape(path)
+  endif
+  
+  execute 'set runtimepath+=' . fnameescape(path)
+endfunction
+
+" Your plugins
+call s:ensure('junegunn/fzf')
+call s:ensure('junegunn/fzf.vim')
+call s:ensure('tomasiser/vim-code-dark')
+call s:ensure('ghifarit53/tokyonight-vim')
+call s:ensure('yegappan/lsp')
+call s:ensure('ojroques/vim-oscyank')
+call s:ensure('tpope/vim-commentary')
+call s:ensure('itchyny/lightline.vim')
+EOF
+
+cat <<'EOF' >"$HOME/.vim/colors.vim"
+set termguicolors
+
+let g:tokyonight_style = 'night' " available: night, storm
+let g:tokyonight_enable_italic = 1
+
+colorscheme tokyonight
+EOF
+
+cat <<'EOF' >"$VIM_CONFIG_FOLDER/fzf.vim"
+" FZF keymaps (requires Plug 'junegunn/fzf.vim')
+
+" Files
+nnoremap <leader>pf :Files<CR>
+nnoremap <leader>ff :Buffers<CR>
+nnoremap <leader>l :CList<CR>    " For quickfix list
+
+" Grep current string
+nnoremap <leader>fw :Rg <C-r><C-w><CR>
+
+" Grep input string (fzf prompt)
+nnoremap <leader>fs :Rg<Space>
+
+" Grep for current file name (without extension)
+nnoremap <leader>fc :execute 'Rg ' . expand('%:t:r')<CR>
+EOF
+
+cat <<'EOF' >"$VIM_CONFIG_FOLDER/lightline.vim"
+set laststatus=2
+let g:lightline = {
+      \ 'colorscheme' : 'tokyonight',
+      \ 'active': {
+      \   'left': [ [ 'mode', 'paste' ],
+      \             [ 'gitbranch', 'readonly', 'filename', 'modified' ] ],
+      \   'right': [ [ 'lineinfo' ], [ 'fileformat', 'fileencoding', 'filetype' ] ]
+      \ },
+      \ 'component_function': {
+      \   'gitbranch': 'FugitiveHead',
+      \   'filename': 'LightlineFilename'
+      \ }
+      \ }
+
+function! LightlineFilename()
+  return expand('%:t') !=# '' ? expand('%:t') : '[No Name]'
+endfunction
+EOF
+
+cat <<'EOF' >"$VIM_CONFIG_FOLDER/lsp.vim"
+" Enable diagnostics highlighting
+let lspOpts = #{autoHighlightDiags: v:true}
+autocmd User LspSetup call LspOptionsSet(lspOpts)
+
+let lspServers = [
+    \ #{
+    \    name: 'rust-analyzer',
+    \    filetype: ['rust'],
+    \    path: 'rust-analyzer',
+    \    args: []
+    \ },
+    \ #{
+    \    name: 'gopls',
+    \    filetype: ['go', 'gomod'],
+    \    path: 'gopls',
+    \    args: []
+    \ },
+    \ #{
+    \    name: 'pylsp',
+    \    filetype: ['python'],
+    \    path: 'pylsp',
+    \    args: []
+    \ },
+    \ #{
+    \    name: 'typescript-language-server',
+    \    filetype: ['javascript', 'typescript', 'javascriptreact', 'typescriptreact'],
+    \    path: 'typescript-language-server',
+    \    args: ['--stdio']
+    \ }
+    \ ]
+
+autocmd User LspSetup call LspAddServer(lspServers)
+
+" Key mappings
+nnoremap gd :LspGotoDefinition<CR>
+nnoremap gr :LspShowReferences<CR>
+nnoremap K  :LspHover<CR>
+nnoremap gl :LspDiag current<CR>
+nnoremap <leader>nd :LspDiag next \| LspDiag current<CR>
+nnoremap <leader>pd :LspDiag prev \| LspDiag current<CR>
+inoremap <silent> <C-Space> <C-x><C-o>
+
+" Set omnifunc for completion across supported filetypes
+autocmd FileType rust,go,python,javascript,typescript,php setlocal omnifunc=lsp#complete
+
+" Custom diagnostic sign characters
+autocmd User LspSetup call LspOptionsSet(#{
+    \    diagSignErrorText: '✘',
+    \    diagSignWarningText: '▲',
+    \    diagSignInfoText: '»',
+    \    diagSignHintText: '⚑',
+    \ })
+EOF
+
+echo "=== [6/9] Sync Wofi configs ==="
+
+WOFI_CONFIG_FOLDER="$HOME/.config/wofi"
+mkdir -p $WOFI_CONFIG_FOLDER
+
+cat <<'EOF' >"$WOFI_CONFIG_FOLDER/config"
+# --- 基礎模式 ---
+mode=drun
+
+# --- 幾何位置 ---
+location=center
+width=800
+height=400
+
+# --- 行為與外觀 ---
+prompt=Search...
+gtk_dark=true
+allow_images=true
+image_size=32
+insensitive=true
+allow_markup=true
+no_actions=true
+orientation=vertical
+# 讓它在居中時更像一個彈出視窗
+hide_search=false
+
+key_up=Ctrl-k
+key_down=Ctrl-j
+key_left=Ctrl-h
+key_right=Ctrl-l
+EOF
+
+cat <<'EOF' >"$WOFI_CONFIG_FOLDER/style.css"
+window {
+  background: #0a0a0a;
+  border: 2px solid #4a6c8c; /* 這裡加粗，確保看得見 */
+  border-radius: 0.8rem;
+  box-shadow: 0 0 15px rgba(74, 108, 140, 0.3);
+}
+
+* {
+  font-family: "JetBrains Mono";
+  color: #e0e0e0;
+}
+
+/* 輸入框外圈也加上邊框，與整體連動 */
+#input {
+  background-color: #171717;
+  margin: 10px;
+  padding: 8px;
+}
+
+/* 列表區容器 */
+#outer-box {
+  padding: 5px;
+}
+
+/* 項目選擇區 */
+#entry {
+  border-radius: 0.4rem;
+  margin: 2px 10px;
+}
+
+#entry:selected {
+  background-color: #1a2a3a;
+  border: 2px solid #6c9dc8; /* 選中時的欄桿光影 */
+}
+EOF
+
+echo "=== [7/9] Sync Vim configs ==="
+cat <<'EOF' >"$VIM_CONFIG_FOLDER/lightline.vim"
+set laststatus=2
+let g:lightline = {
+      \ 'colorscheme' : 'tokyonight',
+      \ 'active': {
+      \   'left': [ [ 'mode', 'paste' ],
+      \             [ 'gitbranch', 'readonly', 'filename', 'modified' ] ],
+      \   'right': [ [ 'lineinfo' ], [ 'fileformat', 'fileencoding', 'filetype' ] ]
+      \ },
+      \ 'component_function': {
+      \   'gitbranch': 'FugitiveHead',
+      \   'filename': 'LightlineFilename'
+      \ }
+      \ }
+
+function! LightlineFilename()
+  return expand('%:t') !=# '' ? expand('%:t') : '[No Name]'
+endfunction
+EOF
+
+cat <<'EOF' >"$VIM_CONFIG_FOLDER/lsp.vim"
+" Enable diagnostics highlighting
+let lspOpts = #{autoHighlightDiags: v:true}
+autocmd User LspSetup call LspOptionsSet(lspOpts)
+
+let lspServers = [
+    \ #{
+    \    name: 'rust-analyzer',
+    \    filetype: ['rust'],
+    \    path: 'rust-analyzer',
+    \    args: []
+    \ },
+    \ #{
+    \    name: 'gopls',
+    \    filetype: ['go', 'gomod'],
+    \    path: 'gopls',
+    \    args: []
+    \ },
+    \ #{
+    \    name: 'pylsp',
+    \    filetype: ['python'],
+    \    path: 'pylsp',
+    \    args: []
+    \ },
+    \ #{
+    \    name: 'typescript-language-server',
+    \    filetype: ['javascript', 'typescript', 'javascriptreact', 'typescriptreact'],
+    \    path: 'typescript-language-server',
+    \    args: ['--stdio']
+    \ }
+    \ ]
+
+autocmd User LspSetup call LspAddServer(lspServers)
+
+" Key mappings
+nnoremap gd :LspGotoDefinition<CR>
+nnoremap gr :LspShowReferences<CR>
+nnoremap K  :LspHover<CR>
+nnoremap gl :LspDiag current<CR>
+nnoremap <leader>nd :LspDiag next \| LspDiag current<CR>
+nnoremap <leader>pd :LspDiag prev \| LspDiag current<CR>
+inoremap <silent> <C-Space> <C-x><C-o>
+
+" Set omnifunc for completion across supported filetypes
+autocmd FileType rust,go,python,javascript,typescript,php setlocal omnifunc=lsp#complete
+
+" Custom diagnostic sign characters
+autocmd User LspSetup call LspOptionsSet(#{
+    \    diagSignErrorText: '✘',
+    \    diagSignWarningText: '▲',
+    \    diagSignInfoText: '»',
+    \    diagSignHintText: '⚑',
+    \ })
+EOF
+
+echo "=== [8/9] Sync TMUX configs ==="
+
+TMUX_CONFIG_PATH="$HOME/.tmux.conf"
+cat <<'EOF' >"$TMUX_CONFIG_PATH"
+# -----------------------------
+# Global settings
+# -----------------------------
+set-environment -g LC_TIME en_US.UTF-8
+
+set -g default-terminal "tmux-256color"
+set -as terminal-features ",tmux-256color:RGB"
+set -as terminal-features ',xterm*:clipboard'
+# set -as terminal-features ",xterm-kitty:RGB"
+
+set -ga update-environment TERM
+set -ga update-environment TERM_PROGRAM
+
+set -g pane-border-style bg=default
+set -g pane-active-border-style bg=default
+set -g status-style bg=default
+set -g window-style bg=default
+set -g window-active-style bg=default
+set -sg escape-time 0
+set -g history-limit 30000
+set -g bell-action any
+set -g display-time 4000
+set -g status-interval 1
+set -g base-index 1
+set -g pane-base-index 1
+setw -g xterm-keys on
+setw -g automatic-rename off
+set -g set-titles on
+set -g focus-events on
+setw -g aggressive-resize on
+set -g status on
+set -g status-left-length 99
+set -g status-right-length 99
+set -g status-justify absolute-centre
+
+set-window-option -g pane-base-index 1
+set-option -g renumber-windows on
+
+SET_DEFAULT_SHELL='tmux set-option -g default-shell $TMUX_DEFAULT_SHELL'
+if-shell '[ -n "$TMUX_DEFAULT_SHELL" ]' \
+  "run-shell '${SET_DEFAULT_SHELL}'"
+
+# -----------------------------
+# key bindings
+# -----------------------------
+
+unbind c-b
+
+set -g prefix C-a
+set -g mouse on
+
+# bind R source-file "$HOME/.tmux.conf"
+bind R source-file "$HOME/.tmux.conf" \; display-message "✅ Tmux configuration reloaded!"
+
+# bind prefix v and s for split windows
+unbind %
+unbind '"'
+bind v split-window -h -c "#{pane_current_path}"
+bind s split-window -v -c "#{pane_current_path}"
+
+# put w to sessions instead of windows
+bind a choose-session
+
+# Windows navigation using shift alt vim keys
+bind-key -n 'M-H' previous-window
+bind-key -n 'M-L' next-window
+bind -n M-1 select-window -t 1
+bind -n M-2 select-window -t 2
+bind -n M-3 select-window -t 3
+bind -n M-4 select-window -t 4
+bind -n M-5 select-window -t 5
+bind -n M-6 select-window -t 6
+bind -n M-7 select-window -t 7
+bind -n M-8 select-window -t 8
+bind -n M-9 select-window -t 9
+
+# Kill all other panes without the current pane and no confirmation
+bind-key q kill-pane -a
+
+# Smart pane switching with awareness of Vim splits.
+# See: https://github.com/christoomey/vim-tmux-navigator
+vim_pattern='(\S+/)?g?\.?(view|l?n?vim?x?|fzf)(diff)?(-wrapped)?'
+is_vim="ps -o state= -o comm= -t '#{pane_tty}' \ | grep -iqE '^[^TXZ ]+ +${vim_pattern}$'"
+bind-key -n 'C-h' if-shell "$is_vim" 'send-keys C-h'  'select-pane -L'
+bind-key -n 'C-j' if-shell "$is_vim" 'send-keys C-j'  'select-pane -D'
+bind-key -n 'C-k' if-shell "$is_vim" 'send-keys C-k'  'select-pane -U'
+bind-key -n 'C-l' if-shell "$is_vim" 'send-keys C-l'  'select-pane -R'
+tmux_version='$(tmux -V | sed -En "s/^tmux ([0-9]+(.[0-9]+)?).*/\1/p")'
+if-shell -b '[ "$(echo "$tmux_version < 3.0" | bc)" = 1 ]' \
+    "bind-key -n 'C-\\' if-shell \"$is_vim\" 'send-keys C-\\'  'select-pane -l'"
+if-shell -b '[ "$(echo "$tmux_version >= 3.0" | bc)" = 1 ]' \
+    "bind-key -n 'C-\\' if-shell \"$is_vim\" 'send-keys C-\\\\'  'select-pane -l'"
+
+# Pane navigation in copy mode
+bind-key -T copy-mode-vi 'C-h' select-pane -L
+bind-key -T copy-mode-vi 'C-j' select-pane -D
+bind-key -T copy-mode-vi 'C-k' select-pane -U
+bind-key -T copy-mode-vi 'C-l' select-pane -R
+bind-key -T copy-mode-vi 'C-\' select-pane -l
+
+# Increase/decrease pane size
+# bind-key = resize-pane -L 10
+# bind-key - resize-pane -R 10
+bind-key -r H resize-pane -L 5
+bind-key -r J resize-pane -D 5
+bind-key -r K resize-pane -U 5
+bind-key -r L resize-pane -R 5
+
+# Clipboard Support
+# 允許 tmux 透過 OSC 52 序列與外部剪貼簿通訊
+set-option -g set-clipboard on
+set-window-option -g mode-keys vi
+
+bind -T copy-mode-vi y send-keys -X copy-selection-and-cancel
+bind -T copy-mode-vi MouseDragEnd1Pane send-keys -X copy-pipe-and-cancel
+# Expand the OSC 52 sequence to support more terminal emulators, including VTE-based ones like GNOME Terminal and Alacritty
+set -ag terminal-overrides ",alacritty:Ms=\\E]52;c;%p2%s\\7"
+set -ag terminal-overrides ",xterm-kitty:Ms=\\E]52;c;%p2%s\\7"
+set -ag terminal-overrides ",ghostty:Ms=\\E]52;c;%p2%s\\7"
+set -ag terminal-overrides ",foot:Ms=\\E]52;c;%p2%s\\7"
+set -ag terminal-overrides ",xterm*:Ms=\\E]52;c;%p2%s\\7"
+set -ag terminal-overrides ",screen*:Ms=\\E]52;c;%p2%s\\7"
+set -ag terminal-overrides ",tmux*:Ms=\\E]52;c;%p2%s\\7"
+set -ag terminal-overrides ",vte*:Ms=\\E]52;c;%p2%s\\7" # GNOME Terminal, XFCE Terminal, Tilix, Guake and other VTE-based terminals
+
+# Enable copy mode with 'k'
+unbind [
+bind-key k copy-mode
+
+# Selection modes in copy mode
+bind -T copy-mode-vi v send-keys -X begin-selection
+bind -T copy-mode-vi V send-keys -X select-line
+bind -T copy-mode-vi C-v send-keys -X select-block
+
+# Debug level
+set -g @debug-level 1
+
+# New session and switch to it
+bind-key c new-window -c "#{pane_current_path}"
+
+# forget the find window.  That is for chumps
+bind-key -r f run-shell "tmux neww ~/.local/bin/byte4work-tmux-sessionizer"
+
+# kitty neovim markdown image.lua preview
+set -gq allow-passthrough on
+set -g visual-activity off
+EOF
+
+echo "=== [9/9] Sync Scripts ==="
+
+SCRIPTS_FOLDER="$HOME/.local/bin"
+cat <<'EOF' >"$SCRIPTS_FOLDER/byte4work-tmux-sessionizer"
+#!/usr/bin/env bash
+
+# === Config ===
+SEARCH_DIRS=(
+	"${HOME}/Development/personal"
+	"${HOME}/Development/side_projects"
+	"${HOME}/Development/learning"
+	"${HOME}/Development/devops"
+	"${HOME}/Development/open_source"
+
+	"${HOME}/Development/working/backend"
+	"${HOME}/Development/working/web"
+	"${HOME}/Development/working/app"
+	"${HOME}/Development/working/cli"
+)
+
+SESSIONIZER_LOG="$HOME/.local/bin/logs/tmux-sessionizer.log"
+
+log() {
+	echo "$(date +'%F %T') - $*" | tee -a "$SESSIONIZER_LOG"
+}
+
+run_tmux() {
+	TMUX= command tmux "$@"
+}
+
+# === FZF-based project picker ===
+pick_project() {
+	local selected
+	local extra_repos=(
+		"${HOME}/dotfiles"
+		"${HOME}/Development"
+		# Add more fixed paths if you want
+	)
+
+	selected=$(
+		{
+			# Print each extra repo if it exists and is a directory
+			for repo in "${extra_repos[@]}"; do
+				[ -d "$repo" ] && echo "$repo"
+			done
+			# Then print the normal search results
+			find "${SEARCH_DIRS[@]}" -mindepth 1 -maxdepth 1 -type d 2>/dev/null
+		} | sort | uniq |
+			fzf --height=40% --reverse --prompt="📁 Pick a project > " \
+				--preview 'tree -L 1 {} | head -100' \
+				--preview-window=right:50%
+	)
+
+	[[ -z "$selected" ]] && exit 1
+	echo "$selected"
+}
+
+# === Main logic ===
+PROJECT_DIR="$1"
+if [[ -z "$PROJECT_DIR" ]]; then
+	# log "Launching fzf to pick a project..."
+	PROJECT_DIR=$(pick_project)
+fi
+
+# log "DEBUG: Raw PROJECT_DIR is: '$PROJECT_DIR'"
+
+PROJECT_NAME="$(basename "$PROJECT_DIR")"
+# log "Selected project: $PROJECT_NAME at $PROJECT_DIR"
+# log "DEBUG: Calculated PROJECT_NAME is: '$PROJECT_NAME'"
+# log "DEBUG: PROJECT_NAME length is: ${#PROJECT_NAME}"
+
+# Check if session exists
+if run_tmux has-session -t="$PROJECT_NAME" 2>/dev/null; then
+	# log "Session $PROJECT_NAME already exists."
+	if [[ -n "$TMUX" ]]; then
+		# log "Inside tmux, switching client..."
+		run_tmux switch-client -t "$PROJECT_NAME" || {
+			# log "[warn] switch-client failed, creating new window..."
+			run_tmux new-window -t "$PROJECT_NAME" -c "$PROJECT_DIR"
+		}
+	else
+		# log "Outside tmux, attaching..."
+		run_tmux attach-session -t "$PROJECT_NAME"
+	fi
+	exit 0
+fi
+
+# Create session
+# log "Creating session $PROJECT_NAME..."
+run_tmux new-session -d -s "$PROJECT_NAME" -c "$PROJECT_DIR"
+
+# Wait a bit to catch any immediate exit
+sleep 0.2
+if ! run_tmux has-session -t="$PROJECT_NAME" 2>/dev/null; then
+	# log "[fatal] Session vanished. Shell likely exited immediately."
+	# log "[hint] Check shell rc files (.zshrc/.bashrc) for early exits."
+	exit 1
+fi
+
+# Switch or attach
+if [[ -n "$TMUX" ]]; then
+	# log "Inside tmux, switching..."
+	run_tmux switch-client -t "$PROJECT_NAME"
+else
+	# log "Outside tmux, attaching..."
+	run_tmux attach-session -t "$PROJECT_NAME"
+fi
+EOF
+chmod +x "$SCRIPTS_FOLDER/byte4work-tmux-sessionizer"
+
+cat <<'EOF' >"$SCRIPTS_FOLDER/byte4work-wofi-clipboard"
+#!/bin/bash
+
+selected=$(cliphist list | wofi --dmenu --allow-images --prompt "Clipboard" --width 800 --height 600)
+[ -z "$selected" ] && exit 0
+echo "$selected" | cliphist decode | wl-copy
+notify-send "Cliphist" "Copy to Clipboard" -t 1000
+EOF
+
+chmod +x "$SCRIPTS_FOLDER/byte4work-wofi-clipboard"
+
+show_cli_multi_menu
+
+echo "=================================================="
+echo "🎉 Sway environment and configuration setup complete!"
+echo "Configuration file written to: ~/.config/sway/config"
+echo "You can now log out, switch to the Sway session, and create your snapshot!"
+echo "=================================================="
