@@ -134,7 +134,7 @@ fi
 info "=== [5/7] Multimedia, Fonts & Input ==="
 sudo pacman -S --noconfirm --needed \
 	ffmpeg mpv vlc-plugin-ffmpeg vlc-plugin-live555 vlc-plugins-all vlc-plugins-extra libva-utils libvdpau \
-	fcitx5-chinese-addons fcitx5-configtool fcitx5-gtk rime-double-pinyin \
+	fcitx5-rime fcitx5-chinese-addons fcitx5-configtool fcitx5-gtk rime-double-pinyin \
 	ttf-jetbrains-mono-nerd ttf-liberation noto-fonts-cjk noto-fonts-emoji noto-fonts-extra \
 	ttf-font-awesome otf-font-awesome ttf-roboto adobe-source-sans-fonts
 
