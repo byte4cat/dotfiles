@@ -58,7 +58,6 @@ return {
 				"gofumpt",
 				"golines",
 				"golangci-lint",
-				"rustfmt",
 				"black",
 				"isort",
 				"autoflake",

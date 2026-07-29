@@ -82,10 +82,6 @@ vim.keymap.set("i", "<A-k>", "<Esc>:m .-2<CR>==gi", { noremap = true, silent = t
 vim.keymap.set("v", "<A-j>", ":m '>+1<CR>gv=gv", { noremap = true, silent = true, desc = "Move Block Down" })
 vim.keymap.set("v", "<A-k>", ":m '<-2<CR>gv=gv", { noremap = true, silent = true, desc = "Move Block Up" })
 
--- zz after moving
-vim.keymap.set("n", "<C-f>", "<C-f>zz", { noremap = true, silent = true })
-vim.keymap.set("n", "<C-b>", "<C-b>zz", { noremap = true, silent = true })
-
 -- ==========================================================================
 -- 外部工具整合 (Tmux, Oil, File Tree, Git, Buffer)
 -- ==========================================================================
@@ -148,31 +144,6 @@ vim.keymap.set(
 
 -- Undotree
 vim.keymap.set("n", "<leader>u", vim.cmd.UndotreeToggle, { noremap = true, silent = true, desc = "Toggle Undotree" })
-
--- ==========================================================================
--- 折疊 (Folding)
--- ==========================================================================
-
--- Key mappings for folding and unfolding
-vim.api.nvim_set_keymap("n", "zj", ":foldopen!<CR>", { noremap = true, silent = true, desc = "Fold Open Cursor" })
-vim.api.nvim_set_keymap("n", "zk", ":foldclose!<CR>", { noremap = true, silent = true, desc = "Fold Close Cursor" })
-
--- enable or disable fold
-vim.keymap.set("n", "<leader>zm", function()
-	if vim.wo.foldenable then
-		vim.opt.foldenable = false
-		vim.opt.foldlevel = 99
-		vim.notify("Fold disable", "info", {
-			title = "Editor",
-		})
-	else
-		vim.opt.foldenable = true
-		vim.opt.foldlevel = 0
-		vim.notify("Fold enable", "info", {
-			title = "Editor",
-		})
-	end
-end, { noremap = true, silent = true, desc = "Toggle Folding" })
 
 -- ==========================================================================
 -- Telescope
