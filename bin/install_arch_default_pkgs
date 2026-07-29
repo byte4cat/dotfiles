@@ -75,7 +75,6 @@ sudo pacman -S --noconfirm --needed \
 
 info "=== AUR Custom Targets (yay) ==="
 yay -S --noconfirm --needed \
-	librewolf-bin \
 	fzf-tab \
 	hyprshade \
 	waypaper \
@@ -100,6 +99,7 @@ yay -S --noconfirm --needed \
 	postman-bin \
 	freelens-bin \
 	localsend-bin
+	# librewolf-bin \
 # wombat-bin # required webkit2gtk, outdated (project archive) since 2021.
 
 # Waypaper default state file
