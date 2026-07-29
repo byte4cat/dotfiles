@@ -241,7 +241,6 @@ bindsym $mainMod+c exec pgrep wofi && pkill wofi || PATH=$my_path byte4work-wofi
 bindsym $mainMod+$secMod+c exec PATH=$my_path byte4work-wofi-clipboard
 bindsym $mainMod+w exec PATH=$my_path byte4work-waypaper-selector; exec swaymsg focus
 bindsym $mainMod+Shift+b exec PATH=$my_path byte4work-babycam
-bindsym $mainMod+Shift+p exec PATH=$my_path byte4work-hyprland-toggle-pin
 
 # --- Screenshot ---
 # 截圖整個螢幕 (Ctrl+1)
@@ -259,6 +258,10 @@ bindsym $mainMod+Control+Shift+2 exec grim -g "$(slurp)" - | satty --filename -
 # 截圖選取區域並用 satty 編輯 (Ctrl+Shift+3)
 bindsym $mainMod+Control+Shift+3 exec grim -g "$(slurp)" - | satty --filename -
 
+input "type:keyboard" {
+    xkb_layout us
+    xkb_options ctrl:nocaps
+}
 
 bar {
     swaybar_command swaybar
