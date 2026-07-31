@@ -76,7 +76,7 @@ set_power_mode() {
 		;;
 	esac
 
-	if err_msg=$(sudo powerprofilesctl set "$target" 2>&1); then
+	if err_msg=$(powerprofilesctl set "$target" 2>&1); then
 		notify-send -a "Power Manager" -u "$urgency" "$icon Power Mode: ${target^^}" "$msg"
 	else
 		logger "Power Mode Error: $err_msg"
