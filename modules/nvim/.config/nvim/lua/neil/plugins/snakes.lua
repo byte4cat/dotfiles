@@ -122,21 +122,21 @@ return {
 		},
 		-- Picker
 		{
-			"<leader>ff",
+			"<leader>pf",
 			function()
 				Snacks.picker.files()
 			end,
 			desc = "Find Files (Snacks)",
 		},
 		{
-			"<leader>/",
+			"<leader>ps",
 			function()
 				Snacks.picker.grep()
 			end,
 			desc = "Grep (Snacks)",
 		},
 		{
-			"<leader>fb",
+			"<leader>pb",
 			function()
 				Snacks.picker.buffers()
 			end,
@@ -157,7 +157,7 @@ return {
 			desc = "LSP Symbols (Snacks)",
 		},
 		{
-			"<leader>fm",
+			"<leader>pm",
 			function()
 				Snacks.picker.man()
 			end,
@@ -165,28 +165,28 @@ return {
 		},
 
 		{
-			"<leader>fh",
+			"<leader>ph",
 			function()
 				Snacks.picker.help()
 			end,
 			desc = "Help Tags (Snacks)",
 		},
 		{
-			"<leader>fg",
+			"<leader>pg",
 			function()
 				Snacks.picker.git_status()
 			end,
 			desc = "Git Status (Snacks)",
 		},
 		{
-			"<leader>fc",
+			"<leader>pc",
 			function()
 				Snacks.picker.git_log_file()
 			end,
 			desc = "Git Buffer Commits (Snacks)",
 		},
 		{
-			"<leader>fl",
+			"<leader>pl",
 			function()
 				Snacks.picker.git_log()
 			end,

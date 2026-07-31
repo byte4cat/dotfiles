@@ -118,6 +118,8 @@ vim.keymap.set("n", "<Esc>", "<cmd>nohlsearch<CR>", { noremap = true, silent = t
 -- Buffer
 vim.keymap.set("n", "<leader>bd", ":bd<CR>", { desc = "Delete Buffer" })
 
+-- File Manager
+-- vim.api.nvim_set_keymap("n", "<leader>e", ":Ex<CR>", { noremap = true, silent = true, desc = "Toggle Netrw" })
 -- Nvim tree
 vim.api.nvim_set_keymap(
 	"n",
@@ -125,19 +127,12 @@ vim.api.nvim_set_keymap(
 	":NvimTreeToggle<CR>",
 	{ noremap = true, silent = true, desc = "Toggle NvimTree" }
 )
--- Let's try mini.file
-vim.api.nvim_set_keymap(
-	"n",
-	"<leader>E",
-	":lua MiniFiles.open()<CR>",
-	{ noremap = true, silent = true, desc = "Toggle Mini file" }
-)
 
 -- Oil.nvim
 -- open parent directory in new floating window
 vim.keymap.set(
 	"n",
-	"<space>-",
+	"<space>E",
 	require("oil").toggle_float,
 	{ noremap = true, silent = true, desc = "Toggle Oil Floating Window" }
 )

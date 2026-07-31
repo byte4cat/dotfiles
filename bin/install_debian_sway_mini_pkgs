@@ -506,7 +506,7 @@ let mapleader = " "
 " Esc mapping
 inoremap jk <Esc>
 
-" Open netrw with <leader>cd
+" Open netrw with <leader>e
 nnoremap <leader>e :Ex<CR>
 
 " Move selected lines up/down (like Alt-Up/Down)
