@@ -1,8 +1,8 @@
 # i3 Configuration File - Migrated from Hyprland Setup
 
-####################
-### 1. 變數設定 ###
-####################
+################
+### 變數設定 ###
+################
 font pango:monospace 14
 
 # 設置 Mod 鍵
@@ -13,7 +13,7 @@ set $altMod Mod1
 set $terminal ghostty
 # set $terminal alacritty
 set $fileManager thunar
-set $browser librewolf
+set $browser firefox
 set $menu rofi -show drun
 set $fileManager GTK_THEME=adw-gtk3-dark thunar
 set $terminalFileManager ghostty -e yazi ~/Downloads
@@ -21,9 +21,9 @@ set $babycam byte4work-babycam
 set $quickmenu byte4work-rofi-quick-menu
 set $powermenu byte4work-rofi-power-menu
 
-############################
-### 2. 環境變數/多螢幕與 X11 設置 ###
-############################
+##################################
+### 環境變數/多螢幕與 X11 設置 ###
+##################################
 
 # 設置 X11 下的 Xcursor 大小
 exec --no-startup-id xsetroot -cursor_name left_ptr
@@ -44,9 +44,9 @@ set $gaps_out 10
 gaps inner $gaps_in
 gaps outer $gaps_out
 
-###################
-### 3. AUTOSTART ###
-###################
+#################
+### AUTOSTART ###
+#################
 
 # 壁紙與合成器
 exec_always --no-startup-id feh --bg-fill ~/.local/share/wallpapers/171652.jpg
@@ -64,31 +64,28 @@ exec --no-startup-id sleep 3 && setxkbmap -option ctrl:nocaps
 # 剪貼簿歷史管理 (X11 專用環境)
 exec --no-startup-id clipmenud &
 
-
-
-#########################
-### 4. 視窗外觀與規則 ###
-#########################
+######################
+### 視窗外觀與規則 ###
+######################
 
 # 預設 1 像素邊框
-default_border pixel 1
-for_window [class="^.*"] border pixel 1
+default_border pixel 2
+for_window [class="^.*"] border pixel 2
 
 # 浮動視窗規則
 for_window [class="Rofi"] floating enable
 for_window [class="Rofi"] focus_on_window activation
 for_window [class="Rofi"] move position center
 
-###################
-### 5. 按鍵綁定 ###
-###################
+################
+### 按鍵綁定 ###
+################
 
 # === 基礎核心操作 ===
 bindsym $mod+Return exec $terminal
 bindsym $mod+q kill
 bindsym $mod+m exec $powermenu
 bindsym $mod+b exec $browser
-bindsym $mod+Shift+e exec $fileManager
 bindsym $mod+e exec $terminalFileManager
 bindsym $mod+d exec $menu
 
@@ -144,7 +141,7 @@ bindsym $mod+6 workspace number 6
 bindsym $mod+7 workspace number 7
 bindsym $mod+8 workspace number 8
 bindsym $mod+9 workspace number 9
-bindsym $mod+0 workspace number 10
+bindsym $mod+0 workspace number 0
 
 # === 移動視窗到指定工作區 ===
 bindsym $mod+Shift+1 move container to workspace number 1
@@ -195,9 +192,9 @@ bindsym XF86AudioPause exec playerctl play-pause
 # === 退出 i3 會話 ===
 bindsym $mod+Shift+m exec i3-nagbar -t warning -m 'You pressed the exit shortcut. Do you really want to exit i3? This will end your X session.' -B 'Yes, exit i3' 'i3-msg exit'
 
-############################
-### 6. 傳統 RESIZE 模式 (保留) ###
-############################
+###############################
+### 傳統 RESIZE 模式 (保留) ###
+###############################
 mode "resize" {
         bindsym h resize shrink width 10 px or 10 ppt
         bindsym j resize grow height 10 px or 10 ppt

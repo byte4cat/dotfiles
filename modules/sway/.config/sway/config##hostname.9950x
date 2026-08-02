@@ -5,8 +5,8 @@ set $my_path $HOME/.local/bin/sway:$HOME/.local/bin/wayland:$HOME/.local/private
 set $mainMod Mod4
 set $secMod Mod1
 set $terminal PATH=$my_path ghostty
-set $browser librewolf
-set $menu wofi --show drun
+set $browser firefox
+set $menu walker
 set $file_manager thunar
 set $PRIMARY_MONITOR DP-1
 
@@ -67,9 +67,6 @@ client.unfocused        #222222 #222222 #444444 #222222 #222222
 default_border pixel 2
 default_floating_border pixel 2
 
-# --- hot reload ---
-bindsym $mainMod+Shift+c reload
-
 # --- 輸出設定 ---
 output HDMI-A-1 {
     mode 1920x1200@60Hz
@@ -108,7 +105,7 @@ assign [class="vesktop"] workspace "sw_vesktop"
 for_window [class="^.*$"] opacity 0.96
 for_window [app_id="^(firefox|brave-browser|librewolf)$"] opacity 1.0
 for_window [class="^(vesktop|Signal)$"] opacity 1.0
-for_window [app_id="com.mitchellh.ghostty"] opacity 0.80
+for_window [app_id="^(com.mitchellh.ghostty|Alacritty)"] opacity 0.80
 for_window [app_id="walker"] floating enable, border none, focus, move center
 for_window [app_id="wofi"] floating enable, move center, focus
 for_window [app_id="waypaper"] floating enable, move center, focus
@@ -210,12 +207,9 @@ bindsym XF86MonBrightnessDown exec "brightnessctl set 5%- && swayosd-client --br
 
 bindsym $mainMod+Return exec $terminal
 bindsym $mainMod+q kill
-# bindsym $mainMod+b exec $browser
-# 使用 --mark 參數標記該視窗，然後移動到 workspace 2
-bindsym $mainMod+b exec $browser --new-window; \
-    exec swaymsg '[app_id="librewolf"] mark --add browser_auto'
-bindsym $mainMod+Shift+e exec $file_manager
-bindsym $mainMod+m exec pgrep wofi && pkill wofi || PATH=$my_path byte4work-wofi-power-menu
+bindsym $mainMod+b exec $browser
+bindsym $mainMod+e exec $file_manager
+bindsym $mainMod+m exec byte4work-walker-power-menu
 
 # 特殊工作區
 bindsym $mainMod+x exec PATH=$my_path byte4work-toggle-signal-workspace
@@ -227,18 +221,14 @@ bindsym $mainMod+Shift+s move container to workspace "sw_vesktop"; workspace "sw
 bindsym $mainMod+a exec PATH=$my_path byte4work-toggle-scratch-term-workspace
 bindsym $mainMod+v exec PATH=$my_path byte4work-toggle-music-workspace
 
-# Waybar
-bindsym $mainMod+Shift+t exec PATH=$my_path byte4work-wofi-switch-waybar-theme
-
 # 啟動器與工具
-bindsym $mainMod+d exec pgrep wofi && pkill wofi || XDG_DATA_DIRS=$HOME/.local/share:$XDG_DATA_DIRS PATH=$my_path wofi --show drun
-bindsym $mainMod+t exec PATH=$my_path byte4work-switch-waybar-theme; exec swaymsg focus
+bindsym $mainMod+d exec $menu
 bindsym $mainMod+n cyclenext
 bindsym $mainMod+Shift+n exec swaync-client -t
 
 # --- 快速選單 ---
-bindsym $mainMod+c exec pgrep wofi && pkill wofi || PATH=$my_path byte4work-wofi-quick-menu
-bindsym $mainMod+$secMod+c exec PATH=$my_path byte4work-wofi-clipboard
+bindsym $mainMod+c exec $my_path byte4work-walker-quick-menu
+bindsym $mainMod+$secMod+c exec PATH=$my_path byte4work-walker-clipboard
 bindsym $mainMod+w exec PATH=$my_path byte4work-waypaper-selector; exec swaymsg focus
 bindsym $mainMod+Shift+b exec PATH=$my_path byte4work-babycam
 
