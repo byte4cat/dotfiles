@@ -12,6 +12,7 @@ p.secMod = "ALT" -- Sets "Alt" key as secondary modifier
 
 p.primaryMonitor = "DP-1"
 p.terminal = "ghostty"
+p.sec_terminal = "alacritty"
 p.browser = "firefox"
 p.menu = "walker"
 p.workMsg = "vesktop"

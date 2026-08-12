@@ -1,0 +1,82 @@
+#!/usr/bin/env bash
+
+# from: https://cht.sh/
+# github: https://github.com/chubin/cheat.sh
+
+languages=(
+	golang
+	solidity
+	vlang
+	v
+	nodejs
+	javascript
+	tmux
+	typescript
+	zsh
+	cpp
+	c
+	lua
+	rust
+	python
+	bash
+	php
+	haskell
+	ArnoldC
+	css
+	html
+	gdb
+)
+
+commands=(
+	find
+	man
+	tldr
+	sed
+	awk
+	tr
+	cp
+	ls
+	grep
+	xargs
+	rg
+	ps
+	mv
+	kill
+	lsof
+	less
+	head
+	tail
+	tar
+	cp
+	rm
+	rename
+	jq
+	cat
+	ssh
+	cargo
+	git
+	git-worktree
+	git-status
+	git-commit
+	git-rebase
+	docker
+	docker-compose
+	stow
+	chmod
+	chown
+	make
+)
+
+selected=$(printf "%s\n" "${languages[@]}" "${commands[@]}" | fzf)
+if [[ -z $selected ]]; then
+	exit 0
+fi
+
+read -p "Enter Query: " query
+
+if printf '%s\n' "${languages[@]}" | grep -qx "$selected"; then
+	query=$(echo $query | tr ' ' '+')
+	tmux neww bash -c "echo \"curl cht.sh/$selected/$query/\" && curl cht.sh/$selected/$query | less -R"
+else
+	tmux neww bash -c "curl -s cht.sh/$selected~$query | less -R"
+fi

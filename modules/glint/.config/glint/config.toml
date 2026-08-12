@@ -1,6 +1,6 @@
-note_path = "~/Documents/Personal/Notes/notes.md"
+note_path = "~/Documents/Personal/notes/notes.md"
 title_size = 24
-monitor_name = 'DP-1' # not support hot reload
+monitor_name = 'DP-1'                             # not support hot reload
 
 margin_bottom = 150
 margin_right = 50

@@ -117,11 +117,12 @@ hl.workspace_rule({ workspace = "10", monitor = "HDMI-A-1" })
 -- 動態創建 Special Workspaces 的空白預設
 hl.workspace_rule({
 	workspace = "special:scratchpad-term",
-	on_created_empty = myEnv.terminal .. " -e bash -c 'tmux new-session -A -s scratchpad; exec bash'",
+	on_created_empty = myEnv.sec_terminal .. " -e bash -c 'tmux new-session -A -s scratchpad; exec bash'",
 })
 hl.workspace_rule({ workspace = "special:music", on_created_empty = "[float] " .. myEnv.music })
 hl.workspace_rule({ workspace = "special:work-msg", on_created_empty = "[tiled] " .. myEnv.workMsg })
-hl.workspace_rule({ workspace = "special:temp" })
+hl.workspace_rule({ workspace = "special:temp_i" })
+hl.workspace_rule({ workspace = "special:temp_o" })
 
 -- 常規 1-10 快捷鍵綁定
 for i = 1, 10 do
@@ -156,8 +157,10 @@ hl.bind(myEnv.mainMod .. " + A", function()
 	hl.dispatch(hl.dsp.workspace.toggle_special("scratchpad-term"))
 end)
 
-hl.bind(myEnv.mainMod .. " + O", hl.dsp.workspace.toggle_special("temp"))
-hl.bind(myEnv.mainMod .. " + SHIFT + O", hl.dsp.window.move({ workspace = "special:temp" }))
+hl.bind(myEnv.mainMod .. " + I", hl.dsp.workspace.toggle_special("temp_i"))
+hl.bind(myEnv.mainMod .. " + O", hl.dsp.workspace.toggle_special("temp_o"))
+hl.bind(myEnv.mainMod .. " + SHIFT + I", hl.dsp.window.move({ workspace = "special:temp_i" }))
+hl.bind(myEnv.mainMod .. " + SHIFT + O", hl.dsp.window.move({ workspace = "special:temp_o" }))
 
 -- =========
 -- 滑鼠綁定

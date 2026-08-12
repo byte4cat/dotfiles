@@ -35,16 +35,16 @@ hl.window_rule({
 hl.window_rule({
 	name = "terminal-transparent",
 	match = { class = "^(com\\.mitchellh\\.ghostty|Alacritty|kitty|foot)$" },
-	opacity = "0.80 override 0.80 override 0.80 override",
+	opacity = "0.90 override 0.90 override 0.90 override",
 	no_blur = true,
 })
 
-hl.window_rule({
-	name = "terminal-alacritty-transparent",
-	match = { class = "^(Alacritty)$" },
-	opacity = "0.80 override 0.80 override 0.80 override",
-	no_blur = false,
-})
+-- hl.window_rule({
+-- 	name = "terminal-alacritty-transparent",
+-- 	match = { class = "^(Alacritty)$" },
+-- 	opacity = "0.80 override 0.80 override 0.80 override",
+-- 	no_blur = false,
+-- })
 
 -- 終端機全螢幕時：稍微調低透明度以專注 (0.90)
 hl.window_rule({
@@ -53,6 +53,6 @@ hl.window_rule({
 		class = "^(com\\.mitchellh\\.ghostty|Alacritty|kitty|foot)$",
 		fullscreen = "1",
 	},
-	opacity = "0.80 override 0.80 override 0.80 override",
+	opacity = "0.95 override 0.95 override 0.95 override",
 	no_blur = false,
 })

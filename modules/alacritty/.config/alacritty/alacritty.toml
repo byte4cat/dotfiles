@@ -45,9 +45,17 @@ y = 0
 
 [general]
 live_config_reload = true
+import = ["colors.toml"]
+
+[cursor]
+style = { shape = "Block", blinking = "On" }
 
 [keyboard]
-bindings = []
+bindings = [
+	{ key = "C", mods = "Control|Shift", action = "Copy" },
+	{ key = "V", mods = "Control|Shift", action = "Paste" },
+	{ key = "F", mods = "Control", action = "SearchForward" },
+]
 
 [selection]
 save_to_clipboard = true

@@ -30,7 +30,7 @@ return {
 		end,
 	},
 	{ "savq/melange-nvim", name = "melange", lazy = true },
-	{ "nyoom-engineering/oxocarbon.nvim", name = "oxocarbon", lazy = true },
+	-- { "nyoom-engineering/oxocarbon.nvim", name = "oxocarbon", lazy = true },
 	{ "scottmckendry/cyberdream.nvim", name = "cyberdream", lazy = true, opts = { transparent = true } },
 	{ "AlexvZyl/nordic.nvim", name = "nordic", lazy = true, opts = { transparent = { bg = false, float = false } } },
 	{ "eldritch-theme/eldritch.nvim", name = "eldritch", lazy = true, opts = { transparent = true } },

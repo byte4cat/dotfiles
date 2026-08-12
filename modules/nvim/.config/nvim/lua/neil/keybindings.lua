@@ -274,8 +274,8 @@ vim.keymap.set("n", "<leader>dv", diffview_toggle, { noremap = true, silent = tr
 -- ==========================================================================
 
 -- Quickfix List
-vim.keymap.set("n", "[c", ":cprev<CR>", { noremap = true, silent = true, desc = "Previous Quickfix Item" })
-vim.keymap.set("n", "]c", ":cnext<CR>", { noremap = true, silent = true, desc = "Next Quickfix Item" })
+vim.keymap.set("n", "[q", ":cprev<CR>", { noremap = true, silent = true, desc = "Previous Quickfix Item" })
+vim.keymap.set("n", "]q", ":cnext<CR>", { noremap = true, silent = true, desc = "Next Quickfix Item" })
 -- Quicker
 vim.keymap.set("n", "<leader>l", function()
 	require("quicker").toggle()

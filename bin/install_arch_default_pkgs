@@ -78,28 +78,28 @@ yay -S --noconfirm --needed \
 	fzf-tab \
 	hyprshade \
 	waypaper \
-    elephant-bin \
-    elephant-bluetooth-bin \
-    elephant-calc-bin \
-    elephant-clipboard-bin \
-    elephant-desktopapplications-bin \
-    elephant-files-bin \
-    elephant-menus-bin \
-    elephant-providerlist-bin \
-    elephant-symbols-bin \
-    elephant-todo-bin \
-    elephant-unicode-bin \
-    elephant-websearch-bin \
-    walker-bin \
-    fcitx5-mcbopomofo-git \
-    mongodb-compass-bin \
+	elephant-bin \
+	elephant-bluetooth-bin \
+	elephant-calc-bin \
+	elephant-clipboard-bin \
+	elephant-desktopapplications-bin \
+	elephant-files-bin \
+	elephant-menus-bin \
+	elephant-providerlist-bin \
+	elephant-symbols-bin \
+	elephant-todo-bin \
+	elephant-unicode-bin \
+	elephant-websearch-bin \
+	walker-bin \
+	fcitx5-mcbopomofo-git \
+	mongodb-compass-bin \
 	networkmanager-fortisslvpn \
 	another-redis-desktop-manager-bin \
 	bruno-bin \
 	postman-bin \
 	freelens-bin \
 	localsend-bin
-	# librewolf-bin \
+# librewolf-bin \
 # wombat-bin # required webkit2gtk, outdated (project archive) since 2021.
 
 # Waypaper default state file
@@ -179,7 +179,7 @@ else
 fi
 
 # Install main applications
-sudo pacman -S --noconfirm --needed ghostty awww firefox
+sudo pacman -S --noconfirm --needed ghostty alacritty awww firefox
 
 # Environment Health Check
 info "=== [7/7] Environment Check ==="
