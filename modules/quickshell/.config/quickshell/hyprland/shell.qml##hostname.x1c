@@ -203,6 +203,7 @@ ShellRoot {
             memProc.running = true
             diskProc.running = true
             volProc.running = true
+			batProc.running = true
         }
     }
 
