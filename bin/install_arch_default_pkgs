@@ -33,7 +33,7 @@ sudo pacman -S --noconfirm --needed \
 	cmake meson ninja gcc clang make pkg-config libxkbcommon \
 	libinput libxcb xcb-util xcb-util-keysyms xcb-util-wm xcb-util-renderutil \
 	zsh rustup tmux gdb lld vlc go starship fnm code neovim docker docker-compose docker-buildx \
-	words gvim man-db man-pages
+	words gvim man-db man-pages tree-sitter
 
 # for markdown and documents converts
 sudo pacman -S --noconfirm --needed \
