@@ -56,7 +56,7 @@ else
 		echo "$INPUT" | wofi --dmenu --allow-markup --width=400 --lines=10 2>>"$PICKER_LOG"
 	else
 		echo "Executing walker..." >>"$PICKER_LOG"
-		echo "$INPUT" | walker --dmenu --width=400 2>>"$PICKER_LOG"
+		echo "$INPUT" | walker --dmenu --nohints --width=400 --minheight=2 2>>"$PICKER_LOG"
 	fi
 fi
 echo "=== Picker finished ===" >>"$PICKER_LOG"

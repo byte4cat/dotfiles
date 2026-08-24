@@ -18,7 +18,7 @@ OPTIONS=(
 	"Power Profile"
 	"Toggle Sleep"
 	"Toggle VPN"
-	"Toggle Vertical Monitor"
+	"Reload Config"
 	"Restart PipeWire"
 	"Restart NetworkManager"
 	"Restart Wifi wlan0"
@@ -84,16 +84,6 @@ set_power_mode() {
 	fi
 }
 
-toggle_monitor() {
-	if hyprctl monitors | grep -q "$MON_NAME"; then
-		hyprctl keyword monitor "$MON_NAME,disable"
-		notify-send "Monitor Manager" "🖥️ $MON_NAME Disabled"
-	else
-		hyprctl keyword monitor "$MON_NAME,$MON_CFG"
-		notify-send "Monitor Manager" "🖥️ $MON_NAME Enabled"
-	fi
-}
-
 get_vpn_connections() {
 	nmcli -t -f NAME,TYPE con show 2>/dev/null | grep -E ':(vpn|openvpn|wireguard|pptp|l2tp|vpnc|fortisslvpn|ipsec)$' | cut -d: -f1
 }
@@ -153,7 +143,22 @@ main() {
 		local selected_line=$(echo -e "$p_options" | $WOFI_CMD --prompt "Select Profile…")
 		[ -n "$selected_line" ] && set_power_mode "$(echo "$selected_line" | awk '{print $NF}')"
 		;;
-	"Toggle Vertical Monitor") toggle_monitor ;;
+	"Reload Config")
+		if [ "$XDG_CURRENT_DESKTOP" = "Hyprland" ]; then
+			result=$(hyprctl $INSTANCE_FLAG reload 2>&1)
+			if [[ "$result" == "ok" ]]; then
+				notify-send "Hyprland" "Config reloaded successfully!" -t 2000
+			else
+				notify-send "Hyprland Error" "Reload failed: $result" -t 4000
+			fi
+		else
+			if swaymsg reload; then
+				notify-send "Sway" "Config reloaded successfully!" -t 2000
+			else
+				notify-send "Sway Error" "Reload failed" -t 4000
+			fi
+		fi
+		;;
 	"Restart PipeWire")
 		"$SCRIPTS_COMMON_DIR/byte4work-restart-pipewire"
 		notify-send "PipeWire Restarted"

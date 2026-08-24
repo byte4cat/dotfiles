@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 
-WOFI_CMD="wofi --show dmenu --width 600 --height 350"
-INSTANCE_FLAG="-i 0"
+ROFI_CMD="rofi -dmenu -width 600 -height 350 -p "Power Menu…""
 
 OPTIONS=(
 	"🟢 Logout"
@@ -13,7 +12,7 @@ OPTIONS=(
 	"❌ Cancel"
 )
 
-selection=$(printf "%s\n" "${OPTIONS[@]}" | $WOFI_CMD --prompt "Power Menu…")
+selection=$(printf "%s\n" "${OPTIONS[@]}" | rofi -dmenu -p "Power Menu…")
 
 if [[ -z "$selection" ]]; then
 	exit 0
@@ -21,11 +20,7 @@ fi
 
 case "$selection" in
 "🟢 Logout")
-	if [ "$XDG_CURRENT_DESKTOP" = "Hyprland" ]; then
-		hyprctl $INSTANCE_FLAG dispatch "hl.dsp.exit()"
-	else
-		swaymsg exit
-	fi
+	i3-msg exit
 	;;
 "☯ Shutdown")
 	systemctl poweroff --no-wall
@@ -40,16 +35,10 @@ case "$selection" in
 	systemctl suspend
 	;;
 "🔒 Lock")
-	if [ "$XDG_CURRENT_DESKTOP" = "Hyprland" ]; then
-		hyprlock
-	else
-		swaylock -f -c 000000
-	fi
+	# i3lock or betterlockscreen
+	i3lock -f -c 000000
 	;;
-"❌ Cancel")
-	exit 0
-	;;
-*)
+"❌ Cancel" | *)
 	exit 0
 	;;
 esac
