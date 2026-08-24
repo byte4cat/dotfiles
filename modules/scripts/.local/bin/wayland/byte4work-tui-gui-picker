@@ -1,0 +1,62 @@
+#!/bin/bash
+
+# ==============================================================================
+# CRITICAL NOTE ON SHEBANG BEHAVIOR:
+# ------------------------------------------------------------------------------
+# The choice of shebang in calling scripts drastically affects `pstree -s $$`.
+#   - `#!/bin/bash`: Preserves a predictable parent process chain, allowing
+#     this script to correctly evaluate terminal vs. GUI contexts.
+#   - `#!/usr/bin/env bash`: Alters the environment resolution path and process
+#     ancestry via `env`, which can cause `pstree` to misidentify execution
+#     contexts (e.g., triggering silent failures or misrouting to fzf).
+#
+# Always ensure scripts calling this picker rely on a consistent interpreter path.
+# ==============================================================================
+
+# Ensure essential directories are in the PATH
+PATH=/usr/bin:/usr/local/bin:$HOME/.local/bin
+
+# picker log
+PICKER_LOG="$HOME/.local/bin/logs/picker_debug.log"
+mkdir -p "$(dirname "$PICKER_LOG")"
+
+echo "=== [$(date)] Picker invoked ===" >>"$PICKER_LOG"
+
+# Capture input from stdin
+INPUT=$(cat)
+echo "INPUT received:" >>"$PICKER_LOG"
+echo "$INPUT" >>"$PICKER_LOG"
+
+# Default menu (can be overridden by environment variable)
+MENU="${MENU:-wofi}"
+echo "MENU is set to: $MENU" >>"$PICKER_LOG"
+
+if [ -z "$INPUT" ]; then
+	echo "Error: INPUT is empty, exiting." >>"$PICKER_LOG"
+	exit 1
+fi
+
+# Get the process tree of the current script instance to determine the caller
+PARENT_TREE=$(pstree -s $$)
+echo "PARENT_TREE: $PARENT_TREE" >>"$PICKER_LOG"
+
+# List of known terminal emulators and shells
+TERMINALS="bash|zsh|fish|sh|foot|kitty|alacritty|ghostty|wezterm|gnome-terminal"
+
+# Logic: If any terminal or shell emulator is found in the parent process tree,
+if [[ "$PARENT_TREE" =~ ($TERMINALS) ]]; then
+	echo "-> Matched terminal, running fzf" >>"$PICKER_LOG"
+	# Use fzf for TUI selection.
+	echo "$INPUT" | fzf --height=40% --reverse --prompt="Select: "
+else
+	echo "-> No terminal matched, falling back to GUI mode ($MENU)" >>"$PICKER_LOG"
+	# Default to GUI mode using wofi or walker for Hyprland/Wayland environments.
+	if [ "$MENU" = "wofi" ]; then
+		echo "Executing wofi..." >>"$PICKER_LOG"
+		echo "$INPUT" | wofi --dmenu --allow-markup --width=400 --lines=10 2>>"$PICKER_LOG"
+	else
+		echo "Executing walker..." >>"$PICKER_LOG"
+		echo "$INPUT" | walker --dmenu --width=400 2>>"$PICKER_LOG"
+	fi
+fi
+echo "=== Picker finished ===" >>"$PICKER_LOG"

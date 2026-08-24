@@ -1,0 +1,13 @@
+#!/bin/bash
+
+# Ensure essential directories are in the PATH
+PATH=/usr/bin:/usr/local/bin:$HOME/.local/bin
+
+# Capture input from stdin
+INPUT=$(cat)
+
+if [ -z "$INPUT" ]; then
+	exit 1
+fi
+
+echo "$INPUT" | fzf --height=40% --reverse --prompt="Select: "

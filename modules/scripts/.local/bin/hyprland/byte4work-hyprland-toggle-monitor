@@ -1,0 +1,35 @@
+#!/bin/bash
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+LOG_DIR="$HOME/.local/bin/logs"
+mkdir -p "$LOG_DIR"
+LOG_PATH="$LOG_DIR/hypr_toggle_monitor.log"
+
+INSTANCE_FLAG="-i 0"
+
+# get all monitors name
+monitors=$(hyprctl $INSTANCE_FLAG -j monitors all | jq -r '.[].name')
+
+echo "[$(date)] Found monitors: $monitors" | tee -a "$LOG_PATH"
+
+if [ -z "$monitors" ]; then
+	echo "[$(date)] No monitor found" | tee -a "$LOG_PATH"
+	exit 1
+fi
+
+selected_monitor=$(echo "$monitors" | byte4work-tui-gui-picker)
+
+if [ -z "$selected_monitor" ]; then
+	echo "[$(date)] No monitor selected" | tee -a "$LOG_PATH"
+	exit 0
+fi
+
+if hyprctl $INSTANCE_FLAG monitors | grep -q "$selected_monitor"; then
+	hyprctl $INSTANCE_FLAG eval "hl.monitor({ output = \"$selected_monitor\", disabled = true })"
+	echo "[$(date)] 🖥️  $selected_monitor Disable" | tee -a "$LOG_PATH"
+	notify-send "🖥️ Monitor" "$selected_monitor Disable" -t 2000
+else
+	hyprctl $INSTANCE_FLAG eval "hl.monitor({ output = \"$selected_monitor\", disabled = false })"
+	echo "[$(date)] 🖥️  $selected_monitor Enable" | tee -a "$LOG_PATH"
+	notify-send "🖥️ Monitor" "$selected_monitor Enable" -t 2000
+fi

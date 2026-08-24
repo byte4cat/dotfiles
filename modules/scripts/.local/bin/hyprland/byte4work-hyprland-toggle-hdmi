@@ -1,9 +1,0 @@
-#!/usr/bin/env bash
-
-if hyprctl monitors | grep -q "HDMI-A-1"; then
-	hyprctl keyword monitor "HDMI-A-1, disable"
-	notify-send "🖥️ Monitor" "HDMI-A-1 Disabled" -t 2000
-else
-	hyprctl keyword monitor "HDMI-A-1, 1920x1200@59.95, -1200x0, 1, transform, 1"
-	notify-send "🖥️ Monitor" "HDMI-A-1 Enabled" -t 2000
-fi

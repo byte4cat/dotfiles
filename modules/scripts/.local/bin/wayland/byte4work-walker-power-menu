@@ -7,8 +7,11 @@ OPTIONS=(
 	"💤 Sleep"
 	"🛌🏻 Hibernate"
 	"🔒 Lock"
+	"↻ Reload Hyprland Config"
 	"❌ Cancel"
 )
+
+INSTANCE_FLAG="-i 0"
 
 selection=$(printf "%s\n" "${OPTIONS[@]}" | walker --dmenu --width 644 --minheight 1 --maxheight 300 -p "Select option…")
 
@@ -19,7 +22,7 @@ fi
 case "$selection" in
 "🟢 Logout")
 	if [ "$XDG_CURRENT_DESKTOP" = "Hyprland" ]; then
-		hyprctl dispatch "hl.dsp.exit()"
+		hyprctl $INSTANCE_FLAG dispatch "hl.dsp.exit()"
 	else
 		swaymsg exit
 	fi
@@ -42,6 +45,14 @@ case "$selection" in
 	else
 		# Sway 通常使用 swaylock 或 swaylock-effects
 		swaylock -f -c 000000
+	fi
+	;;
+"↻ Reload Hyprland Config")
+	result=$(hyprctl $INSTANCE_FLAG reload 2>&1)
+	if [[ "$result" == "ok" ]]; then
+		notify-send "Hyprland" "Config reloaded successfully!" -t 2000
+	else
+		notify-send "Hyprland Error" "Reload failed: $result" -t 4000
 	fi
 	;;
 "❌ Cancel")

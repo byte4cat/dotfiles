@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 WOFI_CMD="wofi --show dmenu --width 600 --height 350"
+INSTANCE_FLAG="-i 0"
 
 OPTIONS=(
 	"🟢 Logout"
@@ -9,6 +10,7 @@ OPTIONS=(
 	"💤 Sleep"
 	"🛌🏻 Hibernate"
 	"🔒 Lock"
+	"↻ Reload Hyprland Config"
 	"❌ Cancel"
 )
 
@@ -21,7 +23,7 @@ fi
 case "$selection" in
 "🟢 Logout")
 	if [ "$XDG_CURRENT_DESKTOP" = "Hyprland" ]; then
-		hyprctl dispatch "hl.dsp.exit()"
+		hyprctl $INSTANCE_FLAG dispatch "hl.dsp.exit()"
 	else
 		swaymsg exit
 	fi
@@ -43,6 +45,14 @@ case "$selection" in
 		hyprlock
 	else
 		swaylock -f -c 000000
+	fi
+	;;
+"↻ Reload Hyprland Config")
+	result=$(hyprctl $INSTANCE_FLAG reload 2>&1)
+	if [[ "$result" == "ok" ]]; then
+		notify-send "Hyprland" "Config reloaded successfully!" -t 2000
+	else
+		notify-send "Hyprland Error" "Reload failed: $result" -t 4000
 	fi
 	;;
 "❌ Cancel")

@@ -1,0 +1,21 @@
+#!/bin/bash
+
+# Ensure essential directories are in the PATH
+PATH=/usr/bin:/usr/local/bin:$HOME/.local/bin
+
+# Capture input from stdin
+INPUT=$(cat)
+
+# Default menu (can be overridden by environment variable)
+MENU="${MENU:-wofi}"
+
+if [ -z "$INPUT" ]; then
+	exit 1
+fi
+
+# Default to GUI mode using wofi or walker for Hyprland/Wayland environments.
+if [ "$MENU" = "wofi" ]; then
+	echo "$INPUT" | wofi --dmenu --allow-markup --width=400 --lines=10
+else
+	echo "$INPUT" | walker --dmenu --width=400
+fi
