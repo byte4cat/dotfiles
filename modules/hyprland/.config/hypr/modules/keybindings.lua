@@ -118,7 +118,7 @@ hl.workspace_rule({ workspace = "10", monitor = "HDMI-A-1" })
 -- 動態創建 Special Workspaces 的空白預設
 hl.workspace_rule({
 	workspace = "special:scratchpad-term",
-	on_created_empty = myEnv.sec_terminal .. " -e bash -c 'tmux new-session -A -s scratchpad; exec bash'",
+	on_created_empty = myEnv.terminal .. " -e zsh",
 })
 hl.workspace_rule({ workspace = "special:music", on_created_empty = "[float] " .. myEnv.music })
 hl.workspace_rule({ workspace = "special:work-msg", on_created_empty = "[tiled] " .. myEnv.workMsg })

@@ -15,7 +15,7 @@ fi
 
 # Default to GUI mode using wofi or walker for Hyprland/Wayland environments.
 if [ "$MENU" = "wofi" ]; then
-	echo "$INPUT" | wofi --dmenu --allow-markup --width=400 --lines=10
+	echo "$INPUT" | wofi --dmenu --allow-markup --width=400 --lines=5
 else
 	echo "$INPUT" | walker --dmenu --nosearch --nohints --width=400 --minheight=2
 fi

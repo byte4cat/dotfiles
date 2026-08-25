@@ -53,7 +53,7 @@ else
 	# Default to GUI mode using wofi or walker for Hyprland/Wayland environments.
 	if [ "$MENU" = "wofi" ]; then
 		echo "Executing wofi..." >>"$PICKER_LOG"
-		echo "$INPUT" | wofi --dmenu --allow-markup --width=400 --lines=10 2>>"$PICKER_LOG"
+		echo "$INPUT" | wofi --dmenu --allow-markup --width=400 --lines=5 2>>"$PICKER_LOG"
 	else
 		echo "Executing walker..." >>"$PICKER_LOG"
 		echo "$INPUT" | walker --dmenu --nohints --width=400 --minheight=2 2>>"$PICKER_LOG"

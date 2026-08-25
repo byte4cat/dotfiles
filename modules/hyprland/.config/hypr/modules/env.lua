@@ -11,7 +11,7 @@ p.mainMod = "SUPER"
 p.secMod = "ALT" -- Sets "Alt" key as secondary modifier
 
 p.primaryMonitor = "DP-1"
-p.terminal = "ghostty"
+p.terminal = "alacritty"
 p.sec_terminal = "alacritty"
 p.browser = "firefox"
 p.menu = "walker"

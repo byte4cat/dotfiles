@@ -9,9 +9,6 @@ SCRIPTS_SWAY_DIR="$HOME/.local/bin/sway"
 LOG_PATH="$HOME/.local/bin/logs/wofi_quick_memu.log"
 WOFI_CMD="wofi --show dmenu --width 800 --height 400"
 
-MON_NAME="HDMI-A-1"
-MON_CFG="1920x1200@60,-1200x0,1,transform,1"
-
 OPTIONS=(
 	"Audio Output"
 	"Audio Input"
@@ -85,7 +82,9 @@ set_power_mode() {
 }
 
 get_vpn_connections() {
-	nmcli -t -f NAME,TYPE con show 2>/dev/null | grep -E ':(vpn|openvpn|wireguard|pptp|l2tp|vpnc|fortisslvpn|ipsec)$' | cut -d: -f1
+	nmcli -t -f NAME,TYPE con show 2>/dev/null |
+		grep -E ':(vpn|openvpn|wireguard|pptp|l2tp|vpnc|fortisslvpn|ipsec)$' |
+		cut -d: -f1
 }
 
 format_vpn_options() {
@@ -102,18 +101,49 @@ format_vpn_options() {
 
 toggle_vpn() {
 	local vpn_name="$1"
+	logger "Toggling VPN: $vpn_name"
+
+	# 檢查 VPN 連線是否處於活躍狀態 (Active)
 	if nmcli con show --active | grep -q "^$vpn_name[[:space:]]"; then
-		nmcli con down "$vpn_name" && notify-send "VPN: Disconnected 📴" "$vpn_name"
+		# 狀態為活躍 (Active)，執行斷開連線
+		logger "VPN $vpn_name is active. Deactivating..."
+		notify-send "VPN: Disconnecting" "Deactivating $vpn_name..."
+		if nmcli con down "$vpn_name"; then
+			notify-send "VPN: Disconnected 📴" "$vpn_name is now disconnected."
+		else
+			notify-send "VPN Error" "Failed to disconnect $vpn_name."
+		fi
 	else
-		nmcli con up "$vpn_name" | grep -q "successfully activated" && notify-send "VPN: Connected 🔒" "$vpn_name"
+		# 狀態為非活躍 (Inactive)，執行連接
+		logger "VPN $vpn_name is inactive. Activating..."
+		notify-send "VPN: Connecting..." "Activating $vpn_name..."
+		if nmcli con up "$vpn_name" | grep -q "successfully activated"; then
+			notify-send "VPN: Connected 🔒" "$vpn_name successfully connected."
+		else
+			notify-send "VPN Error ❌" "Failed to connect to $vpn_name. Check configuration/logs."
+		fi
 	fi
 }
 
 select_audio_device() {
-	local section="Sinks"
-	[[ "$1" == "Audio Input" ]] && section="Sources"
+	logger "Selected mode: $1"
+	local section prompt devices selected_line selected
 
-	local devices=$(awk -v section="$section" '
+	if [[ "$1" == "Audio Output" ]]; then
+		logger "Setting section to Sinks"
+		section="Sinks"
+		prompt="Select Audio Output Device"
+	elif [[ "$1" == "Audio Input" ]]; then
+		logger "Setting section to Sources"
+		section="Sources"
+		prompt="Select Audio Input Device"
+	else
+		notify-send "Unknown audio type: $1"
+		exit 1
+	fi
+
+	# Parsing logic with clean inline match
+	devices=$(awk -v section="$section" '
         $0 ~ "^[[:space:]]*├─ "section":" { in_section=1; next }
         in_section && $0 ~ "^[[:space:]]*│" && $0 ~ /\[vol:/ {
             line=$0; sub(/^[ \t]*│[ \t]*/,"",line)
@@ -124,12 +154,37 @@ select_audio_device() {
         in_section && $0 !~ "^[[:space:]]*│" { in_section=0 }
     ' < <(wpctl status))
 
-	local selected_line=$(printf "%s\n" "$devices" | $WOFI_CMD --prompt "Select $1 Device...")
+	[ -z "$devices" ] && {
+		notify-send "No devices found!"
+		exit 1
+	}
+
+	selected_line=$(printf "%s\n" "$devices" | $WOFI_CMD --prompt "$prompt")
+
 	[ -z "$selected_line" ] && exit 0
-	local selected=$(echo "$selected_line" | sed 's/^[★ ]*//' | cut -d'|' -f1 | awk '{print $1}')
+
+	selected=$(echo "$selected_line" | sed 's/^[★ ]*//' | cut -d'|' -f1 | awk '{print $1}')
+
+	logger "User selected device ID: $selected"
+
+	local assets="$HOME/.local/share/byte4work/assets/"
+	local icon
+	local mic="$assets/mic.png"
+	local speaker="$assets/speaker.png"
+	local headsets="$assets/headsets.png"
+
+	if [[ "$section" == "Sinks" ]]; then
+		icon="$speaker"
+	else
+		icon="$mic"
+	fi
+
+	if [[ "$section" == "Sinks" ]] && ([[ "$selected_line" == *"headset"* ]] || [[ "$selected_line" == *"Headset"* ]]); then
+		icon="$headsets"
+	fi
 
 	wpctl set-default "$selected"
-	notify-send "Audio device switched" "$1 set to: $(echo "$selected_line" | cut -d'|' -f2-)"
+	notify-send -i "$icon" "Audio device switched" "$1 set to: $(echo "$selected_line" | cut -d'|' -f2- | xargs)"
 }
 
 main() {

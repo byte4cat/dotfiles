@@ -8,9 +8,6 @@ SCRIPTS_HYPRLAND_DIR="$HOME/.local/bin/hyprland"
 SCRIPTS_SWAY_DIR="$HOME/.local/bin/sway"
 LOG_PATH="$HOME/.local/bin/logs/walker_quick_memu.log"
 
-MON_NAME="HDMI-A-1"
-MON_CFG="1920x1200@60,-1200x0,1,transform,1"
-
 OPTIONS=(
 	"Audio Output"
 	"Audio Input"
@@ -51,7 +48,6 @@ format_power_options() {
 		local icon="${item%|*}"
 		local m="${item#*|}"
 
-		# 使用標準空格，確保 Walker 渲染一致
 		local prefix="  "
 		[[ "$m" == "$current" ]] && prefix="* "
 
@@ -66,7 +62,6 @@ set_power_mode() {
 
 	logger "Setting power profile to: $target"
 
-	# --- 根據模式設定視覺效果 ---
 	case "$target" in
 	"performance")
 		icon="🚀"
@@ -96,7 +91,7 @@ set_power_mode() {
 	fi
 }
 
-# --- 函數一：自動獲取所有 VPN 連線名稱 ---
+# 自動獲取所有 VPN 連線名稱
 get_vpn_connections() {
 	# 獲取所有已配置的 VPN 名稱
 	nmcli -t -f NAME,TYPE con show 2>/dev/null |
@@ -104,12 +99,9 @@ get_vpn_connections() {
 		cut -d: -f1
 }
 
-# --- 函數二 (新增)：格式化 VPN 選項並加入狀態標記 ---
+# 格式化 VPN 選項並加入狀態標記
 format_vpn_options() {
-	# 獲取所有活躍的連線名稱，方便後續檢查
 	local active_connections=$(nmcli -t -f NAME con show --active 2>/dev/null)
-
-	# 獲取所有 VPN 連線名稱
 	mapfile -t vpn_list < <(get_vpn_connections)
 
 	local output=""
@@ -125,15 +117,13 @@ format_vpn_options() {
 			status_icon="🔴"
 		fi
 
-		# 建立格式化的字串，中間使用 Tab 讓狀態和名稱對齊
 		output+="$status_icon\t$vpn_name\n"
 	done
 
-	# 輸出所有格式化後的選項
 	echo -e "$output"
 }
 
-# --- 通用 VPN 切換函數 ---
+# VPN 切換
 toggle_vpn() {
 	local vpn_name="$1"
 	logger "Toggling VPN: $vpn_name"
@@ -159,12 +149,11 @@ toggle_vpn() {
 		fi
 	fi
 }
-# --------------------
 
 select_audio_device() {
-	# ... (此函數內容保持不變，略過以簡化呈現)
 	logger "Selected mode: $1"
 	local section prompt devices selected_line selected
+
 	if [[ "$1" == "Audio Output" ]]; then
 		logger "Setting section to Sinks"
 		section="Sinks"
@@ -178,21 +167,13 @@ select_audio_device() {
 		exit 1
 	fi
 
-	# Parsing logic matches your actual format!
+	# Parsing logic with clean inline match
 	devices=$(awk -v section="$section" '
         $0 ~ "^[[:space:]]*├─ "section":" { in_section=1; next }
         in_section && $0 ~ "^[[:space:]]*│" && $0 ~ /\[vol:/ {
             line=$0; sub(/^[ \t]*│[ \t]*/,"",line)
-            is_default = match(line, /^\* +([0-9]+)\.\s+(.+)$/, parts)
-            if (is_default) {
-                id = parts[1]
-                name = parts[2]
-                printf "★ %s | %s\n", id, name
-            } else if (match(line, /^([0-9]+)\.\s+(.+)$/, parts)) {
-                id = parts[1]
-                name = parts[2]
-                printf "  %s | %s\n", id, name
-            }
+            if (match(line, /^\* +([0-9]+)\.\s+(.+)$/, parts)) printf "★ %s | %s\n", parts[1], parts[2]
+            else if (match(line, /^([0-9]+)\.\s+(.+)$/, parts)) printf "  %s | %s\n", parts[1], parts[2]
             next
         }
         in_section && $0 !~ "^[[:space:]]*│" { in_section=0 }
