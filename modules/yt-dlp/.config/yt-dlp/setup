@@ -1,0 +1,30 @@
+#!/bin/bash
+
+set -e
+
+ENV_DIR="$HOME/.local/share/yt-dlp-env"
+# 指向你的本地開發專案資料夾（也可以透過參數或預設路徑帶入）
+REPO_DIR="$HOME/Development/open_source/yt-dlp"
+
+echo "==> [1/2] Creating Python virtual environment..."
+python -m venv "$ENV_DIR"
+
+echo "==> [2/2] Upgrading pip and building dependencies..."
+"$ENV_DIR/bin/pip" install --upgrade pip
+
+if [ -d "$REPO_DIR" ]; then
+    echo "==> Installing local yt-dlp repository in editable mode from $REPO_DIR..."
+    # 透過 editable 模式安裝，並順便把 extras 依賴帶進來
+    "$ENV_DIR/bin/pip" install --upgrade --editable "$REPO_DIR[default,curl-cffi]"
+else
+    echo "==> WARNING: Local repository not found at $REPO_DIR, falling back to official release..."
+    "$ENV_DIR/bin/pip" install --upgrade "yt-dlp[default,curl-cffi]"
+fi
+
+echo "==> Deployment complete!"
+echo ""
+echo "Please add the following alias to your ~/.zshrc (or ~/.bashrc):"
+echo "  alias ytdlp=\"$ENV_DIR/bin/yt-dlp\""
+echo ""
+echo "Then reload your shell configuration by running:"
+echo "  source ~/.zshrc"

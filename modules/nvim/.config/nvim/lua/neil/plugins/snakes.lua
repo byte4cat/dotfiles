@@ -15,6 +15,35 @@ return {
 					follow = true,
 					-- 排除圖片
 					exclude = {
+						-- 套件與依賴
+						"node_modules",
+						"vendor",
+
+						-- 編譯產物與前端快取
+						"target",
+						"dist",
+						"build",
+						"out",
+						".nuxt",
+						".output",
+						".next",
+
+						-- Python 快取與暫存
+						"__pycache__",
+						".pytest_cache",
+						".ruff_cache",
+
+						-- 版本控制與 IDE
+						".git",
+						".vscode",
+						".idea",
+
+						-- 作業系統暫存檔
+						".DS_Store",
+						"Thumbs.db",
+
+						-- 常見副檔名（圖片與日誌）
+						"*.log",
 						"**/*.jpg",
 						"**/*.jpeg",
 						"**/*.png",
@@ -27,6 +56,35 @@ return {
 					untracked = true,
 					follow = true,
 					exclude = {
+						-- 套件與依賴
+						"node_modules",
+						"vendor",
+
+						-- 編譯產物與前端快取
+						"target",
+						"dist",
+						"build",
+						"out",
+						".nuxt",
+						".output",
+						".next",
+
+						-- Python 快取與暫存
+						"__pycache__",
+						".pytest_cache",
+						".ruff_cache",
+
+						-- 版本控制與 IDE
+						".git",
+						".vscode",
+						".idea",
+
+						-- 作業系統暫存檔
+						".DS_Store",
+						"Thumbs.db",
+
+						-- 常見副檔名（圖片與日誌）
+						"*.log",
 						"**/*.jpg",
 						"**/*.jpeg",
 						"**/*.png",

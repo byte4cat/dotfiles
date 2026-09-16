@@ -39,3 +39,15 @@ application/x-rar=org.gnome.FileRoller.desktop
 x-scheme-handler/postman=Postman.desktop
 application/x-zerosize=code-oss.desktop
 x-scheme-handler/bruno=bruno.desktop
+# Word
+application/vnd.oasis.opendocument.text=libreoffice-writer.desktop
+application/vnd.openxmlformats-officedocument.wordprocessingml.document=libreoffice-writer.desktop
+application/msword=libreoffice-writer.desktop
+# Excel
+application/vnd.oasis.opendocument.spreadsheet=libreoffice-calc.desktop
+application/vnd.openxmlformats-officedocument.spreadsheetml.sheet=libreoffice-calc.desktop
+application/vnd.ms-excel=libreoffice-calc.desktop
+# PowerPoint
+application/vnd.oasis.opendocument.presentation=libreoffice-impress.desktop
+application/vnd.openxmlformats-officedocument.presentationml.presentation=libreoffice-impress.desktop
+application/vnd.ms-powerpoint=libreoffice-impress.desktop

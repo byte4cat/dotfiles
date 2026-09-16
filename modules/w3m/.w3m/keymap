@@ -1,0 +1,32 @@
+# Scrolling / Paging
+keymap C-f NEXT_PAGE
+keymap C-b PREV_PAGE
+keymap d NEXT_PAGE
+keymap e PREV_PAGE
+
+#### from: https://github.com/gotbletu/shownotes/blob/master/w3m_links_hinting_mode.md
+#### description: https://www.youtube.com/watch?v=-bK5rTFM9B4
+
+#### toggle hinting mode (vimium similar)
+keymap  f-SPC   COMMAND "SET_OPTION display_link_number=toggle ; RESHAPE"
+
+#### jump to link number (e.g press 3ff) and hide hinting mode (similar to gg in vim)
+keymap  ff      COMMAND "SET_OPTION display_link_number=0 ; RESHAPE ; LINK_BEGIN"
+
+#### open current cursor link in new tab and hide hinting mode
+keymap  ft      COMMAND "SET_OPTION display_link_number=0 ; RESHAPE ; TAB_LINK"
+
+#### copy link to clipboard (e.g press f-SPC then 4fy to yank url)
+keymap  fy      COMMAND "SET_OPTION display_link_number=0 ; RESHAPE ; LINK_BEGIN ; EXTERN_LINK 'url=%s ; printf "%b" "$url" > /tmp/clipbrd.txt ; printf "%b" "$url" | xsel -b 2>/dev/null ; printf "%b" "$url" | tmux load-buffer - ; printf '%s' "$url" | wl-copy 2>/dev/null  ; printf '%s' "$url" | clip 2>/dev/null ; printf '%s' "$url" > /dev/clipboard 2>/dev/null ; printf '%s' "$url" | pbcopy 2>/dev/null ; printf '%s' "$url" | termux-clipboard-set 2>/dev/null'"
+
+#### jump to link number and open it
+keymap  fo       COMMAND "SET_OPTION display_link_number=0 ; RESHAPE ; LINK_BEGIN ; GOTO_LINK"
+
+#### jump to link number and open it in new tab
+keymap  fn       COMMAND "SET_OPTION display_link_number=0 ; RESHAPE ; LINK_BEGIN ; TAB_LINK"
+
+# yank url to multiple clipboard (under cursor)
+keymap  yy      EXTERN_LINK "url=%s ; printf "%b" "$url" > /tmp/clipbrd.txt ; printf "%b" "$url" | xsel -b 2>/dev/null ; printf "%b" "$url" | tmux load-buffer - ; printf '%s' "$url" | wl-copy 2>/dev/null  ; printf '%s' "$url" | clip 2>/dev/null ; printf '%s' "$url" > /dev/clipboard 2>/dev/null ; printf '%s' "$url" | pbcopy 2>/dev/null ; printf '%s' "$url" | termux-clipboard-set 2>/dev/null"
+
+# yank url to multiple clipboard (current page)
+keymap  YY      EXTERN "url=%s ; printf "%b" "$url" > /tmp/clipbrd.txt ; printf "%b" "$url" | xsel -b 2>/dev/null ; printf "%b" "$url" | tmux load-buffer - ; printf '%s' "$url" | wl-copy 2>/dev/null  ; printf '%s' "$url" | clip 2>/dev/null ; printf '%s' "$url" > /dev/clipboard 2>/dev/null ; printf '%s' "$url" | pbcopy 2>/dev/null ; printf '%s' "$url" | termux-clipboard-set 2>/dev/null"

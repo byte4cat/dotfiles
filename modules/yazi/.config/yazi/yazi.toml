@@ -2,7 +2,7 @@
 show_hidden = true
 
 [preview]
-image = true
+image = false
 
 [opener]
 edit = [

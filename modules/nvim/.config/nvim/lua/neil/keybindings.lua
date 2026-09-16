@@ -45,11 +45,11 @@ end, { expr = true })
 -- 使用 <F3> 交換當前視窗和下一個視窗的位置
 vim.api.nvim_set_keymap("n", "<F3>", "<C-w>x", { noremap = true, silent = true, desc = "Swap Window Position" })
 
--- 使用 Ctrl+Shift--hjkl 來調整視窗大小
-vim.api.nvim_set_keymap("n", "<leader>H", "<C-w><", { noremap = true, silent = true, desc = "Shrink Window Width" })
-vim.api.nvim_set_keymap("n", "<leader>J", "<C-w>+", { noremap = true, silent = true, desc = "Enlarge Window Height" })
-vim.api.nvim_set_keymap("n", "<leader>K", "<C-w>-", { noremap = true, silent = true, desc = "Shrink Window Height" })
-vim.api.nvim_set_keymap("n", "<leader>L", "<C-w>>", { noremap = true, silent = true, desc = "Enlarge Window Width" })
+-- 使用 <leader> + h/j/k/l 調整視窗大小
+vim.keymap.set("n", "<leader>H", "<cmd>vertical resize -2<CR>", { silent = true, desc = "Shrink Width" })
+vim.keymap.set("n", "<leader>L", "<cmd>vertical resize +2<CR>", { silent = true, desc = "Enlarge Width" })
+vim.keymap.set("n", "<leader>K", "<cmd>resize -2<CR>", { silent = true, desc = "Shrink Height" })
+vim.keymap.set("n", "<leader>J", "<cmd>resize +2<CR>", { silent = true, desc = "Enlarge Height" })
 
 -- use Ctrl-hjkl to switch between windows (注意：會被 nvim-tmux-navigator 覆蓋)
 vim.api.nvim_set_keymap("n", "<C-h>", "<C-w>h", { noremap = true, silent = true, desc = "Switch to Left Window" })
@@ -291,12 +291,28 @@ end, {
 
 -- lsp restart
 vim.keymap.set("n", "<leader>R", function()
-	vim.lsp.stop_client(vim.lsp.get_clients())
+	-- 取得當前 buffer 附加的所有 LSP 客戶端
+	local clients = vim.lsp.get_clients({ bufnr = 0 })
+	if #clients == 0 then
+		-- vim.notify("No LSP clients attached to this buffer", "warn", { title = "LSP" })
+		vim.notify("No LSP clients attached. Reloading buffer...", "warn", { title = "LSP" })
+		vim.cmd("edit!")
+		return
+	end
+
+	-- 停止當前 buffer 的 LSP
+	for _, client in ipairs(clients) do
+		vim.lsp.stop_client(client.id)
+	end
+
+	vim.diagnostic.reset()
+
+	-- 稍微延遲後重新載入檔案以重新附加 LSP
 	vim.defer_fn(function()
-		vim.cmd("edit") -- 重新載入檔案會觸發原生 vim.lsp.enable
-	end, 100)
-	vim.notify("LSP Clients stopped & reloaded", "info", { title = "LSP" })
-end, { noremap = true, silent = true, desc = "LSP Restart" })
+		vim.cmd("edit!")
+		vim.notify("LSP restarted for current buffer", "info", { title = "LSP" })
+	end, 50)
+end, { noremap = true, silent = true, desc = "Restart LSP for current buffer" })
 
 -- DAP
 vim.keymap.set("n", "<leader>du", function()

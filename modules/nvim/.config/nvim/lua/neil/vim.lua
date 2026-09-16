@@ -31,6 +31,12 @@ vim.opt.expandtab = false -- 將 Tab 轉換為空白鍵
 vim.opt.smartindent = false -- 開啟智慧縮排
 vim.opt.autoindent = true -- 延續上一行的縮排
 vim.opt.wrap = false -- 關閉自動換行 (長代碼不折行)
+-- 啟用自動換行
+-- vim.wo.wrap = true
+-- 讓換行時以「單字」為單位斷詞，不會把英文字母從中間硬生生切斷
+-- vim.wo.linebreak = true
+-- 保持換行後的縮排對齊（讓折行後的內文跟上一行切齊）
+-- vim.wo.breakindent = true
 vim.opt.iskeyword:append("-") -- 將 "-" 視為單字的一部分 (如 CSS class-name)
 
 -- 操作手感與視窗管理 (Interaction & Window)

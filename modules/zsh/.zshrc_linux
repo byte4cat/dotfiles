@@ -52,3 +52,13 @@ elif [[ "$XDG_SESSION_TYPE" == "x11" ]]; then
 else
     alias sayenv="echo 'Running on TTY/Console'"
 fi
+
+alias ytdlp="$HOME/.local/share/yt-dlp-env/bin/yt-dlp"
+w3d() {
+    if [ -z "$1" ]; then
+        w3m "https://lite.duckduckgo.com/lite/"
+    else
+        w3m "https://lite.duckduckgo.com/lite/?q=$*"
+    fi
+}
+

@@ -63,4 +63,7 @@ hl.on("hyprland.start", function()
 	-- 預設開啟的主工作區
 	exec("[workspace 1 silent] " .. myEnv.terminal)
 	exec("[workspace 2 silent] " .. myEnv.browser)
+
+	-- 其它
+	exec("systemctl --user start sunshine")
 end)

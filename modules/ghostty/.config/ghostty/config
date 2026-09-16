@@ -29,6 +29,7 @@ confirm-close-surface = false
 
 clipboard-read = allow
 clipboard-write = allow
+copy-on-select = true
 
 # page scrolling
 keybind = "ctrl+shift+f=scroll_page_fractional:0.5"

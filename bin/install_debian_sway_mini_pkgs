@@ -135,7 +135,7 @@ sudo apt update && sudo apt upgrade -y
 sudo apt install -y \
 	fzf ripgrep git tmux curl build-essential \
 	vim sway swaylock swayidle swaybg \
-	i3status wofi dunst alacritty cliphist \
+	i3status wofi dunst ghostty alacritty cliphist \
 	pipewire wireplumber pipewire-audio-client-libraries \
 	network-manager network-manager-gnome \
 	brightnessctl playerctl \
@@ -155,7 +155,7 @@ cat <<'EOF' >"$SWAY_CONFIG_DIR/config"
 # --- Basic Settings ---
 set $mainMod Mod4
 set $secMod Mod1
-set $terminal alacritty
+set $terminal ghostty
 set $menu wofi --show drun
 set $browser firefox
 set $file-manager thunar
