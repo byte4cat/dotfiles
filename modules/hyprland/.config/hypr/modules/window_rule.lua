@@ -23,6 +23,19 @@ hl.window_rule({
 	no_focus = true,
 })
 
+-- 設定當工作區只有一個可見視窗或全螢幕時，gaps 歸零
+hl.workspace_rule({ workspace = "w[tv1]", gaps_out = 0, gaps_in = 0 })
+hl.workspace_rule({ workspace = "f[1]", gaps_out = 0, gaps_in = 0 })
+-- 如果連單視窗時的邊框與圓角也想一併清除
+-- hl.window_rule({ match = { float = false, workspace = "w[tv1]" }, border_size = 0 })
+-- hl.window_rule({ match = { float = false, workspace = "w[tv1]" }, rounding = 0 })
+
+-- 當視窗是show me the key 時, disable border
+hl.window_rule({
+	match = { class = "^(one.alynx.showmethekey)$" },
+	border_size = 0,
+})
+
 -- 常用工具規則
 hl.window_rule({
 	name = "pavucontrol-window",

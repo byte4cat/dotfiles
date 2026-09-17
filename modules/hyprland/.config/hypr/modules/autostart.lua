@@ -15,7 +15,6 @@ hl.on("hyprland.start", function()
 		"dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP HYPRLAND_INSTANCE_SIGNATURE GPG_TTY"
 	)
 	exec("gpg-connect-agent updatestartuptty /bye")
-	exec("gpg-connect-agent /bye")
 	exec("systemctl --user import-environment WAYLAND_DISPLAY XDG_RUNTIME_DIR HYPRLAND_INSTANCE_SIGNATURE")
 
 	-- Daemons
@@ -63,7 +62,4 @@ hl.on("hyprland.start", function()
 	-- 預設開啟的主工作區
 	exec("[workspace 1 silent] " .. myEnv.terminal)
 	exec("[workspace 2 silent] " .. myEnv.browser)
-
-	-- 其它
-	exec("systemctl --user start sunshine")
 end)
