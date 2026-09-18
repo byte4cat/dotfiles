@@ -1,13 +1,13 @@
 xwayland enable
 
 # --- 變數定義 ---
-set $my_path $HOME/.local/bin/sway:$HOME/.local/bin/wayland:$HOME/.local/private/bin:$PATH
+set $my_path $HOME/.local/bin/sway:$HOME/.local/bin/wayland:$HOME/.local/bin/common:$HOME/.local/private/bin:$PATH
 set $mainMod Mod4
 set $secMod Mod1
 set $terminal PATH=$my_path ghostty
 set $browser firefox
 set $menu walker
-set $file_manager thunar
+set $file_manager yazi
 set $PRIMARY_MONITOR DP-1
 
 # --- 自動啟動 ---
@@ -16,10 +16,18 @@ exec_always gpg-connect-agent updatestartuptty /bye
 exec_always gnome-keyring-daemon --start --components=secrets,pkcs11,ssh
 exec_always awww-daemon
 exec_always wl-paste --watch cliphist store
-exec_always pkill waybar; PATH=$my_path byte4work-launch-waybar
+# exec_always pkill waybar; PATH=$my_path byte4work-launch-waybar
 exec_always pkill swaync; swaync
 exec_always fcitx5 -d
+exec_always elephant
+exec_always pkill quickshell; quickshell --config $HOME/.config/quickshell/sway/
 exec_always pkill swayosd-server; swayosd-server
+
+# 系統主題與外觀設定
+exec_always gsettings set org.gnome.desktop.interface color-scheme 'prefer-dark'
+exec_always gsettings set org.gnome.desktop.interface gtk-theme 'adw-gtk3-dark'
+exec_always gsettings set org.gnome.desktop.interface font-name 'sans-serif 11'
+
 
 exec awww img ~/.local/share/wallpapers/wp14362312-linux-minimalist-wallpapers.jpg
 exec --no-startup-id signal-desktop
@@ -53,7 +61,6 @@ smart_borders on
 # -- auto apps --
 exec swaymsg 'workspace 1; exec $terminal'
 exec swaymsg 'workspace 2; exec $browser'
-exec swaymsg 'workspace 0; exec $browser'
 
 # --- 外觀設定 ---
 exec gsettings set org.gnome.desktop.interface color-scheme prefer-dark
@@ -95,8 +102,8 @@ workspace 8 output DP-1
 workspace 9 output DP-1
 workspace 10 output HDMI-A-1
 
-workspace 2 layout tabbed
-for_window [workspace="2"] layout tabbed
+# workspace 2 layout tabbed
+# for_window [workspace="2"] layout tabbed
 
 # --- 視窗規則 ---
 assign [class="Signal"] workspace "sw_signal"
@@ -105,20 +112,21 @@ assign [class="vesktop"] workspace "sw_vesktop"
 for_window [class="^.*$"] opacity 0.96
 for_window [app_id="^(firefox|brave-browser|librewolf)$"] opacity 1.0
 for_window [class="^(vesktop|Signal)$"] opacity 1.0
-for_window [app_id="^(com.mitchellh.ghostty|Alacritty)"] opacity 0.80
-for_window [app_id="walker"] floating enable, border none, focus, move center
-for_window [app_id="wofi"] floating enable, move center, focus
-for_window [app_id="waypaper"] floating enable, move center, focus
-for_window [app_id="com.mitchellh.ghostty" title="spotify-player"] {
-    floating enable
-    move position center
-    move scratchpad
-}
-for_window [app_id="com.mitchellh.ghostty" title="scratchpad-term"] {
-    floating enable
-    move position center
-    move scratchpad
-}
+for_window [app_id="^(com.mitchellh.ghostty|Alacritty|kitty|foot)"] opacity 0.90
+for_window [app_id="walker"] floating enable, border none, move center, focus
+for_window [app_id="wofi"] floating enable, border none, move center, focus
+for_window [app_id="waypaper"] floating enable, border none, move center, focus
+# for_window [app_id="com.mitchellh.ghostty" title="spotify-player"] {
+#     floating enable
+#     move position center
+#     move scratchpad
+# }
+# for_window [app_id="com.mitchellh.ghostty" title="scratchpad-term"] {
+# 	move monitor xxx
+#     floating enable
+#     move position center
+#     move scratchpad
+# }
 for_window [app_id="satty"] {
     floating enable
     border none
@@ -153,12 +161,13 @@ mode "resize" {
 bindsym $mainMod+Shift+f floating toggle
 bindsym $mainMod+f fullscreen toggle
 
-# Vim Style 焦點與移動
+# Vim Style 焦點
 bindsym $mainMod+h focus left
 bindsym $mainMod+j focus down
 bindsym $mainMod+k focus up
 bindsym $mainMod+l focus right
 
+# Vim Style 移動
 bindsym $mainMod+Shift+h move left
 bindsym $mainMod+Shift+j move down
 bindsym $mainMod+Shift+k move up
@@ -209,7 +218,7 @@ bindsym $mainMod+Return exec $terminal
 bindsym $mainMod+q kill
 bindsym $mainMod+b exec $browser
 bindsym $mainMod+e exec $file_manager
-bindsym $mainMod+m exec byte4work-walker-power-menu
+bindsym $mainMod+m exec PATH=$my_path byte4work-walker-power-menu
 
 # 特殊工作區
 bindsym $mainMod+x exec PATH=$my_path byte4work-toggle-signal-workspace
@@ -219,12 +228,14 @@ bindsym $mainMod+Shift+s move container to workspace "sw_vesktop"; workspace "sw
 
 # Scratchpad
 bindsym $mainMod+a exec PATH=$my_path byte4work-toggle-scratch-term-workspace
-bindsym $mainMod+v exec PATH=$my_path byte4work-toggle-music-workspace
+bindsym $mainMod+v exec PATH=$my_path byte4work-toggle-spotify-workspace
 
 # 啟動器與工具
 bindsym $mainMod+d exec $menu
 bindsym $mainMod+n cyclenext
 bindsym $mainMod+Shift+n exec swaync-client -t
+
+bindsym $mod+g layout tabbed
 
 # --- 快速選單 ---
 bindsym $mainMod+c exec $my_path byte4work-walker-quick-menu
@@ -253,24 +264,24 @@ input "type:keyboard" {
     xkb_options ctrl:nocaps
 }
 
-bar {
-    swaybar_command swaybar
-
-    # 設定顯示位置
-    position top
-    
-    # 設定狀態列資訊 (預設使用 i3status)
-    status_command i3status
-
-    # 設定顏色 (這跟 waybar 的 css 完全不同，是這裡自己定義)
-
-	# Nord
-	colors {
-    background #2e3440
-    statusline #d8dee9
-    focused_workspace #88c0d0 #88c0d0 #2e3440
-    inactive_workspace #3b4252 #3b4252 #d8dee9
-	}
-}
+# bar {
+#     swaybar_command swaybar
+# 
+#     # 設定顯示位置
+#     position top
+#     
+#     # 設定狀態列資訊 (預設使用 i3status)
+#     status_command i3status
+# 
+#     # 設定顏色 (這跟 waybar 的 css 完全不同，是這裡自己定義)
+# 
+# 	# Nord
+# 	colors {
+#     background #2e3440
+#     statusline #d8dee9
+#     focused_workspace #88c0d0 #88c0d0 #2e3440
+#     inactive_workspace #3b4252 #3b4252 #d8dee9
+# 	}
+# }
 
 include /home/neil/.local/private/sway/config
