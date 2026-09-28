@@ -6,7 +6,9 @@ PartOf=graphical-session.target
 [Service]
 Type=simple
 Environment=XDG_SESSION_TYPE=wayland
-ExecStart=/usr/bin/sunshine
+Environment=WAYLAND_DISPLAY=wayland-1
+Environment=XDG_RUNTIME_DIR=/run/user/1000
+ExecStart=/usr/bin/env sleep 3 && /usr/bin/sunshine
 Restart=on-failure
 RestartSec=5
 

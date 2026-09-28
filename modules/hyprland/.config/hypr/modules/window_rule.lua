@@ -69,7 +69,7 @@ hl.window_rule({
 -- 媒體與攝像頭規則
 hl.window_rule({
 	name = "media-players-window",
-	match = { class = "^(mpv|vlc|ffplay)$" },
+	match = { class = "^(mpv|ffplay)$" },
 	float = true,
 	center = true,
 	size = { 800, 450 },
