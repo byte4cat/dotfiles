@@ -27,7 +27,7 @@ hl.on("hyprland.start", function()
 	-- UI 相關應用
 	-- exec("byte4work-launch-waybar")
 	exec("swaync")
-	exec("fcitx5 -d")
+	exec("while true; do fcitx5 -d; sleep 1; done")
 	exec("elephant")
 	exec("swayosd-server")
 

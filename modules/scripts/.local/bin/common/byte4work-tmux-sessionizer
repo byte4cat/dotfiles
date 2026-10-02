@@ -12,6 +12,7 @@ SEARCH_DIRS=(
 	"${HOME}/Development/working/web"
 	"${HOME}/Development/working/app"
 	"${HOME}/Development/working/cli"
+	"${HOME}/Development/working/sl-projects"
 )
 
 SESSIONIZER_LOG="$HOME/.local/bin/logs/tmux-sessionizer.log"
