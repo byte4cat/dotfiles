@@ -12,6 +12,31 @@
 #   --force      Delete and recreate the bottle (asks for confirmation)
 #   --sign-only  Only verify/re-sign the DLLs (used by bin/line_launch)
 # ==============================================================================
+#
+# Notes (non-obvious things learned while building this):
+#
+# - LINE refuses to start ("NO_SIGNATURE", CRYPT32.dll) unless the bottle's
+#   system32/syswow64 DLLs carry a signature. We self-sign them with
+#   osslsigncode (AUR only). ~35 16-bit stub DLLs cannot be signed; that is fine.
+# - The signatures vanish when Bottles runs `wineboot -u`. It does so before
+#   launching a program whenever drive_c/windows/Fonts is newer than
+#   <bottle>/.fonts_stamp (bottles/backend/wine/executor.py). After touching
+#   Fonts, call fonts_stamp_sync (lib/line_bottles); bin/line_launch does it on
+#   every launch, and also waits for Wine to be idle and re-signs if needed.
+# - Wine runs inside the flatpak sandbox, so `wineserver -k` from the host cannot
+#   reach it. `flatpak kill com.usebottles.bottles` does (and closes Bottles
+#   too). Use wait_wine_idle before registry changes / launching.
+# - Emoji: colour fonts (CBDT: Noto Color Emoji, COLR: Twemoji) render blank in
+#   LINE under Wine; only the monochrome Noto Emoji works (black-and-white).
+# - Sharp text on a scaled monitor needs Hyprland xwayland.force_zero_scaling
+#   (modules/hyprland/.../env.lua) plus Wine LogPixels=192 (LINE_DPI).
+#   Otherwise the compositor upscales the XWayland window and text is blurry.
+# - LINE draws its own window frame; resizing it through Hyprland leaves the
+#   content un-repainted. A window rule pins its size
+#   (modules/hyprland/.../window_rule.lua).
+# - Not covered: the from-scratch path (new bottle + LINE install) has only been
+#   checked with --dry-run and by re-running on an existing bottle.
+# ------------------------------------------------------------------------------
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -45,7 +70,7 @@ SIGN_ONLY=0
 # -----------------------------
 # Helpers
 # -----------------------------
-usage() { sed -n '3,15p' "${BASH_SOURCE[0]}" | sed 's/^# \{0,1\}//'; }
+usage() { sed -n '3,14p' "${BASH_SOURCE[0]}" | sed 's/^# \{0,1\}//'; }
 
 # Run a command, or only print it in dry-run mode
 run() {
