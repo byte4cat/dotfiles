@@ -92,6 +92,13 @@ hl.config({
 	master = {
 		new_status = "master",
 	},
+
+	-- 只有指定 scrolling layout 的 workspace 會用到（見 keybindings.lua 的 personal-msg）。
+	-- 每個視窗是一欄、橫向排排站，一欄佔 1/2 寬（聊天 App 太窄沒辦法開對話框），
+	-- 放不下的欄用 SUPER+滾輪 或 SUPER+H/L 橫向捲動。只有一個視窗時會撐滿。
+	scrolling = {
+		column_width = 0.5,
+	},
 })
 
 -- Layer rules

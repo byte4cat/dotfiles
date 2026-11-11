@@ -128,6 +128,12 @@ hl.workspace_rule({
 })
 hl.workspace_rule({ workspace = "special:music", on_created_empty = "[float] " .. myEnv.music })
 hl.workspace_rule({ workspace = "special:work-msg", on_created_empty = "[tiled] " .. myEnv.workMsg })
+-- SUPER+X 的聊天視窗（Signal / LINE / WeChat…）：像 i3 一樣橫向排排站
+hl.workspace_rule({ workspace = "special:personal-msg", layout = "scrolling" })
+
+-- 不自動平分欄寬：聊天 App 太窄會沒辦法開對話框，所以每欄維持固定寬度
+-- （looknfeel.lua 的 scrolling.column_width），視窗多時用 SUPER+滾輪 或 SUPER+H/L 捲動。
+
 hl.workspace_rule({ workspace = "special:temp_i" })
 hl.workspace_rule({ workspace = "special:temp_o" })
 
@@ -174,8 +180,6 @@ hl.bind(myEnv.mainMod .. " + SHIFT + O", hl.dsp.window.move({ workspace = "speci
 -- =========
 hl.bind(mainMod .. " + mouse:272", hl.dsp.window.drag(), { mouse = true })
 hl.bind(mainMod .. " + mouse:273", hl.dsp.window.resize(), { mouse = true })
-hl.bind(mainMod .. " + mouse_up", hl.dsp.exec_cmd("hyprctl keyword cursor:zoom_factor 0.8"))
-hl.bind(mainMod .. " + mouse_down", hl.dsp.exec_cmd("hyprctl keyword cursor:zoom_factor 1.2"))
 
 -- ===========
 -- SCREENSHOT
@@ -233,11 +237,26 @@ hl.bind(mainMod .. " + SHIFT + 0", function()
 end)
 
 -- 滑鼠滾輪綁定
-hl.bind(mainMod .. " + mouse_up", function()
+hl.bind(mainMod .. " + SHIFT + mouse_up", function()
 	apply_zoom(0.9)
 end)
-hl.bind(mainMod .. " + mouse_down", function()
+hl.bind(mainMod .. " + SHIFT + mouse_down", function()
 	apply_zoom(1.1)
+end)
+
+-- SUPER+滾輪:在 personal-msg(scrolling layout)左右捲動欄位。
+-- 其他 workspace 不是 scrolling layout,所以只在該 special workspace 啟用。
+local function scroll_personal_msg(step)
+	local sp = hl.get_active_special_workspace()
+	if sp and sp.name == "special:personal-msg" then
+		hl.dispatch(hl.dsp.layout("move " .. step))
+	end
+end
+hl.bind(mainMod .. " + mouse_up", function()
+	scroll_personal_msg("-col")
+end)
+hl.bind(mainMod .. " + mouse_down", function()
+	scroll_personal_msg("+col")
 end)
 
 -- =====================
