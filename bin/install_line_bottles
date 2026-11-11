@@ -31,9 +31,12 @@
 # - Sharp text on a scaled monitor needs Hyprland xwayland.force_zero_scaling
 #   (modules/hyprland/.../env.lua) plus Wine LogPixels=192 (LINE_DPI).
 #   Otherwise the compositor upscales the XWayland window and text is blurry.
-# - LINE draws its own window frame; resizing it through Hyprland leaves the
-#   content un-repainted. A window rule pins its size
-#   (modules/hyprland/.../window_rule.lua).
+# - Tiling: with DXVK enabled, resizing LINE through the window manager left the
+#   content un-repainted (old size, black elsewhere). Disabling DXVK for the
+#   LineLauncher program (Wine's built-in wined3d is used) fixed it (observed;
+#   the D3D9 swapchain resize under XWayland is the likely cause). This only adds
+#   a WINEDLLOVERRIDES at launch, it does not touch the prefix. No window rule
+#   is needed, so LINE tiles normally.
 # - Not covered: the from-scratch path (new bottle + LINE install) has only been
 #   checked with --dry-run and by re-running on an existing bottle.
 # ------------------------------------------------------------------------------
@@ -364,22 +367,56 @@ step_install_line() {
 	find_line_exe >/dev/null || error "LINE not found after install, see $CACHE_DIR/install.log"
 }
 
+# Make sure the registered program runs without DXVK (see Notes). Only the
+# LineLauncher entry is touched. Prints nothing; returns 0 if unchanged, 10 if
+# it had to be changed.
+ensure_program_no_dxvk() {
+	python3 -I - "$BOTTLE_DIR/bottle.yml" "$PROGRAM_NAME" <<'PY'
+import re, sys
+path, name = sys.argv[1], sys.argv[2]
+s = open(path).read()
+a = s.find("External_Programs:")
+b = s.find("Inherited_Environment_Variables:")
+if a < 0 or b < a:
+    sys.exit(0)
+entries = re.split(r"(?m)^(?=    [0-9a-f-]{36}:\n)", s[a:b])
+changed = False
+for i, e in enumerate(entries):
+    if re.search(r"(?m)^        name: %s$" % re.escape(name), e):
+        n = re.sub(r"(?m)^(        dxvk: )true$", r"\1false", e)
+        if n != e:
+            entries[i], changed = n, True
+if changed:
+    open(path, "w").write(s[:a] + "".join(entries) + s[b:])
+    sys.exit(10)
+PY
+}
+
 step_register() {
-	info "[11/12] Register $PROGRAM_NAME in bottle"
-	if grep -q "name: $PROGRAM_NAME" "$BOTTLE_DIR/bottle.yml" 2>/dev/null; then
-		success "Program already registered"
-		return
+	info "[11/12] Register $PROGRAM_NAME in bottle (DXVK off)"
+	if ! grep -q "name: $PROGRAM_NAME" "$BOTTLE_DIR/bottle.yml" 2>/dev/null; then
+		if [ "$DRY_RUN" -eq 1 ]; then
+			info "[dry-run] bottles-cli add -b $BOTTLE -n $PROGRAM_NAME -p <LineLauncher.exe> --no-dxvk"
+			return
+		fi
+		local exe win_path
+		exe="$(find_line_exe)" || error "LineLauncher.exe not found"
+		win_path="C:${exe#"$BOTTLE_DIR/drive_c"}"
+		win_path="${win_path//\//\\}"
+		bottles_cli add -b "$BOTTLE" -n "$PROGRAM_NAME" -p "$win_path" --no-dxvk >/dev/null 2>&1
+		grep -q "name: $PROGRAM_NAME" "$BOTTLE_DIR/bottle.yml" || error "Failed to register $PROGRAM_NAME"
 	fi
 	if [ "$DRY_RUN" -eq 1 ]; then
-		info "[dry-run] bottles-cli add -b $BOTTLE -n $PROGRAM_NAME -p <LineLauncher.exe>"
+		success "Program registered"
 		return
 	fi
-	local exe win_path
-	exe="$(find_line_exe)" || error "LineLauncher.exe not found"
-	win_path="C:${exe#"$BOTTLE_DIR/drive_c"}"
-	win_path="${win_path//\//\\}"
-	bottles_cli add -b "$BOTTLE" -n "$PROGRAM_NAME" -p "$win_path" >/dev/null 2>&1
-	grep -q "name: $PROGRAM_NAME" "$BOTTLE_DIR/bottle.yml" || error "Failed to register $PROGRAM_NAME"
+	local rc=0
+	ensure_program_no_dxvk || rc=$?
+	if [ "$rc" -eq 10 ]; then
+		success "Disabled DXVK for $PROGRAM_NAME"
+	else
+		success "Program registered, DXVK already off"
+	fi
 }
 
 step_icon() {
