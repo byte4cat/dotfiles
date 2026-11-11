@@ -21,7 +21,7 @@ hl.bind(mainMod .. " + SHIFT + M", hl.dsp.exec_cmd("byte4work-hyprland-toggle-mo
 hl.bind(mainMod .. " + M", hl.dsp.exec_cmd(myEnv.powerMenuCmd))
 hl.bind(mainMod .. " + B", hl.dsp.exec_cmd(myEnv.browser))
 hl.bind(mainMod .. " + SHIFT + E", hl.dsp.exec_cmd(myEnv.emojiPickerCmd))
-hl.bind(mainMod .. " + E", hl.dsp.exec_cmd(myEnv.terminalFileManager))
+hl.bind(mainMod .. " + E", hl.dsp.exec_cmd(myEnv.fileManager))
 
 -- =============
 -- 視窗狀態操作
