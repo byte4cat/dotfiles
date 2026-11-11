@@ -1,0 +1,421 @@
+#!/bin/bash
+
+# ==============================================================================
+# Install LINE (Windows desktop) on Linux via Flatpak Bottles (idempotent)
+#
+# Steps: Bottles -> host tools -> overrides -> bottle -> cjkfonts -> emoji font -> DPI
+#        -> self-signed cert -> sign DLLs -> install LINE -> register -> icon
+#
+# Usage: install_line_bottles [--dry-run] [--resign] [--force] [--sign-only]
+#   --dry-run    Show what would be done without changing anything
+#   --resign     Re-sign the bottle's DLLs even if already signed
+#   --force      Delete and recreate the bottle (asks for confirmation)
+#   --sign-only  Only verify/re-sign the DLLs (used by bin/line_launch)
+# ==============================================================================
+set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+DOTFILES_DIR="$(dirname "$SCRIPT_DIR")"
+
+source "$DOTFILES_DIR/lib/common"
+source "$DOTFILES_DIR/lib/line_bottles" # BOTTLES_APP, bottles_cli, wait_wine_idle
+
+# -----------------------------
+# Settings
+# -----------------------------
+BOTTLE="${LINE_BOTTLE:-Line}"
+PROGRAM_NAME="LineLauncher"
+INSTALLER_URL="https://desktop.line-scdn.net/win/new/LineInst.exe"
+INSTALLER_SIGNER="LY Corporation"
+LINE_DPI="${LINE_DPI:-192}"
+EMOJI_FONT_URL="https://github.com/google/fonts/raw/main/ofl/notoemoji/NotoEmoji%5Bwght%5D.ttf"
+
+BOTTLES_DATA="$HOME/.var/app/$BOTTLES_APP/data/bottles"
+BOTTLE_DIR="$BOTTLES_DATA/bottles/$BOTTLE"
+DATA_DIR="$HOME/.local/share/line-bottles" # cert + icon (not in repo)
+CACHE_DIR="$HOME/.cache/line-bottles"      # installer + logs
+ICON_FILE="$DATA_DIR/line.png"
+DESKTOP_FILE="$HOME/.local/share/applications/line.desktop"
+
+DRY_RUN=0
+RESIGN=0
+FORCE=0
+SIGN_ONLY=0
+
+# -----------------------------
+# Helpers
+# -----------------------------
+usage() { sed -n '3,15p' "${BASH_SOURCE[0]}" | sed 's/^# \{0,1\}//'; }
+
+# Run a command, or only print it in dry-run mode
+run() {
+	if [ "$DRY_RUN" -eq 1 ]; then
+		info "[dry-run] $*"
+	else
+		"$@"
+	fi
+}
+
+strip_ansi() { sed 's/\x1b\[[0-9;]*m//g'; }
+
+bottle_exists() {
+	bottles_cli list bottles 2>/dev/null | strip_ansi | grep -x -- "- $BOTTLE" >/dev/null
+}
+
+# Latest installed kron4ek runner (e.g. kron4ek-wine-11.2-amd64)
+latest_runner() {
+	bottles_cli list components 2>/dev/null | strip_ansi |
+		sed -n 's/^- \(kron4ek-wine-.*-amd64\)$/\1/p' | sort -V | tail -n1
+}
+
+bottle_runner() {
+	sed -n 's/^Runner: *//p' "$BOTTLE_DIR/bottle.yml" | head -n1
+}
+
+find_line_exe() {
+	local f
+	for f in "$BOTTLE_DIR"/drive_c/users/*/AppData/Local/LINE/bin/LineLauncher.exe; do
+		[ -f "$f" ] && { echo "$f"; return 0; }
+	done
+	return 1
+}
+
+# -----------------------------
+# Steps
+# -----------------------------
+step_bottles() {
+	info "[1/12] Flatpak & Bottles"
+	check_command flatpak
+	if ! flatpak remotes | grep '^flathub' >/dev/null; then
+		run flatpak remote-add --if-not-exists --user flathub \
+			https://dl.flathub.org/repo/flathub.flatpakrepo
+	fi
+	if flatpak info "$BOTTLES_APP" >/dev/null 2>&1; then
+		success "Bottles already installed"
+	else
+		run flatpak install -y flathub "$BOTTLES_APP"
+	fi
+}
+
+step_tools() {
+	info "[2/12] Host tools (osslsigncode, winetricks, openssl)"
+	check_command openssl winetricks curl fc-scan
+	if command -v osslsigncode >/dev/null 2>&1; then
+		success "osslsigncode already installed"
+	else
+		# osslsigncode lives in the AUR, not in the official repos
+		check_command yay
+		run yay -S --needed osslsigncode
+	fi
+}
+
+step_overrides() {
+	info "[3/12] Flatpak overrides"
+	run flatpak override --user --filesystem=xdg-data/applications "$BOTTLES_APP"
+	run flatpak override --user --filesystem=xdg-download "$BOTTLES_APP"
+}
+
+step_bottle() {
+	info "[4/12] Bottle '$BOTTLE'"
+	if [ "$FORCE" -eq 1 ] && bottle_exists; then
+		warn "--force: bottle '$BOTTLE' (and everything in it) will be deleted"
+		if [ "$DRY_RUN" -eq 1 ]; then
+			info "[dry-run] rm -rf $BOTTLE_DIR"
+		elif confirm "Delete $BOTTLE_DIR?"; then
+			[ -n "$BOTTLE" ] && rm -rf -- "$BOTTLE_DIR"
+		else
+			error "Aborted"
+		fi
+	fi
+
+	if bottle_exists && [ -f "$BOTTLE_DIR/bottle.yml" ]; then
+		success "Bottle already exists (runner: $(bottle_runner))"
+		return
+	fi
+
+	local runner="${LINE_RUNNER:-$(latest_runner)}"
+	[ -n "$runner" ] || error "No kron4ek runner found (set LINE_RUNNER to override)"
+	mkdir -p "$CACHE_DIR"
+	info "Creating bottle with runner $runner (log: $CACHE_DIR/new-bottle.log)"
+	if [ "$DRY_RUN" -eq 1 ]; then
+		info "[dry-run] bottles-cli new --bottle-name $BOTTLE --environment gaming --runner $runner"
+		return
+	fi
+	bottles_cli new --bottle-name "$BOTTLE" --environment gaming \
+		--runner "$runner" >"$CACHE_DIR/new-bottle.log" 2>&1 || true
+	[ -f "$BOTTLE_DIR/bottle.yml" ] || error "Bottle creation failed, see $CACHE_DIR/new-bottle.log"
+	wait_wine_idle 30 || warn "Wine still running after bottle creation"
+}
+
+step_fonts() {
+	info "[5/12] CJK fonts (winetricks cjkfonts)"
+	if [ "$DRY_RUN" -eq 1 ] && [ ! -d "$BOTTLE_DIR" ]; then
+		info "[dry-run] winetricks -q cjkfonts"
+		return
+	fi
+	if grep -qx cjkfonts "$BOTTLE_DIR/winetricks.log" 2>/dev/null; then
+		success "cjkfonts already installed"
+		return
+	fi
+	local runner_dir="$BOTTLES_DATA/runners/$(bottle_runner)"
+	[ -x "$runner_dir/bin/wine" ] || error "Runner not found: $runner_dir"
+	if [ "$DRY_RUN" -eq 1 ]; then
+		info "[dry-run] winetricks -q cjkfonts"
+		return
+	fi
+	WINEPREFIX="$BOTTLE_DIR" WINE="$runner_dir/bin/wine" \
+		WINESERVER="$runner_dir/bin/wineserver" WINEDEBUG=-all \
+		winetricks -q cjkfonts >"$CACHE_DIR/winetricks.log" 2>&1 ||
+		error "winetricks failed, see $CACHE_DIR/winetricks.log"
+	grep -qx cjkfonts "$BOTTLE_DIR/winetricks.log" || error "cjkfonts not recorded after install"
+	wait_wine_idle 30 || warn "Wine still running after winetricks"
+}
+
+step_emoji() {
+	info "[6/12] Emoji font (monochrome Noto Emoji)"
+	# Colour fonts (CBDT/COLR, e.g. Noto Color Emoji, Twemoji) render as blanks
+	# in Wine's GDI path, so use the monochrome outline font instead.
+	local font="$BOTTLE_DIR/drive_c/windows/Fonts/NotoEmoji.ttf"
+	local cached="$CACHE_DIR/NotoEmoji.ttf"
+	local rule='"Segoe UI Emoji"="Noto Emoji"'
+	if [ -f "$font" ] && grep -qF "$rule" "$BOTTLE_DIR/user.reg" 2>/dev/null; then
+		success "Emoji font and replacement rule already set"
+		return
+	fi
+	if [ "$DRY_RUN" -eq 1 ]; then
+		info "[dry-run] install NotoEmoji.ttf and map 'Segoe UI Emoji' -> 'Noto Emoji'"
+		return
+	fi
+	mkdir -p "$CACHE_DIR"
+	if [ ! -s "$cached" ]; then
+		info "Downloading Noto Emoji (monochrome)"
+		curl -fsSL -o "$cached.part" "$EMOJI_FONT_URL"
+		[[ "$(fc-scan --format '%{family}\n' "$cached.part" 2>/dev/null)" == *"Noto Emoji"* ]] ||
+			{ rm -f "$cached.part"; error "Downloaded file is not the Noto Emoji font"; }
+		mv -f "$cached.part" "$cached"
+	fi
+	[ -f "$font" ] || cp -f "$cached" "$font"
+	# Registry changes must not overlap with a running Wine session
+	wait_wine_idle 30 || error "Wine is running; close LINE and run this script again"
+	bottles_cli reg add -b "$BOTTLE" -k 'HKEY_CURRENT_USER\Software\Wine\Fonts\Replacements' \
+		-v 'Segoe UI Emoji' -d 'Noto Emoji' -t REG_SZ >/dev/null 2>&1
+	wait_wine_idle 30 || warn "Wine still running after registry change"
+	grep -qF "$rule" "$BOTTLE_DIR/user.reg" || error "Emoji replacement rule was not saved"
+}
+
+step_dpi() {
+	info "[7/12] Wine DPI ($LINE_DPI)"
+	# Matches monitors with 2x scaling together with Hyprland's
+	# xwayland.force_zero_scaling (modules/hyprland/.../env.lua): XWayland windows
+	# are not upscaled by the compositor, so Wine must scale the UI itself.
+	local hex
+	hex="$(printf '%08x' "$LINE_DPI")"
+	if [ "$(grep -c "\"LogPixels\"=dword:$hex" "$BOTTLE_DIR/user.reg" 2>/dev/null || true)" -ge 2 ]; then
+		success "DPI already $LINE_DPI"
+		return
+	fi
+	if [ "$DRY_RUN" -eq 1 ]; then
+		info "[dry-run] set LogPixels=$LINE_DPI"
+		return
+	fi
+	wait_wine_idle 30 || error "Wine is running; close LINE and run this script again"
+	local key
+	for key in 'HKEY_CURRENT_USER\Control Panel\Desktop' 'HKEY_CURRENT_USER\Software\Wine\Fonts'; do
+		bottles_cli reg add -b "$BOTTLE" -k "$key" -v LogPixels -d "$LINE_DPI" -t REG_DWORD >/dev/null 2>&1
+	done
+	wait_wine_idle 30 || warn "Wine still running after registry change"
+	grep -q "\"LogPixels\"=dword:$hex" "$BOTTLE_DIR/user.reg" || error "LogPixels was not saved"
+}
+
+step_cert() {
+	info "[8/12] Self-signed code-signing certificate"
+	if [ -f "$DATA_DIR/codesign.crt" ] && [ -f "$DATA_DIR/codesign.key" ]; then
+		success "Certificate already exists"
+		return
+	fi
+	if [ "$DRY_RUN" -eq 1 ]; then
+		info "[dry-run] openssl req -x509 ... -> $DATA_DIR/codesign.{crt,key}"
+		return
+	fi
+	mkdir -p "$DATA_DIR"
+	cat >"$DATA_DIR/codesign.conf" <<'EOF'
+[req]
+prompt = no
+default_md = sha256
+default_bits = 2048
+distinguished_name = dn
+x509_extensions = v3_req
+[dn]
+C = US
+ST = Washington
+L = Redmond
+O = Microsoft Corporation
+CN = Microsoft Windows
+[v3_req]
+subjectAltName = @alt_names
+[alt_names]
+DNS.1 = microsoft.com
+EOF
+	openssl req -x509 -new -nodes -sha256 -utf8 -days 3650 -newkey rsa:2048 \
+		-keyout "$DATA_DIR/codesign.key" -out "$DATA_DIR/codesign.crt" \
+		-config "$DATA_DIR/codesign.conf" >/dev/null 2>&1
+	chmod 600 "$DATA_DIR/codesign.key"
+}
+
+# True if the DLL carries our self-signed signature
+# (verify exits non-zero for self-signed certs, so capture output instead of piping)
+dll_signed() {
+	local info
+	[ -f "$1" ] || return 1
+	info="$(osslsigncode verify -in "$1" 2>&1 || true)"
+	[[ "$info" == *"CN=Microsoft Windows"* ]]
+}
+
+step_sign() {
+	info "[9/12] Sign bottle DLLs"
+	local win="$BOTTLE_DIR/drive_c/windows" f ok=0 skipped=0
+	# Wine may rewrite system DLLs when it updates the prefix, so check the
+	# actual files (not a marker): crypt32 is the one LINE complains about.
+	if [ "$RESIGN" -eq 0 ] &&
+		dll_signed "$win/system32/crypt32.dll" && dll_signed "$win/syswow64/crypt32.dll" &&
+		dll_signed "$win/system32/kernel32.dll" && dll_signed "$win/syswow64/kernel32.dll"; then
+		success "DLLs already carry our signature"
+		return
+	fi
+	if [ "$DRY_RUN" -eq 1 ]; then
+		info "[dry-run] osslsigncode sign system32/*.dll syswow64/*.dll"
+		return
+	fi
+
+	for f in "$win"/system32/*.dll "$win"/syswow64/*.dll; do
+		[ -L "$f" ] && continue
+		if [ "$RESIGN" -eq 1 ] &&
+			osslsigncode remove-signature -in "$f" -out "$f.unsigned" >/dev/null 2>&1; then
+			mv -f "$f.unsigned" "$f"
+		fi
+		rm -f "$f.unsigned"
+		if osslsigncode sign -certs "$DATA_DIR/codesign.crt" -key "$DATA_DIR/codesign.key" \
+			-in "$f" -out "$f.signed" >/dev/null 2>&1; then
+			mv -f "$f.signed" "$f"
+			ok=$((ok + 1))
+		else
+			# 16-bit (NE/DOS) stubs cannot be signed; already-signed files are left as is
+			rm -f "$f.signed"
+			skipped=$((skipped + 1))
+		fi
+	done
+	[ "$ok" -gt 0 ] || error "No DLL was signed"
+	dll_signed "$win/system32/crypt32.dll" || error "crypt32.dll is still unsigned"
+	success "Signed $ok DLLs ($skipped skipped: 16-bit stubs or already signed)"
+}
+
+step_install_line() {
+	info "[10/12] Install LINE"
+	if find_line_exe >/dev/null; then
+		success "LINE already installed"
+		return
+	fi
+	local installer="$CACHE_DIR/LineInst.exe"
+	local staged="$HOME/Downloads/LineInst.exe" # Bottles can only read xdg-download
+	if [ "$DRY_RUN" -eq 1 ]; then
+		info "[dry-run] download $INSTALLER_URL and run it in bottle '$BOTTLE'"
+		return
+	fi
+	mkdir -p "$CACHE_DIR" "$HOME/Downloads"
+	if [ ! -s "$installer" ]; then
+		info "Downloading LINE installer"
+		curl -fL --progress-bar -o "$installer" "$INSTALLER_URL"
+	fi
+	local installer_info
+	installer_info="$(osslsigncode verify -in "$installer" 2>&1 || true)"
+	if [[ "$installer_info" != *"$INSTALLER_SIGNER"* ]]; then
+		rm -f "$installer"
+		error "Installer signature is not from $INSTALLER_SIGNER"
+	fi
+	cp -f "$installer" "$staged"
+	info "Launching installer, please complete it in the window that opens"
+	bottles_cli run -b "$BOTTLE" -e "$staged" >"$CACHE_DIR/install.log" 2>&1 || true
+	rm -f "$staged"
+	find_line_exe >/dev/null || error "LINE not found after install, see $CACHE_DIR/install.log"
+}
+
+step_register() {
+	info "[11/12] Register $PROGRAM_NAME in bottle"
+	if grep -q "name: $PROGRAM_NAME" "$BOTTLE_DIR/bottle.yml" 2>/dev/null; then
+		success "Program already registered"
+		return
+	fi
+	if [ "$DRY_RUN" -eq 1 ]; then
+		info "[dry-run] bottles-cli add -b $BOTTLE -n $PROGRAM_NAME -p <LineLauncher.exe>"
+		return
+	fi
+	local exe win_path
+	exe="$(find_line_exe)" || error "LineLauncher.exe not found"
+	win_path="C:${exe#"$BOTTLE_DIR/drive_c"}"
+	win_path="${win_path//\//\\}"
+	bottles_cli add -b "$BOTTLE" -n "$PROGRAM_NAME" -p "$win_path" >/dev/null 2>&1
+	grep -q "name: $PROGRAM_NAME" "$BOTTLE_DIR/bottle.yml" || error "Failed to register $PROGRAM_NAME"
+}
+
+step_icon() {
+	info "[12/12] Icon & desktop entry"
+	if [ ! -f "$ICON_FILE" ]; then
+		local src="$BOTTLE_DIR/drive_c/users"
+		src="$(ls "$src"/*/AppData/Local/LINE/bin/current/assets/Square150x150Logo.scale-400.png 2>/dev/null | head -n1 || true)"
+		if [ -n "$src" ]; then
+			run mkdir -p "$DATA_DIR"
+			run cp -f "$src" "$ICON_FILE"
+		else
+			warn "LINE logo asset not found, icon not installed"
+		fi
+	else
+		success "Icon already installed"
+	fi
+	# The .desktop file is managed by stow (modules/applications)
+	if [ -e "$DESKTOP_FILE" ]; then
+		success "Desktop entry present: $DESKTOP_FILE"
+	else
+		warn "Desktop entry missing, run ./bin/sync_dotfiles to deploy it"
+	fi
+}
+
+# -----------------------------
+# Main
+# -----------------------------
+main() {
+	local arg
+	for arg in "$@"; do
+		case "$arg" in
+			--dry-run) DRY_RUN=1 ;;
+			--resign) RESIGN=1 ;;
+			--force) FORCE=1 ;;
+			--sign-only) SIGN_ONLY=1 ;;
+			-h | --help) usage; exit 0 ;;
+			*) usage; error "Unknown option: $arg" ;;
+		esac
+	done
+
+	if [ "$SIGN_ONLY" -eq 1 ]; then
+		check_command osslsigncode
+		[ -f "$DATA_DIR/codesign.crt" ] || error "No certificate, run install_line_bottles first"
+		step_sign
+		exit 0
+	fi
+
+	step_bottles
+	step_tools
+	step_overrides
+	step_bottle
+	step_fonts
+	step_emoji
+	step_dpi
+	[ "$DRY_RUN" -eq 1 ] || fonts_stamp_sync "$BOTTLE_DIR"
+	step_cert
+	step_sign
+	step_install_line
+	step_register
+	step_icon
+	success "Done. Launch LINE from your application menu (line.desktop)."
+}
+
+main "$@"

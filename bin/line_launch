@@ -1,0 +1,52 @@
+#!/bin/bash
+
+# ==============================================================================
+# Launch LINE (Bottles) safely. Used as Exec= in line.desktop.
+#
+# 1. If LINE is already running, just forward the request to it.
+# 2. Otherwise wait until the previous Wine session has fully exited.
+# 3. Make sure the bottle's DLLs still carry the self-signed signature
+#    (LINE refuses to start with "NO_SIGNATURE"), re-signing if needed.
+# 4. Keep Bottles from force-updating the prefix (see fonts_stamp_sync).
+# 5. Start LINE.
+# ==============================================================================
+set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+DOTFILES_DIR="$(dirname "$SCRIPT_DIR")"
+
+source "$DOTFILES_DIR/lib/common"
+source "$DOTFILES_DIR/lib/line_bottles"
+
+BOTTLE="${LINE_BOTTLE:-Line}"
+PROGRAM_NAME="LineLauncher"
+BOTTLE_DIR="$HOME/.var/app/$BOTTLES_APP/data/bottles/bottles/$BOTTLE"
+CACHE_DIR="$HOME/.cache/line-bottles"
+LOG="$CACHE_DIR/launch.log"
+
+mkdir -p "$CACHE_DIR"
+# Keep the log small
+[ "$(stat -c %s "$LOG" 2>/dev/null || echo 0)" -gt 1048576 ] && : >"$LOG"
+exec >>"$LOG" 2>&1
+echo "=== $(date '+%F %T') line_launch $* ==="
+
+notify() {
+	command -v notify-send >/dev/null 2>&1 && notify-send -a LINE "LINE" "$1" || true
+}
+
+if ! line_running; then
+	if ! wait_wine_idle 30; then
+		warn "Wine is still running after 30s, starting anyway"
+		notify "Wine 尚未完全結束,仍嘗試啟動 LINE"
+	fi
+	if ! "$SCRIPT_DIR/install_line_bottles" --sign-only; then
+		warn "DLL signature check failed, starting anyway"
+		notify "DLL 簽章檢查失敗,詳見 $LOG"
+	fi
+fi
+
+# Must come after the Wine session is idle and DLLs are signed: stops Bottles
+# from running `wineboot -u` (which would remove the signatures again).
+fonts_stamp_sync "$BOTTLE_DIR"
+
+exec flatpak run --command=bottles-cli "$BOTTLES_APP" run -p "$PROGRAM_NAME" -b "$BOTTLE" -- "$@"

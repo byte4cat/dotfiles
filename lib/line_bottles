@@ -1,0 +1,53 @@
+#!/bin/bash
+# ==============================================================================
+# Shared helpers for the LINE-on-Bottles scripts
+# (bin/install_line_bottles, bin/line_launch). Source after lib/common.
+# ==============================================================================
+
+BOTTLES_APP="com.usebottles.bottles"
+
+bottles_cli() { flatpak run --command=bottles-cli "$BOTTLES_APP" "$@"; }
+
+# True while any Wine process of a Bottles runner is alive. They run inside the
+# flatpak sandbox but are visible in the host process list.
+wine_running() {
+	ps -eo args | grep -E 'bottles/runners/.*wineserver|C:\\(windows|users)\\' |
+		grep -v grep >/dev/null
+}
+
+# LINE itself (not only the Wine session) is running
+line_running() {
+	ps -eo args | grep -F 'LINE\bin\current\LINE.exe' | grep -v grep >/dev/null
+}
+
+# Wait until the Wine session is fully gone, then a short grace period.
+# Starting a new Wine session while the previous wineserver is still shutting
+# down can leave services half-initialised (LINE hangs, or the system DLLs get
+# replaced and lose their signature).
+# Returns 1 on timeout.
+wait_wine_idle() {
+	local timeout="${1:-30}" i
+	for ((i = 0; i < timeout; i++)); do
+		if ! wine_running; then
+			sleep 2
+			return 0
+		fi
+		sleep 1
+	done
+	return 1
+}
+
+# Bottles runs `wineboot -u` (forced prefix update) before launching a program
+# whenever drive_c/windows/Fonts is newer than the time recorded in
+# <bottle>/.fonts_stamp (see bottles/backend/wine/executor.py). That update
+# restores the stock system DLLs and wipes our self-signed signatures, so LINE
+# fails with "NO_SIGNATURE". Keeping the stamp ahead of the Fonts mtime stops it.
+# Usage: fonts_stamp_sync <bottle_dir>
+fonts_stamp_sync() {
+	local bottle_dir="$1" fonts_dir mtime
+	fonts_dir="$bottle_dir/drive_c/windows/Fonts"
+	[ -d "$fonts_dir" ] || return 0
+	mtime="$(stat -c '%.9Y' "$fonts_dir")"
+	# +1s margin avoids float rounding differences on Bottles' side
+	awk -v m="$mtime" 'BEGIN { printf "%.9f", m + 1 }' >"$bottle_dir/.fonts_stamp"
+}
