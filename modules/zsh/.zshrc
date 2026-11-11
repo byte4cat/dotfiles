@@ -119,5 +119,12 @@ alias zz='yazi'
 alias tcs='byte4work-tmux-choose-session'
 alias tss='byte4work-tmux-sessionizer'
 
+alias claude-itracxing='CLAUDE_CONFIG_DIR=$HOME/.claude-itracxing claude'
+
 # bun completions
 [ -s "/home/neil/.bun/_bun" ] && source "/home/neil/.bun/_bun"
+
+# flutter
+export PATH="/home/neil/fvm/default/bin:$PATH"
+export ANDROID_HOME="/opt/android-sdk"
+export PATH="$PATH:$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools"
