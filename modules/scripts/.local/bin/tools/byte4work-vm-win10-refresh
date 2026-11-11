@@ -1,0 +1,32 @@
+#!/bin/bash
+V="virsh -c qemu:///system"
+VM=win10
+SNAP=clean
+
+case "$1" in
+  fresh|"")
+    if [ "$($V domstate $VM)" = "running" ]; then
+      read -rp "VM 正在執行,確定丟棄目前狀態並還原?[y/N] " a
+      [ "$a" = "y" ] || exit 1
+      $V destroy $VM
+    fi
+    $V snapshot-revert $VM $SNAP --running
+    ;;
+  keep)
+    [ "$($V domstate $VM)" = "running" ] || $V start $VM
+    ;;
+  save-base)
+    if [ "$($V domstate $VM)" != "shut off" ]; then
+      echo "請先在 Win10 內正常關機"; exit 1
+    fi
+    $V snapshot-delete $VM $SNAP
+    $V snapshot-create-as $VM $SNAP
+    exit 0
+    ;;
+  *)
+    echo "usage: win10 [fresh|keep|save-base]"; exit 1
+    ;;
+esac
+
+virt-viewer -c qemu:///system $VM
+

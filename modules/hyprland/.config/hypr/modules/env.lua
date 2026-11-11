@@ -88,6 +88,8 @@ hl.env(
 		.. home
 		.. "/.local/bin/hyprland:"
 		.. home
+		.. "/.local/bin/tools:"
+		.. home
 		.. "/.local/private/bin:/usr/local/bin:/usr/bin"
 )
 
