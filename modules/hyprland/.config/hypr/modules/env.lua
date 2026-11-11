@@ -99,6 +99,11 @@ hl.env("QT_QPA_PLATFORMTHEME", "qt6ct")
 hl.env("MOZ_ENABLE_WAYLAND", "1")
 hl.env("ELECTRON_OZONE_PLATFORM_HINT", "wayland")
 
+-- Do not let the compositor upscale XWayland windows on scaled monitors (blurry
+-- text). XWayland apps then render at native pixels and must scale themselves,
+-- e.g. the LINE Wine bottle uses LogPixels=192 (see bin/install_line_bottles).
+hl.config({ xwayland = { force_zero_scaling = true } })
+
 hl.env("mesa_glthread", "true")
 -- hl.env("GSK_RENDERER", "nglyph") -- 幫助某些 GTK4 應用穩定
 -- hl.env("WLR_RENDERER", "gles2")  -- 如果預設的 vulkan/gles3 噴 EGL 錯誤，可以退回 gles2 測試
