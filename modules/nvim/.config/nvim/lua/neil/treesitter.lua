@@ -1,10 +1,12 @@
 vim.treesitter.language.register("html", "handlebars")
+vim.treesitter.language.register("markdown", "vimwiki")
 
 vim.api.nvim_create_autocmd("FileType", {
 	pattern = "*",
 	callback = function()
 		local ft = vim.bo.filetype
-		if ft and ft ~= "" and vim.treesitter.query.get(ft, "highlights") then
+		local lang = ft and ft ~= "" and vim.treesitter.language.get_lang(ft)
+		if lang and vim.treesitter.query.get(lang, "highlights") then
 			vim.treesitter.start()
 		end
 

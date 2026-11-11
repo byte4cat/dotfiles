@@ -6,6 +6,7 @@ return {
 	opts = {},
 	config = function()
 		require("render-markdown").setup({
+			file_types = { "markdown", "vimwiki" },
 			link = {
 				-- Turn on / off inline link icon rendering.
 				enabled = true,
