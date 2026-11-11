@@ -50,3 +50,4 @@ application/vnd.oasis.opendocument.presentation=onlyoffice-desktopeditors.deskto
 application/vnd.openxmlformats-officedocument.presentationml.presentation=onlyoffice-desktopeditors.desktop
 application/vnd.ms-powerpoint=onlyoffice-desktopeditors.desktop
 x-scheme-handler/claude-cli=claude-code-url-handler.desktop
+application/lrf=calibre-lrfviewer.desktop
