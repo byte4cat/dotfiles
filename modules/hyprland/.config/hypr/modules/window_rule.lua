@@ -53,6 +53,23 @@ hl.window_rule({
 	size = { "(monitor_w * 0.6)", "(monitor_h * 0.8)" },
 })
 
+-- LINE (Wine/Bottles): 固定視窗大小。
+-- LINE 自己畫邊框，被 Hyprland 拖曳縮放後內容不會重畫（外框變大、內容停在舊尺寸、
+-- 其餘是黑的），所以不讓 Hyprland 調整大小。只匹配主視窗（title = LINE），
+-- 邊框／陰影用的輔助視窗標題是空的，不可限制大小。
+-- 注意：Hyprland 不會因為 modules/*.lua 改動而自動重載，改完要 `hyprctl reload`；
+-- 規則只在視窗開啟時套用，已開著的 LINE 需關掉重開。
+-- 背景與完整說明見 bin/install_line_bottles 開頭的 Notes。
+hl.window_rule({
+	name = "line-wine-fixed-size",
+	match = { class = "^(line\\.exe)$", title = "^LINE$" },
+	float = true,
+	center = true,
+	size = { "(monitor_w * 0.5)", "(monitor_h * 0.9)" },
+	min_size = { "(monitor_w * 0.5)", "(monitor_h * 0.9)" },
+	max_size = { "(monitor_w * 0.5)", "(monitor_h * 0.9)" },
+})
+
 -- Show Me The Key (展示工具)
 hl.window_rule({
 	name = "key-display-overlay",
