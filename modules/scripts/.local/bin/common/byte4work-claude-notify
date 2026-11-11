@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+
+# 接收傳入的參數作為通知訊息（例如 "Task Complete!" 或 "Waiting for your input!"）
+MESSAGE="$1"
+TYPE="$2" # 用來區分是完成還是等待輸入
+
+# 抓取 tmux session 名稱，若無則退回當前資料夾名稱
+NAME=$(tmux display-message -p '#S' 2>/dev/null || basename "$PWD")
+
+# 根據類型選擇不同的音效檔
+if [ "$TYPE" = "complete" ]; then
+    SOUND="/usr/share/sounds/freedesktop/stereo/complete.oga"
+else
+    SOUND="/usr/share/sounds/freedesktop/stereo/bell.oga"
+fi
+
+# 發送通知與播放聲音
+notify-send -i /home/neil/.local/share/icons/claude.svg "Claude Code ($NAME)" "$MESSAGE"
+paplay "$SOUND"
