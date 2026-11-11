@@ -144,3 +144,10 @@ hl.window_rule({
 	size = { "(monitor_w * 0.7)", "(monitor_h * 0.7)" },
 	opacity = "0.9 override 0.1 override 1.0 override", -- active/inactive/fullscreen 三段
 })
+
+-- virt-manager:不讓 VM 檢視器接管快捷鍵,保留 Super+數字 切換工作區
+hl.window_rule({
+	name = "virt-manager-no-shortcuts-inhibit",
+	match = { class = "^(virt-manager)$" },
+	no_shortcuts_inhibit = true,
+})
