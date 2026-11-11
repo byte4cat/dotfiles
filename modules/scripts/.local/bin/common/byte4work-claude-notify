@@ -1,19 +1,73 @@
 #!/usr/bin/env bash
+# Claude Code hook 通知腳本。
+# 用法(hook):直接呼叫,事件資訊由 stdin 的 JSON 提供。
+# 相容舊用法:byte4work-claude-notify "<訊息>" <complete|notification>
 
-# 接收傳入的參數作為通知訊息（例如 "Task Complete!" 或 "Waiting for your input!"）
-MESSAGE="$1"
-TYPE="$2" # 用來區分是完成還是等待輸入
+set -u
 
-# 抓取 tmux session 名稱，若無則退回當前資料夾名稱
-NAME=$(tmux display-message -p '#S' 2>/dev/null || basename "$PWD")
+ICON="${XDG_DATA_HOME:-$HOME/.local/share}/icons/claude.svg"
+SOUND_DIR="/usr/share/sounds/freedesktop/stereo"
 
-# 根據類型選擇不同的音效檔
-if [ "$TYPE" = "complete" ]; then
-    SOUND="/usr/share/sounds/freedesktop/stereo/complete.oga"
-else
-    SOUND="/usr/share/sounds/freedesktop/stereo/bell.oga"
+# --- 讀取 hook 的 stdin JSON(沒有管線輸入時略過)---
+INPUT=""
+if [ ! -t 0 ]; then
+	INPUT=$(cat)
 fi
 
-# 發送通知與播放聲音
-notify-send -i /home/neil/.local/share/icons/claude.svg "Claude Code ($NAME)" "$MESSAGE"
-paplay "$SOUND"
+json_get() {
+	[ -n "$INPUT" ] || return 0
+	printf '%s' "$INPUT" | jq -r "$1 // empty" 2>/dev/null
+}
+
+EVENT=$(json_get '.hook_event_name')
+CWD=$(json_get '.cwd')
+MESSAGE=$(json_get '.message')
+
+# --- 相容舊的位置參數 ---
+if [ -z "$EVENT" ]; then
+	case "${2:-}" in
+	complete) EVENT="Stop" ;;
+	*) EVENT="Notification" ;;
+	esac
+fi
+[ -n "$MESSAGE" ] || MESSAGE="${1:-}"
+
+# --- 依事件決定訊息、音效、緊急程度 ---
+case "$EVENT" in
+Stop)
+	[ -n "$MESSAGE" ] || MESSAGE="Task Complete!"
+	SOUND="$SOUND_DIR/complete.oga"
+	URGENCY="normal"
+	;;
+*)
+	[ -n "$MESSAGE" ] || MESSAGE="Waiting for your input!"
+	SOUND="$SOUND_DIR/bell.oga"
+	URGENCY="critical"
+	;;
+esac
+
+# --- session 名稱:優先 Claude 所在的 tmux pane,否則用 cwd 資料夾名 ---
+NAME=""
+if [ -n "${TMUX_PANE:-}" ]; then
+	NAME=$(tmux display-message -p -t "$TMUX_PANE" '#S' 2>/dev/null || true)
+fi
+[ -n "$NAME" ] || NAME=$(basename "${CWD:-$PWD}")
+
+# --- 發送通知(同一 session 的新通知取代舊的)---
+notify-send \
+	-a "Claude Code" \
+	-i "$ICON" \
+	-u "$URGENCY" \
+	-h "string:x-canonical-private-synchronous:claude-$NAME" \
+	"Claude Code ($NAME)" "$MESSAGE"
+
+# --- 播放音效:背景執行,不阻塞 hook;缺檔或缺播放器時略過 ---
+if [ -f "$SOUND" ]; then
+	if command -v paplay >/dev/null 2>&1; then
+		paplay "$SOUND" >/dev/null 2>&1 &
+	elif command -v pw-play >/dev/null 2>&1; then
+		pw-play "$SOUND" >/dev/null 2>&1 &
+	fi
+fi
+
+exit 0
