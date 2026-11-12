@@ -199,6 +199,32 @@ step_fonts() {
 	wait_wine_idle 30 || warn "Wine still running after winetricks"
 }
 
+step_vcrun() {
+	info "[5b/12] VC++ runtime (winetricks vcrun2022)"
+	# Wine's builtin msvcp140_2.dll lacks __std_smf_cyl_bessel_i, which makes
+	# LINE's media player (linemediaplayer.exe) abort: no video, no sound.
+	if [ "$DRY_RUN" -eq 1 ] && [ ! -d "$BOTTLE_DIR" ]; then
+		info "[dry-run] winetricks -q vcrun2022"
+		return
+	fi
+	if grep -qx vcrun2022 "$BOTTLE_DIR/winetricks.log" 2>/dev/null; then
+		success "vcrun2022 already installed"
+		return
+	fi
+	local runner_dir="$BOTTLES_DATA/runners/$(bottle_runner)"
+	[ -x "$runner_dir/bin/wine" ] || error "Runner not found: $runner_dir"
+	if [ "$DRY_RUN" -eq 1 ]; then
+		info "[dry-run] winetricks -q vcrun2022"
+		return
+	fi
+	WINEPREFIX="$BOTTLE_DIR" WINE="$runner_dir/bin/wine" \
+		WINESERVER="$runner_dir/bin/wineserver" WINEDEBUG=-all \
+		winetricks -q vcrun2022 >"$CACHE_DIR/winetricks-vcrun.log" 2>&1 ||
+		error "winetricks failed, see $CACHE_DIR/winetricks-vcrun.log"
+	grep -qx vcrun2022 "$BOTTLE_DIR/winetricks.log" || error "vcrun2022 not recorded after install"
+	wait_wine_idle 30 || warn "Wine still running after winetricks"
+}
+
 step_emoji() {
 	info "[6/12] Emoji font (monochrome Noto Emoji)"
 	# Colour fonts (CBDT/COLR, e.g. Noto Color Emoji, Twemoji) render as blanks
@@ -469,6 +495,7 @@ main() {
 	step_overrides
 	step_bottle
 	step_fonts
+	step_vcrun
 	step_emoji
 	step_dpi
 	[ "$DRY_RUN" -eq 1 ] || fonts_stamp_sync "$BOTTLE_DIR"
