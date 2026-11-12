@@ -1,0 +1,133 @@
+#!/bin/bash
+
+# ==============================================================================
+# Back up / restore the LINE bottle (a known-good snapshot to fall back on when
+# a LINE update breaks it under Wine).
+#
+# Usage: line_bottle_backup backup [--keep N]   Snapshot the bottle (default keep 3)
+#        line_bottle_backup list                List snapshots
+#        line_bottle_backup restore [FILE]      Restore FILE (default: newest)
+#
+# Snapshots live in ~/.local/share/line-bottles/backups (tar + zstd). Restore
+# never deletes the current bottle: it is renamed to <bottle>.broken-<time>, so
+# remove that yourself once the restored bottle works.
+# The bottle must not be in use: close LINE and wait for Wine to exit first.
+# ==============================================================================
+set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+DOTFILES_DIR="$(dirname "$SCRIPT_DIR")"
+
+source "$DOTFILES_DIR/lib/common"
+source "$DOTFILES_DIR/lib/line_bottles" # BOTTLES_APP, wine_running, fonts_stamp_sync
+
+BOTTLE="${LINE_BOTTLE:-Line}"
+BOTTLES_DIR="$HOME/.var/app/$BOTTLES_APP/data/bottles/bottles"
+BOTTLE_DIR="$BOTTLES_DIR/$BOTTLE"
+BACKUP_DIR="$HOME/.local/share/line-bottles/backups"
+KEEP=3
+
+usage() { sed -n '4,14p' "${BASH_SOURCE[0]}" | sed 's/^# \{0,1\}//'; }
+
+require_idle() {
+	if wine_running; then
+		error "Wine is still running. Close LINE and wait for it to exit (do not kill it blindly)."
+	fi
+}
+
+# Newest first
+list_backups() {
+	ls -1t "$BACKUP_DIR"/${BOTTLE}-*.tar.zst 2>/dev/null || true
+}
+
+cmd_backup() {
+	while [ $# -gt 0 ]; do
+		case "$1" in
+			--keep)
+				[[ "${2:-}" =~ ^[1-9][0-9]*$ ]] || error "--keep needs a positive number"
+				KEEP="$2"
+				shift
+				;;
+			*) error "Unknown option: $1" ;;
+		esac
+		shift
+	done
+
+	check_command tar zstd
+	[ -d "$BOTTLE_DIR" ] || error "Bottle not found: $BOTTLE_DIR"
+	require_idle
+
+	mkdir -p "$BACKUP_DIR"
+	local out tmp
+	out="$BACKUP_DIR/${BOTTLE}-$(date +%Y%m%d-%H%M%S).tar.zst"
+	tmp="$out.part"
+	info "Backing up $BOTTLE_DIR ($(du -sh "$BOTTLE_DIR" | cut -f1)) ..."
+	tar -C "$BOTTLES_DIR" --zstd -cf "$tmp" "$BOTTLE" || {
+		rm -f "$tmp"
+		error "tar failed"
+	}
+	mv "$tmp" "$out"
+	success "Saved $out ($(du -sh "$out" | cut -f1))"
+
+	# Prune: keep only the newest $KEEP snapshots
+	local old
+	while IFS= read -r old; do
+		[ -n "$old" ] || continue
+		info "Removing old snapshot: $old"
+		rm -f -- "$old"
+	done < <(list_backups | tail -n +"$((KEEP + 1))")
+}
+
+cmd_list() {
+	local f found=0
+	while IFS= read -r f; do
+		[ -n "$f" ] || continue
+		found=1
+		echo "$(du -h "$f" | cut -f1)	$f"
+	done < <(list_backups)
+	[ "$found" -eq 1 ] || info "No snapshots in $BACKUP_DIR"
+}
+
+cmd_restore() {
+	local file="${1:-}"
+	[ -n "$file" ] || file="$(list_backups | head -n1)"
+	[ -n "$file" ] || error "No snapshots in $BACKUP_DIR"
+	[ -f "$file" ] || error "Snapshot not found: $file"
+
+	check_command tar zstd
+	require_idle
+
+	# The archive must contain exactly one top-level dir named after the bottle
+	local top
+	top="$(tar --zstd -tf "$file" | head -n1 | cut -d/ -f1)"
+	[ "$top" = "$BOTTLE" ] || error "Snapshot is for bottle '$top', not '$BOTTLE'"
+
+	info "Restore: $file"
+	confirm "Replace the current '$BOTTLE' bottle (it is kept as $BOTTLE.broken-*)?" || {
+		info "Cancelled"
+		return 0
+	}
+
+	local broken=""
+	if [ -d "$BOTTLE_DIR" ]; then
+		broken="$BOTTLES_DIR/$BOTTLE.broken-$(date +%Y%m%d-%H%M%S)"
+		mv "$BOTTLE_DIR" "$broken"
+	fi
+	if ! tar -C "$BOTTLES_DIR" --zstd -xf "$file"; then
+		rm -rf "$BOTTLE_DIR"
+		[ -z "$broken" ] || mv "$broken" "$BOTTLE_DIR"
+		error "Extraction failed, previous bottle put back"
+	fi
+	fonts_stamp_sync "$BOTTLE_DIR"
+	success "Restored $BOTTLE from $file"
+	[ -z "$broken" ] || info "Previous bottle kept at: $broken"
+	info "If Bottles is open, restart it so it re-reads the bottle list."
+}
+
+case "${1:-}" in
+	backup) shift; cmd_backup "$@" ;;
+	list) cmd_list ;;
+	restore) shift; cmd_restore "$@" ;;
+	-h | --help | "") usage ;;
+	*) usage >&2; exit 1 ;;
+esac
