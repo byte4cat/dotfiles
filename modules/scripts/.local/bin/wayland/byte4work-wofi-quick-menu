@@ -184,6 +184,18 @@ select_audio_device() {
 	fi
 
 	wpctl set-default "$selected"
+
+	# 已經在播放/錄音的串流不會自動跟著預設裝置走，要手動搬過去
+	if [[ "$section" == "Sinks" ]]; then
+		for id in $(pactl list short sink-inputs | awk '{print $1}'); do
+			pactl move-sink-input "$id" @DEFAULT_SINK@ 2>/dev/null || true
+		done
+	else
+		for id in $(pactl list short source-outputs | awk '{print $1}'); do
+			pactl move-source-output "$id" @DEFAULT_SOURCE@ 2>/dev/null || true
+		done
+	fi
+
 	notify-send -i "$icon" "Audio device switched" "$1 set to: $(echo "$selected_line" | cut -d'|' -f2- | xargs)"
 }
 
