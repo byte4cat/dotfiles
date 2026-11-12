@@ -1,7 +1,7 @@
 #!/bin/bash
 # ==============================================================================
 # Shared helpers for the LINE-on-Bottles scripts
-# (bin/install_line_bottles, bin/line_launch). Source after lib/common.
+# (bin/install_line_bottles, byte4work-line-launch). Source after lib/common.
 # ==============================================================================
 
 BOTTLES_APP="com.usebottles.bottles"

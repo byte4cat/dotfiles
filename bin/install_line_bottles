@@ -10,7 +10,7 @@
 #   --dry-run    Show what would be done without changing anything
 #   --resign     Re-sign the bottle's DLLs even if already signed
 #   --force      Delete and recreate the bottle (asks for confirmation)
-#   --sign-only  Only verify/re-sign the DLLs (used by bin/line_launch)
+#   --sign-only  Only verify/re-sign the DLLs (used by byte4work-line-launch)
 # ==============================================================================
 #
 # Notes (non-obvious things learned while building this):
@@ -21,7 +21,7 @@
 # - The signatures vanish when Bottles runs `wineboot -u`. It does so before
 #   launching a program whenever drive_c/windows/Fonts is newer than
 #   <bottle>/.fonts_stamp (bottles/backend/wine/executor.py). After touching
-#   Fonts, call fonts_stamp_sync (lib/line_bottles); bin/line_launch does it on
+#   Fonts, call fonts_stamp_sync (lib/line_bottles); byte4work-line-launch does it on
 #   every launch, and also waits for Wine to be idle and re-signs if needed.
 # - Wine runs inside the flatpak sandbox, so `wineserver -k` from the host cannot
 #   reach it. `flatpak kill com.usebottles.bottles` does (and closes Bottles

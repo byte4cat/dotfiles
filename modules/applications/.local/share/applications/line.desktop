@@ -1,6 +1,6 @@
 [Desktop Entry]
 Name=LINE
-Exec=/home/neil/dotfiles/bin/line_launch %u
+Exec=/home/neil/.local/bin/tools/byte4work-line-launch %u
 Type=Application
 Terminal=false
 Categories=Network;InstantMessaging;
