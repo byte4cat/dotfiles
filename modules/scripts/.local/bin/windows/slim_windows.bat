@@ -48,7 +48,13 @@ if "%sel%"=="2" (
 
 echo.
 powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0slim_windows.ps1" %args%
+set "rc=%errorlevel%"
 echo.
+if not "%rc%"=="0" (
+    echo FAILED, see the error above. Nothing was reported as done.
+    pause
+    exit /b %rc%
+)
 if "%sel%"=="2" echo Reboot the guest to apply the change.
 if "%sel%"=="3" echo Reboot the guest to apply the change.
 if "%sel%"=="4" echo Reboot the guest to apply the change.

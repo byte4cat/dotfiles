@@ -36,6 +36,11 @@ param(
 
 $ErrorActionPreference = 'Stop'
 
+# With "powershell -File", "-Skip a,b" arrives as the single string "a,b".
+# Split on commas so both calling styles work.
+if ($Only) { $Only = @($Only | ForEach-Object { $_ -split ',' } | Where-Object { $_ }) }
+if ($Skip) { $Skip = @($Skip | ForEach-Object { $_ -split ',' } | Where-Object { $_ }) }
+
 $BackupFile = Join-Path $env:ProgramData 'slim_windows_backup.json'
 $Backup = [ordered]@{}
 
@@ -274,6 +279,13 @@ $Steps['apps'] = @{
                 }
             }
         }
+    }
+}
+
+$Steps['defrag'] = @{
+    desc = 'Scheduled disk defrag (Windows sees the virtual disk as HDD; defrag only bloats the qcow2 image)'
+    run  = {
+        Disable-Tasks '\Microsoft\Windows\Defrag\' 'ScheduledDefrag'
     }
 }
 
