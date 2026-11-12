@@ -1,3 +1,2 @@
-modules/wallpapers/.local/share/wallpapers/*.jpg filter=lfs diff=lfs merge=lfs -text
-modules/wallpapers/.local/share/wallpapers/*.jpeg filter=lfs diff=lfs merge=lfs -text
-modules/wallpapers/.local/share/wallpapers/*.png filter=lfs diff=lfs merge=lfs -text
+# Windows batch files must keep CRLF line endings (labels/goto break with LF)
+*.bat text eol=crlf
