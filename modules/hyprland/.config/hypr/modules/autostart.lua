@@ -55,8 +55,8 @@ hl.on("hyprland.start", function()
 	)
 
 	-- 通訊與多媒體 (silent 啟動)
-	exec("[workspace special:work-msg silent] " .. myEnv.workMsg)
-	exec("[workspace special:personal-msg silent] " .. myEnv.personalMsg)
+	exec("[workspace special:msg silent] " .. myEnv.workMsg)
+	exec("[workspace special:msg silent] " .. myEnv.personalMsg)
 	exec("[workspace special:music silent] " .. myEnv.music)
 
 	-- 預設開啟的主工作區

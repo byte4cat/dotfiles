@@ -126,14 +126,9 @@ hl.window_rule({
 
 -- 通訊軟體分配
 hl.window_rule({
-	name = "place-work-msg",
-	match = { initial_class = "^(vesktop)$" },
-	workspace = "special:work-msg silent",
-})
-hl.window_rule({
-	name = "place-personal-msg",
-	match = { initial_class = "^(signal)$" },
-	workspace = "special:personal-msg silent",
+	name = "place-msg",
+	match = { initial_class = "^(signal|vesktop)$" },
+	workspace = "special:msg silent",
 })
 
 hl.window_rule({

@@ -127,15 +127,15 @@ hl.workspace_rule({
 	on_created_empty = myEnv.terminal .. " -e zsh",
 })
 hl.workspace_rule({ workspace = "special:music", on_created_empty = "[float] " .. myEnv.music })
-hl.workspace_rule({ workspace = "special:work-msg", on_created_empty = "[tiled] " .. myEnv.workMsg })
+hl.workspace_rule({ workspace = "special:temp-s" })
 -- SUPER+X 的聊天視窗（Signal / LINE / WeChat…）：像 i3 一樣橫向排排站
-hl.workspace_rule({ workspace = "special:personal-msg", layout = "scrolling" })
+hl.workspace_rule({ workspace = "special:msg", layout = "scrolling" })
 
 -- 不自動平分欄寬：聊天 App 太窄會沒辦法開對話框，所以每欄維持固定寬度
 -- （looknfeel.lua 的 scrolling.column_width），視窗多時用 SUPER+滾輪 或 SUPER+H/L 捲動。
 
-hl.workspace_rule({ workspace = "special:temp_i" })
-hl.workspace_rule({ workspace = "special:temp_o" })
+hl.workspace_rule({ workspace = "special:temp-i" })
+hl.workspace_rule({ workspace = "special:temp-o" })
 
 -- 常規 1-10 快捷鍵綁定
 for i = 1, 10 do
@@ -154,26 +154,26 @@ hl.config({ binds = { allow_workspace_cycles = true } })
 -- 特殊工作區 (Special)
 -- =====================
 
-hl.bind(myEnv.mainMod .. " + S", hl.dsp.workspace.toggle_special("work-msg"))
-hl.bind(myEnv.mainMod .. " + SHIFT + S", hl.dsp.window.move({ workspace = "special:work-msg" }))
+hl.bind(myEnv.mainMod .. " + S", hl.dsp.workspace.toggle_special("temp-s"))
+hl.bind(myEnv.mainMod .. " + SHIFT + S", hl.dsp.window.move({ workspace = "special:temp-s" }))
 
 hl.bind(myEnv.mainMod .. " + V", function()
 	hl.dispatch(hl.dsp.focus({ monitor = myEnv.primaryMonitor }))
 	hl.dispatch(hl.dsp.workspace.toggle_special("music"))
 end)
 
-hl.bind(myEnv.mainMod .. " + X", hl.dsp.workspace.toggle_special("personal-msg"))
-hl.bind(myEnv.mainMod .. " + SHIFT + X", hl.dsp.window.move({ workspace = "special:personal-msg" }))
+hl.bind(myEnv.mainMod .. " + X", hl.dsp.workspace.toggle_special("msg"))
+hl.bind(myEnv.mainMod .. " + SHIFT + X", hl.dsp.window.move({ workspace = "special:msg" }))
 
 hl.bind(myEnv.mainMod .. " + A", function()
 	hl.dispatch(hl.dsp.focus({ monitor = myEnv.primaryMonitor }))
 	hl.dispatch(hl.dsp.workspace.toggle_special("scratchpad-term"))
 end)
 
-hl.bind(myEnv.mainMod .. " + I", hl.dsp.workspace.toggle_special("temp_i"))
-hl.bind(myEnv.mainMod .. " + O", hl.dsp.workspace.toggle_special("temp_o"))
-hl.bind(myEnv.mainMod .. " + SHIFT + I", hl.dsp.window.move({ workspace = "special:temp_i" }))
-hl.bind(myEnv.mainMod .. " + SHIFT + O", hl.dsp.window.move({ workspace = "special:temp_o" }))
+hl.bind(myEnv.mainMod .. " + I", hl.dsp.workspace.toggle_special("temp-i"))
+hl.bind(myEnv.mainMod .. " + O", hl.dsp.workspace.toggle_special("temp-o"))
+hl.bind(myEnv.mainMod .. " + SHIFT + I", hl.dsp.window.move({ workspace = "special:temp-i" }))
+hl.bind(myEnv.mainMod .. " + SHIFT + O", hl.dsp.window.move({ workspace = "special:temp-o" }))
 
 -- =========
 -- 滑鼠綁定
@@ -244,19 +244,19 @@ hl.bind(mainMod .. " + SHIFT + mouse_down", function()
 	apply_zoom(1.1)
 end)
 
--- SUPER+滾輪:在 personal-msg(scrolling layout)左右捲動欄位。
+-- SUPER+滾輪:在 msg(scrolling layout)左右捲動欄位。
 -- 其他 workspace 不是 scrolling layout,所以只在該 special workspace 啟用。
-local function scroll_personal_msg(step)
+local function scroll_msg(step)
 	local sp = hl.get_active_special_workspace()
-	if sp and sp.name == "special:personal-msg" then
+	if sp and sp.name == "special:msg" then
 		hl.dispatch(hl.dsp.layout("move " .. step))
 	end
 end
 hl.bind(mainMod .. " + mouse_up", function()
-	scroll_personal_msg("-col")
+	scroll_msg("-col")
 end)
 hl.bind(mainMod .. " + mouse_down", function()
-	scroll_personal_msg("+col")
+	scroll_msg("+col")
 end)
 
 -- =====================
