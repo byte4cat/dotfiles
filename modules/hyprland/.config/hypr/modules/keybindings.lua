@@ -184,29 +184,17 @@ hl.bind(mainMod .. " + mouse:273", hl.dsp.window.resize(), { mouse = true })
 -- ===========
 -- SCREENSHOT
 -- ===========
-local screenshot_dir = os.getenv("HOME") .. "/Pictures/Screenshots"
+-- 1 = 全螢幕, 2 = 視窗, 3 = 選區域 (加 SHIFT 則進 satty 標註)
+-- 1 和 2 不會抓取輸入焦點,可用來截下拉選單
+local shot = "byte4work-wl-screenshot"
 
-local notify_cmd = "notify-send 'Screenshot' \"saved & copied\""
-local cmd_full = "grim - | tee " .. screenshot_dir .. "/$(date +'%Y%m%d-%H%M%S').png | wl-copy && " .. notify_cmd
-local cmd_slurp = 'grim -g "$(slurp)" - | tee '
-	.. screenshot_dir
-	.. "/$(date +'%Y%m%d-%H%M%S').png | wl-copy && "
-	.. notify_cmd
+hl.bind(mainMod .. " + CONTROL + 1", hl.dsp.exec_cmd(shot .. " full"))
+hl.bind(mainMod .. " + CONTROL + 2", hl.dsp.exec_cmd(shot .. " window"))
+hl.bind(mainMod .. " + CONTROL + 3", hl.dsp.exec_cmd(shot .. " region"))
 
-hl.bind(mainMod .. " + CONTROL + 1", sh_exec(cmd_full))
-hl.bind(mainMod .. " + CONTROL + 2", sh_exec(cmd_slurp))
-hl.bind(mainMod .. " + CONTROL + 3", sh_exec(cmd_slurp))
-
-local satty_full = "grim - | satty --filename - --fullscreen --output-filename "
-	.. screenshot_dir
-	.. "/$(date +'%Y%m%d-%H%M%S').png"
-local satty_slurp = 'grim -g "$(slurp)" - | satty --filename - --output-filename '
-	.. screenshot_dir
-	.. "/$(date +'%Y%m%d-%H%M%S').png"
-
-hl.bind(mainMod .. " + CONTROL + SHIFT + 1", sh_exec(satty_full))
-hl.bind(mainMod .. " + CONTROL + SHIFT + 2", sh_exec(satty_slurp))
-hl.bind(mainMod .. " + CONTROL + SHIFT + 3", sh_exec(satty_slurp))
+hl.bind(mainMod .. " + CONTROL + SHIFT + 1", hl.dsp.exec_cmd(shot .. " full edit"))
+hl.bind(mainMod .. " + CONTROL + SHIFT + 2", hl.dsp.exec_cmd(shot .. " window edit"))
+hl.bind(mainMod .. " + CONTROL + SHIFT + 3", hl.dsp.exec_cmd(shot .. " region edit"))
 
 -- =====
 -- ZOOM

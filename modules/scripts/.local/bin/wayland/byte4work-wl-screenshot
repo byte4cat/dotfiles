@@ -1,0 +1,46 @@
+#!/bin/bash
+# Usage: byte4work-wl-screenshot <full|window|region> [edit]
+#   full   : focused monitor (no input grab, safe for dropdown menus)
+#   window : currently focused window (no input grab)
+#   region : select an area with slurp (grabs input, closes dropdown menus)
+#   edit   : open in satty instead of saving + copying directly
+
+mode="$1"
+edit="$2"
+
+dir="${SCREENSHOT_DIR:-$HOME/Pictures/Screenshots}"
+mkdir -p "$dir"
+file="$dir/$(date +'%Y%m%d-%H%M%S').png"
+
+geometry=()
+case "$mode" in
+full)
+	output=$(hyprctl monitors -j | jq -r '.[] | select(.focused) | .name')
+	[ -n "$output" ] && geometry=(-o "$output")
+	;;
+window)
+	g=$(hyprctl activewindow -j | jq -r 'select(.address != null) | "\(.at[0]),\(.at[1]) \(.size[0])x\(.size[1])"')
+	if [ -z "$g" ]; then
+		notify-send "Screenshot" "No active window"
+		exit 1
+	fi
+	geometry=(-g "$g")
+	;;
+region)
+	g=$(slurp) || exit 0
+	[ -z "$g" ] && exit 0
+	geometry=(-g "$g")
+	;;
+*)
+	echo "Usage: $0 <full|window|region> [edit]" >&2
+	exit 1
+	;;
+esac
+
+if [ "$edit" = "edit" ]; then
+	satty_args=(--filename - --output-filename "$file")
+	[ "$mode" = "full" ] && satty_args+=(--fullscreen)
+	grim "${geometry[@]}" - | satty "${satty_args[@]}"
+else
+	grim "${geometry[@]}" - | tee "$file" | wl-copy && notify-send "Screenshot" "saved & copied"
+fi
