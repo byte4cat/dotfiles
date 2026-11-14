@@ -1,0 +1,61 @@
+#!/usr/bin/env bash
+# Power menu (dmenu mode). Backend via MENU_BACKEND=walker|wofi,
+# see byte4work-menu-lib. byte4work-walker-power-menu / byte4work-wofi-power-menu
+# are thin wrappers that set it.
+
+WALKER_ARGS=(--dmenu --width 644 --minheight 1 --maxheight 300)
+WOFI_ARGS=(--show dmenu --width 600 --height 350)
+
+# shellcheck source=byte4work-menu-lib
+source "$HOME/.local/bin/wayland/byte4work-menu-lib"
+
+OPTIONS=(
+	"🟢 Logout"
+	"☯ Shutdown"
+	"🔄 Reboot"
+	"💤 Sleep"
+	"🛌🏻 Hibernate"
+	"🔒 Lock"
+	"❌ Cancel"
+)
+
+INSTANCE_FLAG="-i 0"
+
+selection=$(printf "%s\n" "${OPTIONS[@]}" | menu "Power Menu…")
+
+if [[ -z "$selection" ]]; then
+	exit 0
+fi
+
+case "$selection" in
+"🟢 Logout")
+	if [ "$XDG_CURRENT_DESKTOP" = "Hyprland" ]; then
+		hyprctl $INSTANCE_FLAG dispatch "hl.dsp.exit()"
+	else
+		swaymsg exit
+	fi
+	;;
+"☯ Shutdown")
+	systemctl poweroff --no-wall
+	;;
+"🔄 Reboot")
+	systemctl reboot --no-wall
+	;;
+"🛌🏻 Hibernate")
+	systemctl hibernate
+	;;
+"💤 Sleep")
+	systemctl suspend
+	;;
+"🔒 Lock")
+	if [ "$XDG_CURRENT_DESKTOP" = "Hyprland" ]; then
+		hyprlock
+	else
+		# Sway 通常使用 swaylock 或 swaylock-effects
+		swaylock -f -c 000000
+	fi
+	;;
+*)
+	exit 0
+	;;
+esac

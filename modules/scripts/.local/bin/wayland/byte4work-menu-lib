@@ -1,0 +1,27 @@
+# shellcheck shell=bash
+# Shared menu helpers for byte4work-quick-menu / byte4work-power-menu.
+# Source this file; it is not meant to be executed.
+#
+# MENU_BACKEND selects the dmenu program: walker (default) or wofi.
+# Callers may set WALKER_ARGS / WOFI_ARGS before calling menu().
+
+MENU_BACKEND="${MENU_BACKEND:-walker}"
+
+declare -p WALKER_ARGS >/dev/null 2>&1 || WALKER_ARGS=(--dmenu --width 644 --minheight 1 --maxheight 300)
+declare -p WOFI_ARGS >/dev/null 2>&1 || WOFI_ARGS=(--show dmenu --width 800 --height 400)
+
+# menu <placeholder>: read options from stdin, print the selected line
+menu() {
+	case "$MENU_BACKEND" in
+	wofi) wofi "${WOFI_ARGS[@]}" --prompt "$1" ;;
+	*) walker "${WALKER_ARGS[@]}" -p "$1" ;;
+	esac
+}
+
+# menu_backend_cmd: print the executable used by the current backend
+menu_backend_cmd() {
+	case "$MENU_BACKEND" in
+	wofi) echo wofi ;;
+	*) echo walker ;;
+	esac
+}
