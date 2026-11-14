@@ -59,22 +59,22 @@ hl.bind(mainMod .. " + " .. secMod .. " + C", hl.dsp.exec_cmd(myEnv.clipboardCmd
 hl.bind(
 	mainMod .. " + CONTROL + SHIFT + H",
 	hl.dsp.window.resize({ x = -30, y = 0, relative = true }),
-	{ repeat_bind = true }
+	{ repeating = true }
 )
 hl.bind(
 	mainMod .. " + CONTROL + SHIFT + J",
 	hl.dsp.window.resize({ x = 0, y = 30, relative = true }),
-	{ repeat_bind = true }
+	{ repeating = true }
 )
 hl.bind(
 	mainMod .. " + CONTROL + SHIFT + K",
 	hl.dsp.window.resize({ x = 0, y = -30, relative = true }),
-	{ repeat_bind = true }
+	{ repeating = true }
 )
 hl.bind(
 	mainMod .. " + CONTROL + SHIFT + L",
 	hl.dsp.window.resize({ x = 30, y = 0, relative = true }),
-	{ repeat_bind = true }
+	{ repeating = true }
 )
 
 -- 移動視窗位置 (Move window)
@@ -218,8 +218,8 @@ hl.bind(mainMod .. " + minus", function()
 	apply_zoom(0.9)
 end, { repeating = true })
 
--- Reset
-hl.bind(mainMod .. " + SHIFT + 0", function()
+-- Reset (SUPER+SHIFT+0 is "move window to workspace 10")
+hl.bind(mainMod .. " + CONTROL + 0", function()
 	current_zoom = 1.0
 	adjust_zoom(1.0)
 end)

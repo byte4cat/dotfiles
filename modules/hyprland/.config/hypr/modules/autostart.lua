@@ -49,7 +49,7 @@ hl.on("hyprland.start", function()
 	exec("quickshell --config $HOME/.config/quickshell/hyprland/")
 	-- 終端機與 tmux
 	exec(
-		"[workspace special:scratchpadterm] "
+		"[workspace special:scratchpad-term] "
 			.. myEnv.terminal
 			.. ' -e bash -c "tmux new-session -A -s scratchpad; exec bash"'
 	)

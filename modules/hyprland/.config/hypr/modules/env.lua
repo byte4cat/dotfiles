@@ -90,7 +90,9 @@ hl.env(
 		.. home
 		.. "/.local/bin/tools:"
 		.. home
-		.. "/.local/private/bin:/usr/local/bin:/usr/bin"
+		.. "/.local/private/bin:"
+		.. home
+		.. "/.cargo/bin:/usr/local/bin:/usr/bin"
 )
 
 hl.env("GDK_BACKEND", "wayland")
