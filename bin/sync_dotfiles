@@ -195,18 +195,27 @@ stow_dotfiles() {
 		"librewolf"
 	)
 
-	# Directories that system might auto-create, so we force-delete them
-	# before stowing to avoid "already exists" errors.
-	local force_dirs=(
-		"$HOME/.config/gtk-3.0"
-		"$HOME/.config/gtk-4.0"
+	# Packages whose files the system or apps may create as real files
+	# (e.g. gtk settings.ini), which makes stow fail with "already exists".
+	# Back up only those conflicting files; never delete the whole directory,
+	# since it also holds untracked files such as matugen's colors.css.
+	local conflict_pkgs=(
+		"gtk-3.0"
+		"gtk-4.0"
 	)
+	local stamp
+	stamp=$(date +%Y%m%d-%H%M%S)
 
-	for dir in "${force_dirs[@]}"; do
-		if [ -d "$dir" ] && [ ! -L "$dir" ]; then
-			info "  > Removing pre-existing directory to allow stow: $dir"
-			rm -rf "$dir"
-		fi
+	for pkg_name in "${conflict_pkgs[@]}"; do
+		[ -d "modules/$pkg_name" ] || continue
+		while IFS= read -r -d '' src; do
+			local rel="${src#modules/$pkg_name/}"
+			local dest="$HOME/$rel"
+			if [ -e "$dest" ] && [ ! -L "$dest" ]; then
+				info "  > Backing up conflicting file: $dest -> $dest.bak-$stamp"
+				mv "$dest" "$dest.bak-$stamp"
+			fi
+		done < <(find "modules/$pkg_name" -type f -print0)
 	done
 
 	local sources=(
