@@ -1,42 +1,214 @@
 #!/bin/bash
-
-set -e
+# Quick system menu built on walker (dmenu mode).
+#
+# Layers:
+#   1. UI       : menu / notify / log_msg / require  (only place that talks to walker)
+#   2. Actions  : action_* functions, one per feature (use return, never exit)
+#   3. Registry : ENTRIES ("Label|function"), shown in order and dispatched by main
+#
+# To add a feature: write an action_* function, then add one line to ENTRIES.
 
 SCRIPTS_COMMON_DIR="$HOME/.local/bin/common"
 SCRIPTS_WAYLAND_DIR="$HOME/.local/bin/wayland"
 SCRIPTS_HYPRLAND_DIR="$HOME/.local/bin/hyprland"
-SCRIPTS_SWAY_DIR="$HOME/.local/bin/sway"
 LOG_PATH="$HOME/.local/bin/logs/walker_quick_memu.log"
+ASSETS_DIR="$HOME/.local/share/byte4work/assets"
 
-OPTIONS=(
-	"Audio Output"
-	"Audio Input"
-	"Power Profile"
-	"Toggle Sleep"
-	"Toggle VPN"
-	"Reload Config"
-	"Restart PipeWire"
-	"Restart NetworkManager"
-	"Restart Wifi wlan0"
-)
+WALKER_ARGS=(--dmenu --width 644 --minheight 1 --maxheight 300)
 
-logger() {
+# =========================================================
+# 1. UI layer
+# =========================================================
+
+log_msg() {
 	mkdir -p "$(dirname "$LOG_PATH")"
 	echo "$(date): $*" >>"$LOG_PATH"
 }
 
-for cmd in wpctl walker; do
-	command -v $cmd >/dev/null 2>&1 || {
-		echo "Missing $cmd"
-		logger "Missing dependency: $cmd"
-		notify-send "Missing dependency: $cmd"
-		exit 1
-	}
-done
+# menu <placeholder>: read options from stdin, print the selected line
+menu() {
+	walker "${WALKER_ARGS[@]}" -p "$1"
+}
+
+notify() {
+	notify-send "$@"
+}
+
+# require <cmd>: return 1 (and tell the user) when a dependency is missing
+require() {
+	command -v "$1" >/dev/null 2>&1 && return 0
+	log_msg "Missing dependency: $1"
+	notify -u critical "Missing dependency" "$1"
+	return 1
+}
+
+# =========================================================
+# 2. Action layer
+# =========================================================
+
+# ---------- Audio ----------
+
+select_audio_device() {
+	log_msg "Selected mode: $1"
+	local section prompt devices selected_line selected icon
+
+	case "$1" in
+	"Audio Output")
+		section="Sinks"
+		prompt="Select Audio Output Device"
+		;;
+	"Audio Input")
+		section="Sources"
+		prompt="Select Audio Input Device"
+		;;
+	*)
+		notify "Unknown audio type: $1"
+		return 1
+		;;
+	esac
+
+	devices=$(awk -v section="$section" '
+        $0 ~ "^[[:space:]]*├─ "section":" { in_section=1; next }
+        in_section && $0 ~ "^[[:space:]]*│" && $0 ~ /\[vol:/ {
+            line=$0; sub(/^[ \t]*│[ \t]*/,"",line)
+            if (match(line, /^\* +([0-9]+)\.\s+(.+)$/, parts)) printf "★ %s | %s\n", parts[1], parts[2]
+            else if (match(line, /^([0-9]+)\.\s+(.+)$/, parts)) printf "  %s | %s\n", parts[1], parts[2]
+            next
+        }
+        in_section && $0 !~ "^[[:space:]]*│" { in_section=0 }
+    ' < <(wpctl status))
+
+	if [ -z "$devices" ]; then
+		notify "No devices found!"
+		return 1
+	fi
+
+	selected_line=$(printf "%s\n" "$devices" | menu "$prompt…")
+	[ -z "$selected_line" ] && return 0
+
+	selected=$(echo "$selected_line" | sed 's/^[★ ]*//' | cut -d'|' -f1 | awk '{print $1}')
+	log_msg "User selected device ID: $selected"
+
+	if [[ "$section" == "Sinks" ]]; then
+		icon="$ASSETS_DIR/speaker.png"
+		[[ "${selected_line,,}" == *"headset"* ]] && icon="$ASSETS_DIR/headsets.png"
+	else
+		icon="$ASSETS_DIR/mic.png"
+	fi
+
+	if ! wpctl set-default "$selected"; then
+		notify -u critical "Audio" "Failed to switch to device $selected"
+		return 1
+	fi
+
+	if [[ "$section" == "Sinks" ]]; then
+		for id in $(pactl list short sink-inputs | awk '{print $1}'); do
+			pactl move-sink-input "$id" @DEFAULT_SINK@ 2>/dev/null || true
+		done
+	else
+		for id in $(pactl list short source-outputs | awk '{print $1}'); do
+			pactl move-source-output "$id" @DEFAULT_SOURCE@ 2>/dev/null || true
+		done
+	fi
+
+	notify -i "$icon" "Audio device switched" "$1 set to: $(echo "$selected_line" | cut -d'|' -f2- | xargs)"
+}
+
+action_audio_output() { select_audio_device "Audio Output"; }
+action_audio_input() { select_audio_device "Audio Input"; }
+
+# mic_is_muted: return 0 when the default source is muted
+mic_is_muted() {
+	wpctl get-volume @DEFAULT_SOURCE@ 2>/dev/null | grep -q MUTED
+}
+
+action_mic_mute() {
+	if ! wpctl set-mute @DEFAULT_SOURCE@ toggle; then
+		notify -u critical "Microphone" "Failed to toggle mute"
+		return 1
+	fi
+	if mic_is_muted; then
+		log_msg "Mic muted"
+		notify -i "$ASSETS_DIR/mic.png" "🔇 Microphone muted"
+	else
+		log_msg "Mic unmuted"
+		notify -i "$ASSETS_DIR/mic.png" "🎙️ Microphone unmuted"
+	fi
+}
+
+# ---------- Bluetooth ----------
+
+# bluetooth_state: print "on", "off", or "none" (no controller)
+bluetooth_state() {
+	local info
+	info=$(bluetoothctl show 2>/dev/null)
+	if echo "$info" | grep -q "Powered: yes"; then
+		echo on
+	elif echo "$info" | grep -q "Powered: no"; then
+		echo off
+	else
+		echo none
+	fi
+}
+
+action_bluetooth() {
+	require bluetoothctl || return 1
+
+	local state target
+	state=$(bluetooth_state)
+	case "$state" in
+	on) target=off ;;
+	off) target=on ;;
+	*)
+		notify -u critical "Bluetooth" "No Bluetooth controller found"
+		return 1
+		;;
+	esac
+
+	log_msg "Bluetooth power $target"
+	if bluetoothctl power "$target" >/dev/null 2>&1; then
+		notify "Bluetooth" "Powered ${target^^}"
+	else
+		notify -u critical "Bluetooth" "Failed to power $target (check rfkill)"
+		return 1
+	fi
+}
+
+# ---------- Screenshot ----------
+
+SCREENSHOT_OPTIONS=(
+	"Screen"
+	"Window"
+	"Region"
+	"Screen → Edit"
+	"Window → Edit"
+	"Region → Edit"
+)
+
+action_screenshot() {
+	local choice mode edit=""
+	choice=$(printf "%s\n" "${SCREENSHOT_OPTIONS[@]}" | menu "Screenshot…")
+	[ -z "$choice" ] && return 0
+
+	case "$choice" in
+	Screen*) mode=full ;;
+	Window*) mode=window ;;
+	Region*) mode=region ;;
+	*) return 1 ;;
+	esac
+	[[ "$choice" == *Edit ]] && edit=edit
+
+	log_msg "Screenshot: $mode $edit"
+	# Let walker close and focus return to the previous window first.
+	sleep 0.3
+	"$SCRIPTS_WAYLAND_DIR/byte4work-wl-screenshot" "$mode" $edit
+}
+
+# ---------- Power ----------
 
 format_power_options() {
-	local current=$(powerprofilesctl get)
-	local output=""
+	local current output="" item icon m prefix
+	current=$(powerprofilesctl get)
 
 	local modes=(
 		"⚡️|performance"
@@ -45,22 +217,20 @@ format_power_options() {
 	)
 
 	for item in "${modes[@]}"; do
-		local icon="${item%|*}"
-		local m="${item#*|}"
-
-		local prefix="  "
+		icon="${item%|*}"
+		m="${item#*|}"
+		prefix="  "
 		[[ "$m" == "$current" ]] && prefix="* "
-
 		output+="$prefix $icon $m\n"
 	done
-	echo -ne "$output"
+	printf "%b" "$output"
 }
 
 set_power_mode() {
 	local target=$1
-	local icon urgency msg
+	local icon urgency msg err_msg
 
-	logger "Setting power profile to: $target"
+	log_msg "Setting power profile to: $target"
 
 	case "$target" in
 	"performance")
@@ -81,257 +251,187 @@ set_power_mode() {
 	esac
 
 	if err_msg=$(powerprofilesctl set "$target" 2>&1); then
-		notify-send -a "Power Manager" \
-			-u "$urgency" \
-			"$icon  Power Mode: ${target^^}" \
-			"$msg"
+		notify -a "Power Manager" -u "$urgency" "$icon  Power Mode: ${target^^}" "$msg"
 	else
-		logger "Power Mode Error: $err_msg"
-		notify-send -a "Power Manager" -u critical "❌ Switch Failed" "$err_msg"
+		log_msg "Power Mode Error: $err_msg"
+		notify -a "Power Manager" -u critical "❌ Switch Failed" "$err_msg"
+		return 1
 	fi
 }
 
-# 自動獲取所有 VPN 連線名稱
+action_power_profile() {
+	require powerprofilesctl || return 1
+
+	local selected_line selected_mode
+	selected_line=$(format_power_options | menu "Select Profile…")
+	[ -z "$selected_line" ] && return 0
+
+	selected_mode=$(echo "$selected_line" | awk '{print $NF}')
+	if [ -n "$selected_mode" ]; then
+		set_power_mode "$selected_mode"
+	else
+		log_msg "Error: Could not parse mode from $selected_line"
+		notify -u critical "Parse Error" "Selected: $selected_line"
+		return 1
+	fi
+}
+
+action_toggle_sleep() {
+	"$SCRIPTS_HYPRLAND_DIR/byte4work-hypridle-toggle"
+}
+
+# ---------- VPN ----------
+
+# get_vpn_connections: print every configured VPN connection name
 get_vpn_connections() {
-	# 獲取所有已配置的 VPN 名稱
 	nmcli -t -f NAME,TYPE con show 2>/dev/null |
 		grep -E ':(vpn|openvpn|wireguard|pptp|l2tp|vpnc|fortisslvpn|ipsec)$' |
 		cut -d: -f1
 }
 
-# 格式化 VPN 選項並加入狀態標記
+# format_vpn_options: "<status>\t<name>" per VPN, 🟢 active / 🔴 inactive
 format_vpn_options() {
-	local active_connections=$(nmcli -t -f NAME con show --active 2>/dev/null)
-	mapfile -t vpn_list < <(get_vpn_connections)
+	local active_connections vpn_name status_icon
+	active_connections=$(nmcli -t -f NAME con show --active 2>/dev/null)
 
-	local output=""
-	local status_icon=""
-
-	for vpn_name in "${vpn_list[@]}"; do
-		# 檢查當前 VPN 名稱是否在活躍連線列表中
-		if echo "$active_connections" | grep -q "^$vpn_name$"; then
-			# 活躍，使用綠色圓點
+	while IFS= read -r vpn_name; do
+		[ -z "$vpn_name" ] && continue
+		if grep -qxF "$vpn_name" <<<"$active_connections"; then
 			status_icon="🟢"
 		else
-			# 非活躍，使用紅色圓點
 			status_icon="🔴"
 		fi
-
-		output+="$status_icon\t$vpn_name\n"
-	done
-
-	echo -e "$output"
+		printf "%s\t%s\n" "$status_icon" "$vpn_name"
+	done < <(get_vpn_connections)
 }
 
-# VPN 切換
 toggle_vpn() {
 	local vpn_name="$1"
-	logger "Toggling VPN: $vpn_name"
+	log_msg "Toggling VPN: $vpn_name"
 
-	# 檢查 VPN 連線是否處於活躍狀態 (Active)
-	if nmcli con show --active | grep -q "^$vpn_name[[:space:]]"; then
-		# 狀態為活躍 (Active)，執行斷開連線
-		logger "VPN $vpn_name is active. Deactivating..."
-		notify-send "VPN: Disconnecting" "Deactivating $vpn_name..."
+	if nmcli -t -f NAME con show --active | grep -qxF "$vpn_name"; then
+		log_msg "VPN $vpn_name is active. Deactivating..."
+		notify "VPN: Disconnecting" "Deactivating $vpn_name..."
 		if nmcli con down "$vpn_name"; then
-			notify-send "VPN: Disconnected 📴" "$vpn_name is now disconnected."
+			notify "VPN: Disconnected 📴" "$vpn_name is now disconnected."
 		else
-			notify-send "VPN Error" "Failed to disconnect $vpn_name."
+			notify "VPN Error" "Failed to disconnect $vpn_name."
+			return 1
 		fi
 	else
-		# 狀態為非活躍 (Inactive)，執行連接
-		logger "VPN $vpn_name is inactive. Activating..."
-		notify-send "VPN: Connecting..." "Activating $vpn_name..."
+		log_msg "VPN $vpn_name is inactive. Activating..."
+		notify "VPN: Connecting..." "Activating $vpn_name..."
 		if nmcli con up "$vpn_name" | grep -q "successfully activated"; then
-			notify-send "VPN: Connected 🔒" "$vpn_name successfully connected."
+			notify "VPN: Connected 🔒" "$vpn_name successfully connected."
 		else
-			notify-send "VPN Error ❌" "Failed to connect to $vpn_name. Check configuration/logs."
+			notify "VPN Error ❌" "Failed to connect to $vpn_name. Check configuration/logs."
+			return 1
 		fi
 	fi
 }
 
-select_audio_device() {
-	logger "Selected mode: $1"
-	local section prompt devices selected_line selected
+action_vpn() {
+	local options selected_line selected_vpn
+	options=$(format_vpn_options)
 
-	if [[ "$1" == "Audio Output" ]]; then
-		logger "Setting section to Sinks"
-		section="Sinks"
-		prompt="Select Audio Output Device"
-	elif [[ "$1" == "Audio Input" ]]; then
-		logger "Setting section to Sources"
-		section="Sources"
-		prompt="Select Audio Input Device"
-	else
-		notify-send "Unknown audio type: $1"
-		exit 1
+	if [ -z "$options" ]; then
+		log_msg "No VPN connections found."
+		notify "VPN Error" "No configured VPN connections found."
+		return 0
 	fi
 
-	# Parsing logic with clean inline match
-	devices=$(awk -v section="$section" '
-        $0 ~ "^[[:space:]]*├─ "section":" { in_section=1; next }
-        in_section && $0 ~ "^[[:space:]]*│" && $0 ~ /\[vol:/ {
-            line=$0; sub(/^[ \t]*│[ \t]*/,"",line)
-            if (match(line, /^\* +([0-9]+)\.\s+(.+)$/, parts)) printf "★ %s | %s\n", parts[1], parts[2]
-            else if (match(line, /^([0-9]+)\.\s+(.+)$/, parts)) printf "  %s | %s\n", parts[1], parts[2]
-            next
-        }
-        in_section && $0 !~ "^[[:space:]]*│" { in_section=0 }
-    ' < <(wpctl status))
-
-	[ -z "$devices" ] && {
-		notify-send "No devices found!"
-		exit 1
-	}
-
-	selected_line=$(printf "%s\n" "$devices" | walker --dmenu --width 644 --minheight 1 --maxheight 300 -p "Select item…")
-
-	[ -z "$selected_line" ] && exit 0
-
-	selected=$(echo "$selected_line" | sed 's/^[★ ]*//' | cut -d'|' -f1 | awk '{print $1}')
-
-	logger "User selected device ID: $selected"
-
-	local assets="$HOME/.local/share/byte4work/assets/"
-	local icon
-	local mic="$assets/mic.png"
-	local speaker="$assets/speaker.png"
-	local headsets="$assets/headsets.png"
-
-	if [[ "$section" == "Sinks" ]]; then
-		icon="$speaker"
-	else
-		icon="$mic"
+	selected_line=$(printf "%s\n" "$options" | menu "Select VPN to toggle…")
+	if [ -z "$selected_line" ]; then
+		log_msg "VPN submenu cancelled."
+		return 0
 	fi
 
-	if [[ "$section" == "Sinks" ]] && ([[ "$selected_line" == *"headset"* ]] || [[ "$selected_line" == *"Headset"* ]]); then
-		icon="$headsets"
-	fi
-
-	wpctl set-default "$selected"
-
-    if [[ "$section" == "Sinks" ]]; then
-        for id in $(pactl list short sink-inputs | awk '{print $1}'); do
-            pactl move-sink-input "$id" @DEFAULT_SINK@ 2>/dev/null || true
-        done
-    else
-        for id in $(pactl list short source-outputs | awk '{print $1}'); do
-            pactl move-source-output "$id" @DEFAULT_SOURCE@ 2>/dev/null || true
-        done
-    fi
-
-	notify-send -i "$icon" "Audio device switched" "$1 set to: $(echo "$selected_line" | cut -d'|' -f2- | xargs)"
+	selected_vpn=$(echo "$selected_line" | awk -F'\t' '{print $2}')
+	toggle_vpn "$selected_vpn"
 }
+
+# ---------- System ----------
+
+action_reload_config() {
+	local result
+	if [ "${XDG_CURRENT_DESKTOP:-}" = "Hyprland" ]; then
+		result=$(hyprctl reload 2>&1)
+		if [[ "$result" == "ok" ]]; then
+			notify "Hyprland" "Config reloaded successfully!" -t 2000
+		else
+			notify "Hyprland Error" "Reload failed: $result" -t 4000
+			return 1
+		fi
+	else
+		if swaymsg reload; then
+			notify "Sway" "Config reloaded successfully!" -t 2000
+		else
+			notify "Sway Error" "Reload failed" -t 4000
+			return 1
+		fi
+	fi
+}
+
+action_restart_pipewire() {
+	"$SCRIPTS_COMMON_DIR/byte4work-restart-pipewire" && notify "PipeWire Restarted"
+}
+
+action_restart_network_manager() {
+	notify "Restarting NetworkManager"
+	"$SCRIPTS_COMMON_DIR/byte4work-restart-network-manager" && notify "NetworkManager Restarted"
+}
+
+action_restart_wifi() {
+	"$SCRIPTS_COMMON_DIR/byte4work-restart-wifi-wlan0" && notify "Wifi wlan0 Restarted"
+}
+
+# =========================================================
+# 3. Registry layer
+# =========================================================
+
+ENTRIES=(
+	"Audio Output|action_audio_output"
+	"Audio Input|action_audio_input"
+	"Toggle Mic Mute|action_mic_mute"
+	"Toggle Bluetooth|action_bluetooth"
+	"Screenshot|action_screenshot"
+	"Power Profile|action_power_profile"
+	"Toggle Sleep|action_toggle_sleep"
+	"Toggle VPN|action_vpn"
+	"Reload Config|action_reload_config"
+	"Restart PipeWire|action_restart_pipewire"
+	"Restart NetworkManager|action_restart_network_manager"
+	"Restart Wifi wlan0|action_restart_wifi"
+)
 
 main() {
-	logger "Script started"
-
-	selection=$(printf "%s\n" "${OPTIONS[@]}" | walker --dmenu --width 644 --minheight 1 --maxheight 300 -p "Select item…")
-	[ -z "$selection" ] && exit 0
-
-	logger "User selected: $selection"
-
-	case "$selection" in
-	"Audio Output" | "Audio Input")
-		logger "Proceeding to select $selection device"
-		select_audio_device "$selection"
-		exit 0
-		;;
-
-	"Power Profile")
-		logger "Opening Power Profile submenu"
-		local p_options=$(format_power_options)
-		local selected_line=$(echo -e "$p_options" | walker --dmenu --width 644 --minheight 1 --maxheight 300 -p "Select Profile…")
-
-		[ -z "$selected_line" ] && exit 0
-
-		local selected_mode=$(echo "$selected_line" | awk '{print $NF}')
-
-		if [ -n "$selected_mode" ]; then
-			set_power_mode "$selected_mode"
-		else
-			logger "Error: Could not parse mode from $selected_line"
-			notify-send -u critical "Parse Error" "Selected: $selected_line"
-		fi
-		exit 0
-		;;
-	"Reload Config")
-		if [ "$XDG_CURRENT_DESKTOP" = "Hyprland" ]; then
-			result=$(hyprctl $INSTANCE_FLAG reload 2>&1)
-			if [[ "$result" == "ok" ]]; then
-				notify-send "Hyprland" "Config reloaded successfully!" -t 2000
-			else
-				notify-send "Hyprland Error" "Reload failed: $result" -t 4000
-			fi
-		else
-			if swaymsg reload; then
-				notify-send "Sway" "Config reloaded successfully!" -t 2000
-			else
-				notify-send "Sway Error" "Reload failed" -t 4000
-			fi
-		fi
-		;;
-	"Restart PipeWire")
-		logger "Restarting PipeWire"
-		"$SCRIPTS_COMMON_DIR/byte4work-restart-pipewire"
-		notify-send "PipeWire Restarted"
-		exit 0
-		;;
-	"Restart NetworkManager")
-		logger "Restarting NetworkManager"
-		notify-send "Restarting NetworkManager"
-		"$SCRIPTS_COMMON_DIR/byte4work-restart-network-manager"
-		notify-send "NetworkManager Restarted"
-		exit 0
-		;;
-	"Restart Wifi wlan0")
-		logger "Restarting Wifi wlan0"
-		"$SCRIPTS_COMMON_DIR/byte4work-restart-wifi-wlan0"
-		notify-send "Wifi wlan0 Restarted"
-		exit 0
-		;;
-
-	"Toggle Sleep")
-		logger "Toggle Sleep"
-		"$SCRIPTS_HYPRLAND_DIR/byte4work-hypridle-toggle"
-		exit 0
-		;;
-
-	# --- 處理 VPN 子選單 (自動獲取選項並帶有狀態) ---
-	"Toggle VPN")
-		logger "User chose Toggle VPN. Getting list of VPN connections with status."
-
-		# 呼叫新的格式化函數來獲取帶有狀態標記的選項
-		local vpn_options_formatted=$(format_vpn_options)
-
-		if [ -z "$vpn_options_formatted" ]; then
-			logger "No VPN connections found."
-			notify-send "VPN Error" "No configured VPN connections found."
-			exit 0
-		fi
-
-		# 顯示子選單並獲取選定的 **完整行**
-		local selected_line=$(echo -e "$vpn_options_formatted" | walker --dmenu --width 644 --minheight 1 --maxheight 300 -p "Select VPN to toggle…")
-
-		[ -z "$selected_line" ] && {
-			logger "VPN submenu cancelled."
-			exit 0
+	local cmd entry selection
+	for cmd in walker wpctl notify-send; do
+		command -v "$cmd" >/dev/null 2>&1 || {
+			echo "Missing $cmd" >&2
+			log_msg "Missing dependency: $cmd"
+			exit 1
 		}
+	done
 
-		# 從選定的行中，移除開頭的圓點和 Tab，只提取 VPN 名稱
-		local selected_vpn=$(echo "$selected_line" | awk -F'\t' '{print $2}')
+	log_msg "Script started"
 
-		# 呼叫通用的切換函數
-		toggle_vpn "$selected_vpn"
-		exit 0
-		;;
-	# ----------------------------------------
-	*)
-		logger "Unknown option selected: $selection"
-		notify-send "Unknown Selection" "The selected option '$selection' is not yet implemented."
-		exit 0
-		;;
-	esac
+	selection=$(for entry in "${ENTRIES[@]}"; do printf "%s\n" "${entry%%|*}"; done | menu "Select item…")
+	[ -z "$selection" ] && exit 0
+	log_msg "User selected: $selection"
+
+	for entry in "${ENTRIES[@]}"; do
+		if [[ "${entry%%|*}" == "$selection" ]]; then
+			"${entry#*|}"
+			exit $?
+		fi
+	done
+
+	log_msg "Unknown option selected: $selection"
+	notify "Unknown Selection" "The selected option '$selection' is not yet implemented."
 }
 
-main
+# Allow `source`-ing this file for testing without opening the menu.
+if [[ "${BASH_SOURCE[0]}" == "$0" ]]; then
+	main "$@"
+fi
