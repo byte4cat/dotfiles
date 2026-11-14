@@ -9,15 +9,8 @@ fi
 
 # --- Define Paths ---
 WAYBAR_CONFIG_DIR="$HOME/.config/waybar"
-<<<<<<< HEAD
 CONFIG_DIR="$WAYBAR_CONFIG_DIR/modules/$COMPOSITOR"
 STYLE_DIR="$WAYBAR_CONFIG_DIR/styles"
-||||||| ef15699
-CONFIG_DIR="$WAYBAR_CONFIG_DIR/modules"
-STYLE_DIR="$WAYBAR_CONFIG_DIR/styles"
-=======
-CONFIG_DIR="$WAYBAR_CONFIG_DIR/modules"
->>>>>>> hyprland-lua-migration
 
 # --- Discover Available Preset Names ---
 # Finds all *.jsonc files and extracts the PRESET name.
