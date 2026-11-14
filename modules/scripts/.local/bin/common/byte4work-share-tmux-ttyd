@@ -22,7 +22,10 @@ ip=$(ip -4 addr show up scope global | awk '/inet / {print $2}' | cut -d/ -f1 | 
 # 3. Parameters
 port=42069 # Using your preferred port
 user="neil"
-pass=$(date +%m%d) # Dynamic password based on MMDD
+# Random 16-char alphanumeric password per share (no ':' so user:pass stays valid).
+# The session is writable (-W) and reachable on the LAN, so it must not be guessable.
+pass=$(head -c 256 /dev/urandom | LC_ALL=C tr -dc 'A-Za-z0-9')
+pass=${pass:0:16}
 auth="$user:$pass"
 
 # 4. Display Info & Notification
