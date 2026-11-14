@@ -121,60 +121,46 @@ prepare_host_files() {
 	fi
 }
 
-link_librewolf_css() {
-	local lw_config_dir="$HOME/.config/librewolf/librewolf"
-	local dotfiles_chrome_src="$DOTFILES_DIR/modules/librewolf/chrome"
+# link_browser_chrome <name> <profiles_dir> <profile_glob> <chrome_src>
+# Link the dotfiles chrome/ (userChrome.css etc.) into every matching profile.
+# An existing symlink is replaced; a real chrome/ directory is backed up to
+# chrome.bak-<timestamp> instead of being deleted.
+link_browser_chrome() {
+	local name="$1" profiles_dir="$2" profile_glob="$3" chrome_src="$4"
 
-	if [ -d "$lw_config_dir" ] && [ -d "$dotfiles_chrome_src" ]; then
-		info "🔗 Linking LibreWolf chrome to random profile(s)..."
-
-		# 尋找所有以 .default-default 結尾的資料夾
-		for profile in "$lw_config_dir"/*.default-default; do
-			[ -d "$profile" ] || continue
-
-			info "  > Target profile: $(basename "$profile")"
-
-			local target="$profile/chrome"
-			info "  > Target profile: $(basename "$profile")"
-			if [ -L "$target" ] || [ -e "$target" ]; then
-				rm -rf "$target"
-			fi
-
-			# 建立符號連結，使用 -sf 確保重複執行時會覆蓋
-			ln -sf "$dotfiles_chrome_src" "$profile/chrome"
-		done
-		success "✅ LibreWolf chrome linked."
-	else
-		warn "⚠️ LibreWolf config or dotfiles source not found, skipping link."
+	if [ ! -d "$profiles_dir" ] || [ ! -d "$chrome_src" ]; then
+		warn "⚠️ $name config or dotfiles source not found, skipping link."
+		return 0
 	fi
+
+	info "🔗 Linking $name chrome to profile(s)..."
+	local profile target backup
+	for profile in "$profiles_dir"/$profile_glob; do
+		[ -d "$profile" ] || continue
+		target="$profile/chrome"
+		info "  > Target profile: $(basename "$profile")"
+
+		if [ -L "$target" ]; then
+			rm -f "$target"
+		elif [ -e "$target" ]; then
+			backup="$target.bak-$(date +%Y%m%d-%H%M%S)"
+			warn "  ! Existing chrome/ is not a symlink, backing up to: $backup"
+			mv "$target" "$backup"
+		fi
+
+		ln -s "$chrome_src" "$target"
+	done
+	success "✅ $name chrome linked."
+}
+
+link_librewolf_css() {
+	link_browser_chrome "LibreWolf" "$HOME/.config/librewolf/librewolf" \
+		"*.default-default" "$DOTFILES_DIR/modules/librewolf/chrome"
 }
 
 link_firefox_css() {
-	local config_dir="$HOME/.mozilla/firefox"
-	local dotfiles_chrome_src="$DOTFILES_DIR/modules/firefox/chrome"
-
-	if [ -d "$config_dir" ] && [ -d "$dotfiles_chrome_src" ]; then
-		info "🔗 Linking Firefox chrome to random profile(s)..."
-
-		# 尋找所有以 .default-release 結尾的資料夾
-		for profile in "$config_dir"/*.default-release; do
-			[ -d "$profile" ] || continue
-
-			info "  > Target profile: $(basename "$profile")"
-
-			local target="$profile/chrome"
-			info "  > Target profile: $(basename "$profile")"
-			if [ -L "$target" ] || [ -e "$target" ]; then
-				rm -rf "$target"
-			fi
-
-			# 建立符號連結，使用 -sf 確保重複執行時會覆蓋
-			ln -sf "$dotfiles_chrome_src" "$profile/chrome"
-		done
-		success "✅ Firefox chrome linked."
-	else
-		warn "⚠️ Firefox config or dotfiles source not found, skipping link."
-	fi
+	link_browser_chrome "Firefox" "$HOME/.mozilla/firefox" \
+		"*.default-release" "$DOTFILES_DIR/modules/firefox/chrome"
 }
 
 cleanup_orphans() {
