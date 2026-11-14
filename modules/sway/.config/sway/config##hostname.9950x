@@ -235,10 +235,10 @@ bindsym $mainMod+d exec $menu
 bindsym $mainMod+n cyclenext
 bindsym $mainMod+Shift+n exec swaync-client -t
 
-bindsym $mod+g layout tabbed
+bindsym $mainMod+g layout tabbed
 
 # --- 快速選單 ---
-bindsym $mainMod+c exec $my_path byte4work-walker-quick-menu
+bindsym $mainMod+c exec PATH=$my_path byte4work-walker-quick-menu
 bindsym $mainMod+$secMod+c exec PATH=$my_path byte4work-walker-clipboard
 bindsym $mainMod+w exec PATH=$my_path byte4work-waypaper-selector; exec swaymsg focus
 bindsym $mainMod+Shift+b exec PATH=$my_path byte4work-babycam
