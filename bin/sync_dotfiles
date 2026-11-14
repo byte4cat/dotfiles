@@ -178,13 +178,38 @@ link_firefox_css() {
 }
 
 cleanup_orphans() {
-	info "Cleaning up broken symlinks in ~/.config and ~/.local/private..."
-	# 尋找目錄下指向 dotfiles 但原始檔案已不存在的斷頭連結並刪除
-	# -L 是找連結，! -e 是找指向目標不存在的
-	find "$HOME/.config" "$HOME/.local/private" -xtype l -delete 2>/dev/null || true
+	info "Cleaning up broken dotfiles symlinks..."
+	# 只刪「指向 dotfiles、但目標已不存在」的斷頭連結(例如測試後改名或刪除的檔案)。
+	# 其他程式自己的斷頭連結不能動，例如 Electron/Chromium 的 SingletonLock
+	# 本來就指向不存在的路徑，刪掉會讓程式偵測不到執行中的實例。
+	local dotfiles_real
+	dotfiles_real=$(realpath "$DOTFILES_DIR")
 
-	# 清理空目錄
-	find "$HOME/.config" "$HOME/.local/private" -type d -empty -delete 2>/dev/null || true
+	local roots=(
+		"$HOME/.config"
+		"$HOME/.local/bin"
+		"$HOME/.local/share"
+		"$HOME/.local/private"
+	)
+
+	local link target dir
+	while IFS= read -r -d '' link; do
+		target=$(readlink -m "$link")
+		[[ "$target" == "$dotfiles_real/"* ]] || continue
+
+		info "  > Removing broken link: $link"
+		rm -f "$link"
+
+		# 只清掉因為刪除連結而變空的上層目錄，停在 roots / $HOME
+		dir=$(dirname "$link")
+		while [[ "$dir" != "$HOME" && ! " ${roots[*]} " =~ " $dir " ]] &&
+			rmdir "$dir" 2>/dev/null; do
+			dir=$(dirname "$dir")
+		done
+	done < <(
+		find "${roots[@]}" -xtype l -print0 2>/dev/null
+		find "$HOME" -maxdepth 1 -xtype l -print0 2>/dev/null
+	)
 }
 
 stow_dotfiles() {
