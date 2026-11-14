@@ -19,7 +19,7 @@ main() {
 
 	# --- Install pkgs default pkgs ---
 	info "\n--- 1/2: Installing all required packages ---"
-	"$SCRIPT_DIR/bin/install_default_arch_pkgs"
+	"$SCRIPT_DIR/bin/install_arch_default_pkgs"
 
 	# --- Install pkgs from requirements/*.txt ---
 	# info "\n--- 2/3: Installing all required packages ---"
