@@ -48,6 +48,7 @@ return {
 			"yamlls",
 			"zls",
 			"qmlls",
+			"bashls",
 		}
 
 		-- Formatters & Linters
@@ -63,6 +64,7 @@ return {
 			"prettierd",
 			"clang-format",
 			"shfmt",
+			"shellcheck", -- used by bashls for diagnostics
 			"sql-formatter",
 		}
 
