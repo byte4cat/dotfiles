@@ -101,8 +101,18 @@ return {
 		-- Default list of enabled providers defined so that you can extend it
 		-- elsewhere in your config, without redefining it, due to `opts_extend`
 		sources = {
-			default = { "lsp", "path", "snippets", "buffer" },
+			default = { "lsp", "path", "snippets", "buffer", "dictionary" },
 			providers = {
+				dictionary = {
+					name = "dictionary",
+					module = "blink.compat.source",
+					score_offset = -10, -- 權重稍微調低，不干擾程式碼
+					min_keyword_length = 2, -- 打 2 個字母才觸發
+					enabled = function()
+						-- 僅在 markdown 和 vimwiki 下啟用
+						return vim.bo.filetype == "markdown" or vim.bo.filetype == "vimwiki"
+					end,
+				},
 				lsp = {
 					min_keyword_length = 1, -- Only suggest after typing at least 1 character
 				},
@@ -128,22 +138,6 @@ return {
 			paths = { "/usr/share/dict/words" },
 			exact_length = 2,
 		})
-
-		opts.sources = {
-			default = { "lsp", "path", "snippets", "buffer", "dictionary" },
-			providers = {
-				dictionary = {
-					name = "dictionary",
-					module = "blink.compat.source",
-					score_offset = -10, -- 權重稍微調低，不干擾程式碼
-					min_keyword_length = 2, -- 打 2 個字母才觸發
-					enabled = function()
-						-- 僅在 markdown 和 vimwiki 下啟用
-						return vim.bo.filetype == "markdown" or vim.bo.filetype == "vimwiki"
-					end,
-				},
-			},
-		}
 
 		require("blink-cmp").setup(opts)
 	end,
