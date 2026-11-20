@@ -43,7 +43,6 @@ return {
 			"ssh_config",
 			"scss",
 			"svelte",
-			"tmux",
 			"toml",
 			"typst",
 			"typescript",
