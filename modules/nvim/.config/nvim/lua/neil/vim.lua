@@ -93,7 +93,13 @@ vim.api.nvim_create_autocmd("BufReadCmd", {
 
 		-- Clean up the empty or binary buffer forced open by nvim-tree or other plugins
 		local current_buf = vim.api.nvim_get_current_buf()
-		vim.cmd("b#") -- Switch back to the previous buffer
+		-- Switch back to the previous buffer, or to an empty one when there is none (E23)
+		local alt = vim.fn.bufnr("#")
+		if alt > 0 and alt ~= current_buf and vim.fn.buflisted(alt) == 1 then
+			vim.cmd("b#")
+		else
+			vim.cmd("enew")
+		end
 		pcall(vim.api.nvim_buf_delete, current_buf, { force = true })
 
 		-- Launch zathura in the background without blocking Neovim
