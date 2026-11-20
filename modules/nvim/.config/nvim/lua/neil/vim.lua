@@ -1,6 +1,5 @@
 -- 全域變數與環境設定 (Globals)
 vim.g.mapleader = " " -- 設定 Leader Key 為空白鍵
-vim.g.encoding = "utf-8" -- 強制編碼 (Neovim 預設即為 utf-8)
 -- 停用內建 netrw (為了相容 nvim-tree, oil.nvim)
 vim.g.loaded_netrw = 1
 vim.g.loaded_netrwPlugin = 1
@@ -27,8 +26,8 @@ vim.opt.smartcase = true -- 若搜尋詞包含大寫，則轉為精確匹配
 vim.opt.tabstop = 4 -- Tab 顯示寬度
 vim.opt.softtabstop = 4 -- 退格鍵刪除的空白數
 vim.opt.shiftwidth = 4 -- 自動縮排的寬度
-vim.opt.expandtab = false -- 將 Tab 轉換為空白鍵
-vim.opt.smartindent = false -- 開啟智慧縮排
+vim.opt.expandtab = false -- 不把 Tab 轉成空白（保留 Tab 字元）
+vim.opt.smartindent = false -- 關閉智慧縮排（交給 filetype／treesitter 的縮排）
 vim.opt.autoindent = true -- 延續上一行的縮排
 vim.opt.wrap = false -- 關閉自動換行 (長代碼不折行)
 -- 啟用自動換行
