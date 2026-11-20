@@ -49,6 +49,7 @@ return {
 			"zls",
 			"qmlls",
 			"bashls",
+			"tinymist",
 		}
 
 		-- Formatters & Linters
