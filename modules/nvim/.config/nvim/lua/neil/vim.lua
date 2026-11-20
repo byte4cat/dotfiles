@@ -80,6 +80,15 @@ vim.opt.winblend = 0 -- 浮動視窗透明度
 
 vim.lsp.log.set_level("error")
 
+-- Neovim never rotates lsp.log (servers' stderr goes there too): start over once it passes 10 MB.
+do
+	local lsp_log = vim.lsp.log.get_filename()
+	local stat = vim.uv.fs_stat(lsp_log)
+	if stat and stat.size > 10 * 1024 * 1024 then
+		os.remove(lsp_log)
+	end
+end
+
 if vim.fn.executable("rg") == 1 then
 	vim.opt.grepprg = "rg --vimgrep --smart-case"
 end
