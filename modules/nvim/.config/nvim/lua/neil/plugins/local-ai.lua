@@ -54,19 +54,6 @@ return {
 					},
 				},
 
-				fast = {
-					provider = "openai_fim_compatible",
-					context_window = 512,
-					provider_options = {
-						openai_fim_compatible = {
-							model = "qwen2.5-coder:3b",
-							api_key = "TERM",
-							name = "Ollama",
-							end_point = "http://localhost:11434/v1/completions",
-						},
-					},
-				},
-
 				heavy = {
 					provider = "openai_fim_compatible",
 					context_window = 2048,
