@@ -4,14 +4,7 @@ return {
 		"MunifTanjim/nui.nvim",
 		"nvim-lua/plenary.nvim",
 		"nvim-treesitter/nvim-treesitter",
-		-- Optional, for markdown rendering with render-markdown.nvim
-		{
-			"MeanderingProgrammer/render-markdown.nvim",
-			opts = {
-				file_types = { "markdown" },
-			},
-			ft = { "markdown" },
-		},
+		-- Responses are markdown buffers, which render-markdown.nvim picks up by itself (plugins/render-markdown.lua)
 	},
 	ft = "hurl",
 	opts = {
