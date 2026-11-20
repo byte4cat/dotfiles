@@ -44,6 +44,7 @@ return {
 			"scss",
 			"svelte",
 			"toml",
+			"tsx",
 			"typst",
 			"typescript",
 			"vim",
@@ -51,6 +52,7 @@ return {
 			"vue",
 			"xml",
 			"yaml",
+			"zig",
 		})
 	end,
 }
