@@ -37,7 +37,10 @@ end
 local function apply_transparency()
 	local groups = { "Normal", "NormalFloat", "NormalNC", "SignColumn", "EndOfBuffer" }
 	for _, group in ipairs(groups) do
-		vim.api.nvim_set_hl(0, group, { bg = "none", ctermbg = "none" })
+		-- nvim_set_hl replaces the whole group: keep the theme's fg and attributes, drop only the background.
+		local hl = vim.api.nvim_get_hl(0, { name = group, link = false })
+		hl.bg, hl.ctermbg = nil, nil
+		vim.api.nvim_set_hl(0, group, hl)
 	end
 end
 
