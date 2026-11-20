@@ -7,8 +7,7 @@ return {
 	},
 	ft = { "go", "gomod" },
 	config = function()
-		require("go").setup({
-			lsp_conf = true,
-		})
+		-- gopls is started by plugins/lsp.lua; lsp_cfg = true here would start a second one.
+		require("go").setup({})
 	end,
 }
