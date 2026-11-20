@@ -302,7 +302,7 @@ vim.keymap.set("n", "<leader>R", function()
 
 	-- 停止當前 buffer 的 LSP
 	for _, client in ipairs(clients) do
-		vim.lsp.stop_client(client.id)
+		client:stop()
 	end
 
 	vim.diagnostic.reset()
