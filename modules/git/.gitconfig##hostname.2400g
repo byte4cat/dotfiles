@@ -13,6 +13,7 @@
     acm = !git add --all && git commit -m
     undo = reset --soft HEAD~1
 	sign = commit --amend --no-edit -S
+	pushall = "!f(){ for r in $(git remote); do git push \"$r\" \"$@\"; done; }; f"
     graph = log --oneline --graph --decorate
 	l = log --graph --pretty=format:"%C(yellow)%h%Cred%d\\ %Creset%s%Cblue\\ [%cn]%C(auto)[%G?]"
 	ls = log --pretty=format:"%C(yellow)%h%Cred%d\\ %Creset%s%Cblue\\ [%cn]%C(auto)[%G?]" --decorate
