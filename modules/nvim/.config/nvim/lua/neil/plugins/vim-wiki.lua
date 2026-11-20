@@ -1,6 +1,8 @@
 return {
 	"vimwiki/vimwiki",
 	init = function()
+		-- Only files inside the wikis below are vimwiki; other .md files stay markdown.
+		vim.g.vimwiki_global_ext = 0
 		vim.g.vimwiki_list = {
 			{
 				path = "~/Documents/vimwiki/",
