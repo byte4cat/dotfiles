@@ -17,17 +17,10 @@ return {
 		-- Default formatter
 		formatters = {
 			json = { "jq" }, -- Make sure you have install jq in your system, e.g: brew install jq
-			html = {
-				"prettier", -- Make sure you have install prettier in your system, e.g: npm install -g prettier
-				"--parser",
-				"html",
-			},
-			xml = {
-				"tidy", -- Make sure you have installed tidy in your system, e.g: brew install tidy-html5
-				"-xml",
-				"-i",
-				"-q",
-			},
+			-- prettierd comes from Mason (also used by conform); the file name only picks the parser.
+			html = { "prettierd", "response.html" },
+			-- xmllint comes with libxml2
+			xml = { "xmllint", "--format", "-" },
 		},
 		-- Default mappings for the response popup or split views
 		mappings = {
