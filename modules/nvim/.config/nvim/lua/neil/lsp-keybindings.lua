@@ -20,7 +20,7 @@ function M.setup(bufnr)
 	vim.keymap.set("n", "gr", "<cmd>Lspsaga finder ref<CR>", opts)
 	vim.keymap.set("n", "<leader>ca", "<cmd>Lspsaga code_action<CR>", opts)
 	vim.keymap.set("n", "<leader>ci", "<cmd>Lspsaga incoming_calls<CR>", opts)
-	vim.keymap.set("n", "<leader>co", "<cmd>Lspsaga outcoming_calls<CR>", opts)
+	vim.keymap.set("n", "<leader>co", "<cmd>Lspsaga outgoing_calls<CR>", opts)
 	vim.keymap.set("n", "<leader>cr", "<cmd>Lspsaga rename<CR>", opts)
 end
 
